@@ -10,15 +10,15 @@ import {
   ChevronLeft,
   ChevronRight,
   MapPin,
+  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 
 import backgroundImage from '../../assets/images/background.png';
 
 import { Helmet } from 'react-helmet-async';
-import SimpleTestimonial from '../../components/landing/SimpleTestimonial';
+
 import JobCard from '../../components/common/JobCard';
-import LandingNavbar from '../../components/layouts/LandingNavbar';
-import LandingFooter from '../../components/layouts/LandingFooter';
 import AboutPage from '../../components/landing/AboutPage';
 
 const LandingPage = () => {
@@ -81,20 +81,13 @@ const LandingPage = () => {
           <p className="mb-8 text-lg text-gray-600 md:text-xl">
             Connect with the best opportunities and find the perfect candidates for your team.
           </p>
-          <div className="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
-            <Link
-              to="/job-seeker/search-jobs"
-              className="focus:ring-opacity-50 rounded-md border border-purple-200 bg-indigo-100 bg-white px-6 py-3 font-medium text-indigo-700 text-purple-600 shadow-md transition-all duration-200 hover:border-purple-300 hover:bg-indigo-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-            >
-              Find Jobs
-            </Link>
-            <Link
-              to="/employer/post-job"
-              className="focus:ring-opacity-50 rounded-md bg-indigo-700 bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:bg-indigo-800 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-            >
-              Post Jobs
-            </Link>
-          </div>
+          <Link
+            to="/login"
+            className="focus:ring-opacity-50 flex w-[220px] items-center justify-center space-x-4 rounded-md border border-purple-600 bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none sm:w-[220px]"
+          >
+            <span>To Explore Jobs</span>
+            <ArrowRight />
+          </Link>
         </div>
 
         {/* Right: Background image */}

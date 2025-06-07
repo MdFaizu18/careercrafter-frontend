@@ -15,19 +15,6 @@ import {
 export default function NotFoundPage() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [floatingElements, setFloatingElements] = useState([]);
-
-  useEffect(() => {
-    // Create floating elements for background animation
-    const elements = Array.from({ length: 6 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 2,
-      duration: 3 + Math.random() * 2,
-    }));
-    setFloatingElements(elements);
-  }, []);
 
   const handleRefresh = () => {
     setIsAnimating(true);
@@ -56,22 +43,6 @@ export default function NotFoundPage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50">
       {/* Floating Background Elements */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {floatingElements.map(element => (
-          <div
-            key={element.id}
-            className="absolute h-20 w-20 opacity-10"
-            style={{
-              left: `${element.x}%`,
-              top: `${element.y}%`,
-              animationDelay: `${element.delay}s`,
-              animationDuration: `${element.duration}s`,
-            }}
-          >
-            <div className="h-full w-full animate-pulse rounded-full bg-gradient-to-br from-purple-400 to-indigo-400"></div>
-          </div>
-        ))}
-      </div>
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div className="mx-auto max-w-4xl text-center">
@@ -106,37 +77,6 @@ export default function NotFoundPage() {
               Looks like this page decided to pursue other opportunities. Don't worry though - we'll
               help you find exactly what you're looking for!
             </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="mx-auto mb-12 max-w-2xl">
-            <div className="relative">
-              <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search for jobs, pages, or anything..."
-                className="w-full rounded-xl border-2 border-purple-200 bg-white/80 py-4 pr-4 pl-12 text-lg backdrop-blur-sm transition-all duration-300 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none"
-              />
-              <button className="absolute top-1/2 right-2 -translate-y-1/2 transform rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-2 text-white transition-all duration-200 hover:from-purple-700 hover:to-indigo-700">
-                Search
-              </button>
-            </div>
-
-            {/* Popular Search Terms */}
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <span className="mr-2 text-sm text-gray-500">Popular searches:</span>
-              {jobSearchTerms.slice(0, 3).map((term, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSearchQuery(term)}
-                  className="rounded-full border border-purple-200 bg-white/60 px-3 py-1 text-sm text-purple-700 transition-all duration-200 hover:border-purple-300 hover:bg-white/80"
-                >
-                  {term}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Action Buttons */}
@@ -187,27 +127,6 @@ export default function NotFoundPage() {
                   </p>
                 </a>
               ))}
-            </div>
-          </div>
-
-          {/* Fun Stats */}
-          <div className="mx-auto max-w-3xl rounded-2xl border border-purple-100 bg-white/60 p-8 backdrop-blur-sm">
-            <h3 className="mb-6 text-lg font-bold text-gray-800">
-              While you're here, check out these stats:
-            </h3>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div className="text-center">
-                <div className="mb-2 text-3xl font-bold text-purple-600">50K+</div>
-                <div className="text-gray-600">Jobs Posted</div>
-              </div>
-              <div className="text-center">
-                <div className="mb-2 text-3xl font-bold text-indigo-600">25K+</div>
-                <div className="text-gray-600">Happy Users</div>
-              </div>
-              <div className="text-center">
-                <div className="mb-2 text-3xl font-bold text-pink-600">95%</div>
-                <div className="text-gray-600">Success Rate</div>
-              </div>
             </div>
           </div>
 
