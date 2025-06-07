@@ -19,6 +19,7 @@ import SimpleTestimonial from '../../components/landing/SimpleTestimonial';
 import JobCard from '../../components/common/JobCard';
 import LandingNavbar from '../../components/layouts/LandingNavbar';
 import LandingFooter from '../../components/layouts/LandingFooter';
+import AboutPage from '../../components/landing/AboutPage';
 
 const LandingPage = () => {
   // Sample featured jobs
@@ -67,8 +68,11 @@ const LandingPage = () => {
       <Helmet>
         <title>CareerCrafter - Where Talent Meets Opportunity </title>
       </Helmet>
-     
-      <section className="flex flex-col items-center justify-between bg-[#f6f6f645] px-6 py-20 text-gray-900 md:flex-row md:px-24 md:py-20">
+
+      <section
+        id="home"
+        className="flex flex-col items-center justify-between bg-[#f6f6f645] px-6 py-20 text-gray-900 md:flex-row md:px-24 md:py-20"
+      >
         {/* Left: Text content */}
         <div className="mb-10 w-full text-center md:mb-0 md:w-1/2 md:text-left">
           <h1 className="mb-6 bg-indigo-600 bg-clip-text text-4xl leading-tight font-extrabold text-transparent md:text-5xl lg:text-6xl">
@@ -137,70 +141,7 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section className="md:24 container mx-auto bg-[#f6f6f645] px-8 py-20 sm:px-32">
-        <div className="mb-16 text-center">
-          {/* <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-indigo-600">How CareerCrafter Works</h2> */}
-          <h2 className="mb-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 bg-clip-text text-5xl font-bold text-transparent">
-            How CareerCrafter Works
-          </h2>
-          <p className="mx-auto max-w-2xl text-xl text-gray-600">
-            We connect talented professionals with the best companies worldwide.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg bg-white p-6 text-center shadow-md transition-shadow duration-200 hover:shadow-lg">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-              <Users className="h-8 w-8 text-purple-600" />
-            </div>
-            <h3 className="mb-3 text-xl font-bold">For Job Seekers</h3>
-            <p className="text-gray-600">
-              Create a profile, upload your resume, and apply to thousands of jobs from top
-              companies worldwide.
-            </p>
-            <Link
-              to="/register"
-              className="mt-4 inline-block font-medium text-indigo-600 hover:underline"
-            >
-              Create Account →
-            </Link>
-          </div>
-
-          <div className="duration-200text-center rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-              <Building className="h-8 w-8 text-purple-600" />
-            </div>
-            <h3 className="mb-3 text-xl font-bold">For Employers</h3>
-            <p className="text-gray-600">
-              Post jobs, review applications, and connect with qualified candidates that match your
-              requirements.
-            </p>
-            <Link
-              to="/register"
-              className="mt-4 inline-block font-medium text-indigo-600 hover:underline"
-            >
-              Start Hiring →
-            </Link>
-          </div>
-
-          <div className="rounded-lg bg-white p-6 text-center shadow-md transition-shadow duration-200 hover:shadow-lg">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-              <Briefcase className="h-8 w-8 text-purple-600" />
-            </div>
-            <h3 className="mb-3 text-xl font-bold">Perfect Match</h3>
-            <p className="text-gray-600">
-              Our intelligent matching algorithm connects the right talent with the right
-              opportunities.
-            </p>
-            <Link
-              to="/how-it-works"
-              className="mt-4 inline-block font-medium text-indigo-600 hover:underline"
-            >
-              Learn More →
-            </Link>
-          </div>
-        </div>
-      </section>
+      <AboutPage />
 
       {/* Featured Jobs Section */}
       <section className="md:24 bg-gray-50 bg-gradient-to-b from-purple-50 to-purple-50 px-8 py-20 sm:px-28">
@@ -225,35 +166,23 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <SimpleTestimonial />
-
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-indigo-600 py-20 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="mb-6 text-3xl font-bold md:text-4xl">
-            Ready to Take the Next Step in Your Career?
-          </h2>
-          <p className="mx-auto mb-10 max-w-2xl text-xl text-purple-100">
-            Join thousands of professionals who have found their dream jobs through CareerCrafter.
+      <section className="bg-gradient-to-br from-purple-600 to-indigo-700 px-4 py-16 text-white md:px-8">
+        <div className="mx-auto max-w-4xl text-center">
+          <h2 className="mb-6 text-3xl font-bold md:text-4xl">Ready to find your dream job?</h2>
+          <p className="mb-8 text-xl opacity-90">
+            Join thousands of professionals who are discovering new opportunities every day
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link
-              to="/register"
-              className="focus:ring-opacity-50 rounded-md border border-purple-200 bg-white px-6 py-3 font-medium text-purple-600 shadow-md transition-all duration-200 hover:border-purple-300 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-            >
-              Create Account
-            </Link>
-            <Link
-              to="/job-seeker/search-jobs"
-              className="focus:ring-opacity-50 rounded-md bg-indigo-700 bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:bg-indigo-800 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-            >
-              Browse Jobs
-            </Link>
+            <button className="rounded-full bg-white px-8 py-3 font-bold text-purple-700 shadow-lg transition-colors hover:bg-purple-50">
+              Get Started Now
+            </button>
+            <button className="rounded-full border-2 border-white bg-transparent px-8 py-3 font-bold transition-colors hover:bg-white/10">
+              Learn More
+            </button>
           </div>
         </div>
       </section>
-
     </div>
   );
 };

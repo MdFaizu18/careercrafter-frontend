@@ -119,7 +119,7 @@ const LoginPage = ({ onLogin }) => {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleChange}
-                     className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+                    className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                   <button
                     type="button"

@@ -230,7 +230,7 @@ const RegisterPage = () => {
                     placeholder="Password"
                     value={formData.password}
                     onChange={handleChange}
-                   className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+                    className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                   <button
                     type="button"
@@ -249,7 +249,10 @@ const RegisterPage = () => {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="confirmPassword"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Confirm Password
                 </label>
                 <div className="relative mt-1">
@@ -264,7 +267,7 @@ const RegisterPage = () => {
                     placeholder="Confirm Password"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                   className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+                    className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                   <button
                     type="button"

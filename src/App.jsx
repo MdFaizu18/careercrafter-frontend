@@ -7,7 +7,6 @@ import NotFoundPage from './pages/error/NotFoundPage';
 import LandingPage from './pages/landing/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPaGE';
-import AboutPage from './pages/landing/AboutPage';
 
 // Define the router using createBrowserRouter
 const router = createBrowserRouter([
@@ -27,10 +26,6 @@ const router = createBrowserRouter([
       {
         path: 'register',
         element: <RegisterPage />,
-      },
-      {
-        path: 'about',
-        element: <AboutPage />,
       },
     ],
   },
