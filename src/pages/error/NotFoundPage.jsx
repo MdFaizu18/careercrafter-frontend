@@ -14,7 +14,6 @@ import {
 
 export default function NotFoundPage() {
   const [isAnimating, setIsAnimating] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   const handleRefresh = () => {
     setIsAnimating(true);
@@ -31,15 +30,6 @@ export default function NotFoundPage() {
     { name: 'Support', icon: Mail, href: '/support' },
   ];
 
-  const jobSearchTerms = [
-    'Software Engineer',
-    'Product Manager',
-    'Data Scientist',
-    'UX Designer',
-    'Marketing Manager',
-    'Sales Representative',
-  ];
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-indigo-50 to-pink-50">
       {/* Floating Background Elements */}
@@ -52,15 +42,6 @@ export default function NotFoundPage() {
               <h1 className="animate-pulse bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 bg-clip-text text-8xl font-bold text-transparent md:text-9xl">
                 404
               </h1>
-
-              {/* Animated briefcase icon */}
-              <div className="absolute -top-4 -right-4 md:-top-8 md:-right-8">
-                <div
-                  className={`transform transition-all duration-1000 ${isAnimating ? 'scale-125 rotate-360' : 'scale-100 rotate-0'}`}
-                >
-                  <Briefcase className="h-12 w-12 animate-bounce text-purple-500 md:h-16 md:w-16" />
-                </div>
-              </div>
             </div>
           </div>
 
@@ -73,7 +54,7 @@ export default function NotFoundPage() {
                 <div className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-gradient-to-r from-purple-400 to-indigo-400"></div>
               </span>
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-gray-600">
+            <p className="mx-auto max-w-xl text-lg text-gray-600">
               Looks like this page decided to pursue other opportunities. Don't worry though - we'll
               help you find exactly what you're looking for!
             </p>
@@ -107,34 +88,11 @@ export default function NotFoundPage() {
             </button>
           </div>
 
-          {/* Popular Pages */}
-          <div className="mb-12">
-            <h3 className="mb-6 text-xl font-bold text-gray-800">
-              Or explore these popular pages:
-            </h3>
-            <div className="mx-auto grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4">
-              {popularPages.map((page, index) => (
-                <a
-                  key={index}
-                  href={page.href}
-                  className="group transform rounded-xl border border-purple-100 bg-white/80 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-purple-300 hover:bg-white hover:shadow-lg"
-                >
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 transition-all duration-300 group-hover:from-purple-200 group-hover:to-indigo-200">
-                    <page.icon className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <p className="font-medium text-gray-800 transition-colors group-hover:text-purple-700">
-                    {page.name}
-                  </p>
-                </a>
-              ))}
-            </div>
-          </div>
-
           {/* Contact Support */}
           <div className="mt-12 text-center">
             <p className="mb-4 text-gray-600">Still can't find what you're looking for?</p>
             <a
-              href="/support"
+              href="/jobseeker/support"
               className="inline-flex items-center gap-2 font-medium text-purple-600 underline decoration-2 underline-offset-4 transition-all duration-200 hover:text-purple-700 hover:decoration-purple-300"
             >
               <Mail className="h-4 w-4" />

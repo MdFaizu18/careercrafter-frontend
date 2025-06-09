@@ -82,7 +82,7 @@ const LandingPage = () => {
             Connect with the best opportunities and find the perfect candidates for your team.
           </p>
           <Link
-            to="/login"
+            to="/jobseeker/dashboard"
             className="focus:ring-opacity-50 flex w-[220px] items-center justify-center space-x-4 rounded-md border border-purple-600 bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none sm:w-[220px]"
           >
             <span>To Explore Jobs</span>

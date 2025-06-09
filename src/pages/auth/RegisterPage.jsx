@@ -211,7 +211,7 @@ const RegisterPage = () => {
                     className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                 </div>
-                {errors.email && <p className="form-error">{errors.email}</p>}
+                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
               </div>
 
               <div>
@@ -244,7 +244,7 @@ const RegisterPage = () => {
                     )}
                   </button>
                 </div>
-                {errors.password && <p className="form-error">{errors.password}</p>}
+                {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                 {formData.password && passwordStrength()}
               </div>
 
@@ -281,7 +281,9 @@ const RegisterPage = () => {
                     )}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="form-error">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
+                )}
               </div>
 
               <div className="flex items-center">

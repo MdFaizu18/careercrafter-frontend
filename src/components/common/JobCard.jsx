@@ -58,7 +58,7 @@ const JobCard = ({ job, showActions = true }) => {
         <div className="mt-6 flex items-center justify-between">
           <span className="text-sm text-gray-500">Posted {job.postedDate}</span>
           <Link
-            to={`/job-seeker/job/${job.id}`}
+            to={`/jobseeker/job/${job.id}`}
             className="rounded-md bg-indigo-100 px-4 py-2 text-indigo-700 transition-colors hover:bg-purple-200"
           >
             View Details
