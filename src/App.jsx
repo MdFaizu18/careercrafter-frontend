@@ -15,8 +15,12 @@ import ResumeManager from './pages/jobseeker/ResumeManager';
 import MyApplications from './pages/jobseeker/MyApplications';
 import SupportPage from './pages/jobseeker/SupportPage';
 import JobseekerProfile from './pages/jobseeker/JobseekerProfile';
+import EmployerOutlet from './pages/employer/EmployerOutlet';
+import DashboardEmployer from './pages/employer/DashboardEmployer';
+import PostJob from './pages/employer/PostJobs';
+import ViewApplications from './pages/employer/ViewApplications';
+import ManageJobs from './pages/employer/ManageJobs';
 
-// Define the router using createBrowserRouter
 const router = createBrowserRouter([
   {
     path: '/',
@@ -68,6 +72,28 @@ const router = createBrowserRouter([
       {
         path: 'profile',
         element: <JobseekerProfile />,
+      },
+    ],
+  },
+  {
+    path: 'employer',
+    element: <EmployerOutlet />,
+    children: [
+      {
+        path: 'dashboard',
+        element: <DashboardEmployer />,
+      },
+      {
+        path: 'post-job',
+        element: <PostJob />,
+      },
+      {
+        path: 'view-applications',
+        element: <ViewApplications />,
+      },
+      {
+        path: 'manage-jobs',
+        element: <ManageJobs />,
       },
     ],
   },

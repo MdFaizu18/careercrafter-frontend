@@ -201,7 +201,10 @@ const MyApplications = () => {
             <p className="text-gray-600">Track and manage your job applications.</p>
           </div>
           <div className="mt-4 md:mt-0">
-            <Link to="/job-seeker/search-jobs" className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+            <Link
+              to="/job-seeker/search-jobs"
+              className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            >
               Find More Jobs
             </Link>
           </div>
@@ -402,8 +405,7 @@ const MyApplications = () => {
 
         {/* Application Details Modal */}
         {selectedApplication && (
-       <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 p-4">
-
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
             <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white">
               <div className="p-6">
                 <div className="mb-6 flex items-start justify-between">
@@ -492,7 +494,7 @@ const MyApplications = () => {
                   </button>
                   <Link
                     to={`/job-seeker/job/${selectedApplication.id}`}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 flex items-center"
+                    className="focus:ring-opacity-50 flex items-center rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   >
                     <Eye className="mr-2 h-4 w-4" />
                     View Job

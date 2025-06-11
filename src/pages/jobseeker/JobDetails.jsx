@@ -409,9 +409,9 @@ const JobDetails = () => {
       </div>
 
       {/* Application Form Modal */}
-        {/* <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"> */}
+      {/* <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"> */}
       {showApplyForm && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white">
             <div className="p-6">
               {applicationSubmitted ? (
@@ -471,7 +471,7 @@ const JobDetails = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.name ? 'border-red-500' : ''}`}
+                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.name ? 'border-red-500' : ''}`}
                       />
                       {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
                     </div>
@@ -486,12 +486,10 @@ const JobDetails = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.email ? 'border-red-500' : ''}`}
+                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.email ? 'border-red-500' : ''}`}
                       />
                       {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                     </div>
-
-                   
 
                     <div className="mb-6">
                       <label htmlFor="resume" className="form-label">
@@ -542,8 +540,6 @@ const JobDetails = () => {
                         <p className="mt-1 text-xs text-red-500">{errors.resume}</p>
                       )}
                     </div>
-
-                   
 
                     <div className="mb-6 flex items-center">
                       <input
