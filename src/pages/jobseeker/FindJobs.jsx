@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Search, MapPin, Briefcase, Filter, X, ChevronDown, CheckCircle } from 'lucide-react';
 import JobCard from '../../components/common/JobCard';
+import { Helmet } from 'react-helmet-async';
 
 const FindJobs = () => {
   // Sample data
@@ -271,294 +272,299 @@ const FindJobs = () => {
   }, [filters]);
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-24">
-      <h1 className="mb-8 text-2xl font-bold text-gray-900">Find Your Perfect Job</h1>
+    <div>
+      <Helmet>
+        <title>Find Jobs - CareerCraftery</title>
+      </Helmet>
+      <div className="container mx-auto px-4 py-8 sm:px-24">
+        <h1 className="mb-8 text-2xl font-bold text-gray-900">Find Your Perfect Job</h1>
 
-      {/* Search Bar */}
-      <div className="mb-8 rounded-lg bg-white p-4 shadow-md">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute top-3 left-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Job title, keywords, or company"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="focus:border-transparent; w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              />
+        {/* Search Bar */}
+        <div className="mb-8 rounded-lg bg-white p-4 shadow-md">
+          <div className="flex flex-col gap-4 md:flex-row">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute top-3 left-3 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Job title, keywords, or company"
+                  value={searchTerm}
+                  onChange={e => setSearchTerm(e.target.value)}
+                  className="focus:border-transparent; w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                />
+              </div>
             </div>
-          </div>
-          <div className="flex-1">
-            <div className="relative">
-              <MapPin className="absolute top-3 left-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Location"
-                value={location}
-                onChange={e => setLocation(e.target.value)}
-                className="focus:border-transparent; w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              />
+            <div className="flex-1">
+              <div className="relative">
+                <MapPin className="absolute top-3 left-3 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                  className="focus:border-transparent; w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                />
+              </div>
             </div>
+            <button
+              className="focus:ring-opacity-50; flex-shrink-0 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              onClick={handleSearch}
+            >
+              Search Jobs
+            </button>
+            <button
+              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="mr-2 h-5 w-5" />
+              Filters
+            </button>
           </div>
-          <button
-            className="focus:ring-opacity-50; flex-shrink-0 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-            onClick={handleSearch}
-          >
-            Search Jobs
-          </button>
-          <button
-            className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="mr-2 h-5 w-5" />
-            Filters
-          </button>
+
+          {/* Filters */}
+          {showFilters && (
+            <div className="mt-4 border-t border-gray-200 pt-4">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-medium">Filter Results</h3>
+                <button className="text-sm text-purple-600 hover:underline" onClick={clearFilters}>
+                  Clear all filters
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                {/* Job Type */}
+                <div>
+                  <h4 className="mb-2 flex items-center font-medium">
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    Job Type
+                  </h4>
+                  <div className="space-y-2">
+                    {jobTypes.map(type => (
+                      <label key={type} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={filters.jobType.includes(type)}
+                          onChange={() => toggleFilter('jobType', type)}
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{type}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Salary Range */}
+                <div>
+                  <h4 className="mb-2 font-medium">Salary Range</h4>
+                  <div className="space-y-2">
+                    {salaryRanges.map(range => (
+                      <label key={range} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={filters.salary.includes(range)}
+                          onChange={() => toggleFilter('salary', range)}
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{range}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Date Posted */}
+                <div>
+                  <h4 className="mb-2 font-medium">Date Posted</h4>
+                  <div className="space-y-2">
+                    {datePostedOptions.map(option => (
+                      <label key={option.value} className="flex items-center">
+                        <input
+                          type="radio"
+                          checked={filters.datePosted === option.value}
+                          onChange={() => setDatePosted(option.value)}
+                          className="h-4 w-4 border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Experience Level */}
+                <div>
+                  <h4 className="mb-2 font-medium">Experience Level</h4>
+                  <div className="space-y-2">
+                    {experienceLevels.map(level => (
+                      <label key={level} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={filters.experienceLevel.includes(level)}
+                          onChange={() => toggleFilter('experienceLevel', level)}
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{level}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Active Filters */}
+          {(filters.jobType.length > 0 ||
+            filters.salary.length > 0 ||
+            filters.datePosted !== 'any' ||
+            filters.experienceLevel.length > 0 ||
+            searchTerm ||
+            location) && (
+            <div className="mt-4 border-t border-gray-200 pt-4">
+              <div className="flex flex-wrap gap-2">
+                {searchTerm && (
+                  <div className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
+                    <span>Keyword: {searchTerm}</span>
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="ml-2 text-purple-700 hover:text-purple-900"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+
+                {location && (
+                  <div className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
+                    <span>Location: {location}</span>
+                    <button
+                      onClick={() => setLocation('')}
+                      className="ml-2 text-purple-700 hover:text-purple-900"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+
+                {filters.jobType.map(type => (
+                  <div
+                    key={type}
+                    className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700"
+                  >
+                    <span>{type}</span>
+                    <button
+                      onClick={() => toggleFilter('jobType', type)}
+                      className="ml-2 text-purple-700 hover:text-purple-900"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+
+                {filters.salary.map(range => (
+                  <div
+                    key={range}
+                    className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700"
+                  >
+                    <span>{range}</span>
+                    <button
+                      onClick={() => toggleFilter('salary', range)}
+                      className="ml-2 text-purple-700 hover:text-purple-900"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+
+                {filters.datePosted !== 'any' && (
+                  <div className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
+                    <span>
+                      {datePostedOptions.find(option => option.value === filters.datePosted)?.label}
+                    </span>
+                    <button
+                      onClick={() => setDatePosted('any')}
+                      className="ml-2 text-purple-700 hover:text-purple-900"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+
+                {filters.experienceLevel.map(level => (
+                  <div
+                    key={level}
+                    className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700"
+                  >
+                    <span>{level}</span>
+                    <button
+                      onClick={() => toggleFilter('experienceLevel', level)}
+                      className="ml-2 text-purple-700 hover:text-purple-900"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Filters */}
-        {showFilters && (
-          <div className="mt-4 border-t border-gray-200 pt-4">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-medium">Filter Results</h3>
-              <button className="text-sm text-purple-600 hover:underline" onClick={clearFilters}>
-                Clear all filters
+        {/* Results */}
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">
+            {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'} Found
+          </h2>
+          <div className="flex items-center">
+            <span className="mr-2 text-sm text-gray-600">Sort by:</span>
+            <select className="focus:border-transparent; w-auto w-full rounded-md border border-gray-300 px-3 px-4 py-1 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+              <option>Most Relevant</option>
+              <option>Newest</option>
+              <option>Salary: High to Low</option>
+              <option>Salary: Low to High</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Job Listings */}
+        <div className="space-y-6">
+          {jobs.length > 0 ? (
+            jobs.map(job => <JobCard key={job.id} job={job} />)
+          ) : (
+            <div className="rounded-lg bg-white py-12 text-center shadow-md">
+              <Briefcase className="mx-auto mb-4 h-16 w-16 text-gray-300" />
+              <h3 className="mb-2 text-xl font-medium text-gray-900">No jobs found</h3>
+              <p className="mb-6 text-gray-600">
+                Try adjusting your search or filter criteria to find more jobs.
+              </p>
+              <button onClick={clearFilters} className="btn-primary">
+                Clear Filters
               </button>
             </div>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-              {/* Job Type */}
-              <div>
-                <h4 className="mb-2 flex items-center font-medium">
-                  <Briefcase className="mr-2 h-4 w-4" />
-                  Job Type
-                </h4>
-                <div className="space-y-2">
-                  {jobTypes.map(type => (
-                    <label key={type} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.jobType.includes(type)}
-                        onChange={() => toggleFilter('jobType', type)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{type}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Salary Range */}
-              <div>
-                <h4 className="mb-2 font-medium">Salary Range</h4>
-                <div className="space-y-2">
-                  {salaryRanges.map(range => (
-                    <label key={range} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.salary.includes(range)}
-                        onChange={() => toggleFilter('salary', range)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{range}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Date Posted */}
-              <div>
-                <h4 className="mb-2 font-medium">Date Posted</h4>
-                <div className="space-y-2">
-                  {datePostedOptions.map(option => (
-                    <label key={option.value} className="flex items-center">
-                      <input
-                        type="radio"
-                        checked={filters.datePosted === option.value}
-                        onChange={() => setDatePosted(option.value)}
-                        className="h-4 w-4 border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Experience Level */}
-              <div>
-                <h4 className="mb-2 font-medium">Experience Level</h4>
-                <div className="space-y-2">
-                  {experienceLevels.map(level => (
-                    <label key={level} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.experienceLevel.includes(level)}
-                        onChange={() => toggleFilter('experienceLevel', level)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{level}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Active Filters */}
-        {(filters.jobType.length > 0 ||
-          filters.salary.length > 0 ||
-          filters.datePosted !== 'any' ||
-          filters.experienceLevel.length > 0 ||
-          searchTerm ||
-          location) && (
-          <div className="mt-4 border-t border-gray-200 pt-4">
-            <div className="flex flex-wrap gap-2">
-              {searchTerm && (
-                <div className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
-                  <span>Keyword: {searchTerm}</span>
-                  <button
-                    onClick={() => setSearchTerm('')}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {location && (
-                <div className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
-                  <span>Location: {location}</span>
-                  <button
-                    onClick={() => setLocation('')}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {filters.jobType.map(type => (
-                <div
-                  key={type}
-                  className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700"
-                >
-                  <span>{type}</span>
-                  <button
-                    onClick={() => toggleFilter('jobType', type)}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-
-              {filters.salary.map(range => (
-                <div
-                  key={range}
-                  className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700"
-                >
-                  <span>{range}</span>
-                  <button
-                    onClick={() => toggleFilter('salary', range)}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-
-              {filters.datePosted !== 'any' && (
-                <div className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
-                  <span>
-                    {datePostedOptions.find(option => option.value === filters.datePosted)?.label}
-                  </span>
-                  <button
-                    onClick={() => setDatePosted('any')}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {filters.experienceLevel.map(level => (
-                <div
-                  key={level}
-                  className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700"
-                >
-                  <span>{level}</span>
-                  <button
-                    onClick={() => toggleFilter('experienceLevel', level)}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Results */}
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
-          {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'} Found
-        </h2>
-        <div className="flex items-center">
-          <span className="mr-2 text-sm text-gray-600">Sort by:</span>
-          <select className="focus:border-transparent; w-auto w-full rounded-md border border-gray-300 px-3 px-4 py-1 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
-            <option>Most Relevant</option>
-            <option>Newest</option>
-            <option>Salary: High to Low</option>
-            <option>Salary: Low to High</option>
-          </select>
+          )}
         </div>
-      </div>
 
-      {/* Job Listings */}
-      <div className="space-y-6">
-        {jobs.length > 0 ? (
-          jobs.map(job => <JobCard key={job.id} job={job} />)
-        ) : (
-          <div className="rounded-lg bg-white py-12 text-center shadow-md">
-            <Briefcase className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-            <h3 className="mb-2 text-xl font-medium text-gray-900">No jobs found</h3>
-            <p className="mb-6 text-gray-600">
-              Try adjusting your search or filter criteria to find more jobs.
-            </p>
-            <button onClick={clearFilters} className="btn-primary">
-              Clear Filters
-            </button>
+        {/* Pagination */}
+        {jobs.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <nav className="flex items-center space-x-2">
+              <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
+                Previous
+              </button>
+              <button className="rounded-md bg-purple-600 px-3 py-2 text-white">1</button>
+              <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
+                2
+              </button>
+              <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
+                3
+              </button>
+              <span className="px-3 py-2">...</span>
+              <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
+                10
+              </button>
+              <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
+                Next
+              </button>
+            </nav>
           </div>
         )}
       </div>
-
-      {/* Pagination */}
-      {jobs.length > 0 && (
-        <div className="mt-8 flex justify-center">
-          <nav className="flex items-center space-x-2">
-            <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
-              Previous
-            </button>
-            <button className="rounded-md bg-purple-600 px-3 py-2 text-white">1</button>
-            <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
-              2
-            </button>
-            <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
-              3
-            </button>
-            <span className="px-3 py-2">...</span>
-            <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
-              10
-            </button>
-            <button className="rounded-md border border-gray-300 px-3 py-2 text-gray-700 hover:bg-gray-50">
-              Next
-            </button>
-          </nav>
-        </div>
-      )}
     </div>
   );
 };

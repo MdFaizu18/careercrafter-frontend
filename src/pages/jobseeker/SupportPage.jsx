@@ -21,7 +21,6 @@ export default function SupportPage() {
     priority: '',
     subject: '',
     description: '',
-    attachments: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,7 +69,7 @@ export default function SupportPage() {
     {
       question: 'How does the job matching algorithm work?',
       answer:
-        'Our AI analyzes your skills, experience, preferences, and behavior to match you with relevant job opportunities from our database.',
+        'Our App analyzes your skills, experience, preferences, and behavior to match you with relevant job opportunities from our database.',
     },
   ];
 
@@ -120,18 +119,9 @@ export default function SupportPage() {
         <div className="mx-auto max-w-6xl text-center">
           <h1 className="mb-4 text-4xl font-bold">How can we help you?</h1>
           <p className="mb-8 text-xl opacity-90">
-            Get support for your CareerCrafter account and find answers to common questions
+            Get support from CareerCrafter for any issues or questions you have about your job
+            search, account, or our platform.
           </p>
-
-          {/* Search Bar */}
-          <div className="relative mx-auto max-w-2xl">
-            <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search for help articles..."
-              className="w-full rounded-lg py-3 pr-4 pl-12 text-gray-800 focus:ring-2 focus:ring-purple-300 focus:outline-none"
-            />
-          </div>
         </div>
       </div>
 
@@ -193,7 +183,7 @@ export default function SupportPage() {
                       <option value="technical">Technical Problems</option>
                       <option value="billing">Billing & Payments</option>
                       <option value="jobs">Job Matching</option>
-                      <option value="profile">Profile & Settings</option>
+                      <option value="profile">Spam Jobs</option>
                       <option value="other">Other</option>
                     </select>
                   </div>
@@ -245,31 +235,6 @@ export default function SupportPage() {
                     className="w-full resize-none rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
                     placeholder="Please provide detailed information about your issue..."
                   />
-                </div>
-
-                {/* File Upload */}
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                    Attachments (Optional)
-                  </label>
-                  <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-purple-400">
-                    <input
-                      type="file"
-                      name="attachments"
-                      multiple
-                      className="hidden"
-                      id="file-upload"
-                      onChange={e =>
-                        setFormData(prev => ({ ...prev, attachments: e.target.files }))
-                      }
-                    />
-                    <label htmlFor="file-upload" className="cursor-pointer">
-                      <div className="text-gray-500">
-                        <p className="text-sm">Click to upload files or drag and drop</p>
-                        <p className="mt-1 text-xs">PNG, JPG, PDF up to 10MB</p>
-                      </div>
-                    </label>
-                  </div>
                 </div>
 
                 {/* Submit Button */}
@@ -362,43 +327,6 @@ export default function SupportPage() {
                   </div>
                   <span className="text-sm text-gray-600">2-3 days</span>
                 </div>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="rounded-xl bg-white p-6 shadow-lg">
-              <h3 className="mb-4 text-lg font-bold text-gray-800">Quick Links</h3>
-              <div className="space-y-2">
-                <a
-                  href="#"
-                  className="block text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  Account Settings
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  Privacy Policy
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  Terms of Service
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  User Guide
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  System Status
-                </a>
               </div>
             </div>
           </div>

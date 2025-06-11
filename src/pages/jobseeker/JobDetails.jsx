@@ -232,14 +232,14 @@ const JobDetails = () => {
                 Apply Now
               </button>
               <div className="flex space-x-2">
-                <button className="flex flex-1 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
+                {/* <button className="flex flex-1 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
                   <Bookmark className="mr-1 h-4 w-4" />
                   Save
-                </button>
-                <button className="flex flex-1 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
+                </button> */}
+                {/* <button className="flex flex-1 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
                   <Share2 className="mr-1 h-4 w-4" />
                   Share
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
@@ -409,8 +409,9 @@ const JobDetails = () => {
       </div>
 
       {/* Application Form Modal */}
+        {/* <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"> */}
       {showApplyForm && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 p-4">
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white">
             <div className="p-6">
               {applicationSubmitted ? (
@@ -470,7 +471,7 @@ const JobDetails = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`form-input ${errors.name ? 'border-red-500' : ''}`}
+                        className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.name ? 'border-red-500' : ''}`}
                       />
                       {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
                     </div>
@@ -485,25 +486,12 @@ const JobDetails = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`form-input ${errors.email ? 'border-red-500' : ''}`}
+                        className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.email ? 'border-red-500' : ''}`}
                       />
                       {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                     </div>
 
-                    <div className="mb-6">
-                      <label htmlFor="phone" className="form-label">
-                        Phone Number <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className={`form-input ${errors.phone ? 'border-red-500' : ''}`}
-                      />
-                      {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
-                    </div>
+                   
 
                     <div className="mb-6">
                       <label htmlFor="resume" className="form-label">
@@ -555,20 +543,7 @@ const JobDetails = () => {
                       )}
                     </div>
 
-                    <div className="mb-6">
-                      <label htmlFor="coverLetter" className="form-label">
-                        Cover Letter (Optional)
-                      </label>
-                      <textarea
-                        id="coverLetter"
-                        name="coverLetter"
-                        rows="4"
-                        value={formData.coverLetter}
-                        onChange={handleChange}
-                        className="form-input"
-                        placeholder="Tell us why you're a good fit for this position..."
-                      ></textarea>
-                    </div>
+                   
 
                     <div className="mb-6 flex items-center">
                       <input

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, ChevronDown, Eye, MessageCircle, X } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const MyApplications = () => {
   // Sample data
@@ -189,353 +190,359 @@ const MyApplications = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-24">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Applications</h1>
-          <p className="text-gray-600">Track and manage your job applications.</p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Link to="/job-seeker/search-jobs" className="btn-primary">
-            Find More Jobs
-          </Link>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="mb-6 rounded-lg bg-white p-4 shadow-md">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute top-3 left-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search applications..."
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              />
-            </div>
+    <div>
+      <Helmet>
+        <title>My Applications - CareerCraftery</title>
+      </Helmet>
+      <div className="container mx-auto px-4 py-8 sm:px-24">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">My Applications</h1>
+            <p className="text-gray-600">Track and manage your job applications.</p>
           </div>
-          <div className="w-full md:w-64">
-            <div className="relative">
-              <Filter className="absolute top-3 left-3 text-gray-400" />
-              <select
-                value={statusFilter}
-                onChange={handleStatusFilter}
-                className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              >
-                <option value="all">All Statuses</option>
-                <option value="applied">Applied</option>
-                <option value="interview">Interview</option>
-                <option value="offer">Offer</option>
-                <option value="rejected">Rejected</option>
-                <option value="no response">No Response</option>
-              </select>
-            </div>
+          <div className="mt-4 md:mt-0">
+            <Link to="/job-seeker/search-jobs" className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+              Find More Jobs
+            </Link>
           </div>
         </div>
-      </div>
 
-      {/* Applications List */}
-      <div className="mb-8 overflow-hidden rounded-lg bg-white shadow-md">
-        {filteredApplications.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                  >
-                    Job
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                  >
-                    Company
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                  >
-                    Location
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                  >
-                    Applied
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
-                {filteredApplications.map(application => (
-                  <tr key={application.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {application.position}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-gray-100">
-                          {application.companyLogo ? (
-                            <img
-                              src={application.companyLogo || '/placeholder.svg'}
-                              alt={application.company}
-                              className="h-8 w-8 rounded-md"
-                            />
-                          ) : (
-                            <span className="text-gray-500">{application.company.charAt(0)}</span>
-                          )}
+        {/* Filters */}
+        <div className="mb-6 rounded-lg bg-white p-4 shadow-md">
+          <div className="flex flex-col gap-4 md:flex-row">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute top-3 left-3 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search applications..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="w-full md:w-64">
+              <div className="relative">
+                <Filter className="absolute top-3 left-3 text-gray-400" />
+                <select
+                  value={statusFilter}
+                  onChange={handleStatusFilter}
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="applied">Applied</option>
+                  <option value="interview">Interview</option>
+                  <option value="offer">Offer</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="no response">No Response</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Applications List */}
+        <div className="mb-8 overflow-hidden rounded-lg bg-white shadow-md">
+          {filteredApplications.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                    >
+                      Job
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                    >
+                      Company
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                    >
+                      Location
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                    >
+                      Applied
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+                    >
+                      Status
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {filteredApplications.map(application => (
+                    <tr key={application.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {application.position}
                         </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {application.company}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-gray-100">
+                            {application.companyLogo ? (
+                              <img
+                                src={application.companyLogo || '/placeholder.svg'}
+                                alt={application.company}
+                                className="h-8 w-8 rounded-md"
+                              />
+                            ) : (
+                              <span className="text-gray-500">{application.company.charAt(0)}</span>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {application.company}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{application.location}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{application.appliedDate}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs leading-5 font-semibold ${getStatusColor(application.status)}`}
-                      >
-                        {application.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                      <button
-                        onClick={() => viewApplicationDetails(application)}
-                        className="text-purple-600 hover:text-purple-900"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{application.location}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{application.appliedDate}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex rounded-full px-2 py-1 text-xs leading-5 font-semibold ${getStatusColor(application.status)}`}
+                        >
+                          {application.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                        <button
+                          onClick={() => viewApplicationDetails(application)}
+                          className="text-purple-600 hover:text-purple-900"
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">No applications found</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {searchTerm || statusFilter !== 'all'
+                  ? 'Try adjusting your search or filter criteria.'
+                  : 'Start applying to jobs to track your applications here.'}
+              </p>
+              <div className="mt-6">
+                <Link to="/job-seeker/search-jobs" className="btn-primary">
+                  Find Jobs
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Application Stats */}
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="mb-2 text-lg font-semibold">Total Applications</h3>
+            <p className="text-3xl font-bold text-purple-600">{applications.length}</p>
           </div>
-        ) : (
-          <div className="py-12 text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No applications found</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || statusFilter !== 'all'
-                ? 'Try adjusting your search or filter criteria.'
-                : 'Start applying to jobs to track your applications here.'}
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="mb-2 text-lg font-semibold">Interviews</h3>
+            <p className="text-3xl font-bold text-purple-600">
+              {applications.filter(app => app.status === 'Interview').length}
             </p>
-            <div className="mt-6">
-              <Link to="/job-seeker/search-jobs" className="btn-primary">
-                Find Jobs
-              </Link>
+          </div>
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="mb-2 text-lg font-semibold">Offers</h3>
+            <p className="text-3xl font-bold text-green-600">
+              {applications.filter(app => app.status === 'Offer').length}
+            </p>
+          </div>
+          <div className="rounded-lg bg-white p-6 shadow-md">
+            <h3 className="mb-2 text-lg font-semibold">Rejection Rate</h3>
+            <p className="text-3xl font-bold text-gray-700">
+              {applications.length > 0
+                ? `${Math.round((applications.filter(app => app.status === 'Rejected').length / applications.length) * 100)}%`
+                : '0%'}
+            </p>
+          </div>
+        </div>
+
+        {/* Application Details Modal */}
+        {selectedApplication && (
+       <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 p-4">
+
+            <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white">
+              <div className="p-6">
+                <div className="mb-6 flex items-start justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      {selectedApplication.position}
+                    </h2>
+                    <p className="text-gray-600">
+                      {selectedApplication.company} - {selectedApplication.location}
+                    </p>
+                  </div>
+                  <button
+                    onClick={closeApplicationDetails}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Applied Date</h3>
+                    <p className="text-gray-900">{selectedApplication.appliedDate}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                    <span
+                      className={`inline-flex rounded-full px-2 py-1 text-xs leading-5 font-semibold ${getStatusColor(selectedApplication.status)}`}
+                    >
+                      {selectedApplication.status}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <div className="mb-2 flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Notes</h3>
+                    <button
+                      onClick={openNoteModal}
+                      className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
+                    >
+                      <MessageCircle className="mr-1 h-4 w-4" />
+                      {selectedApplication.notes ? 'Edit Note' : 'Add Note'}
+                    </button>
+                  </div>
+                  {selectedApplication.notes ? (
+                    <p className="rounded-md bg-gray-50 p-4 text-gray-700">
+                      {selectedApplication.notes}
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 italic">No notes added yet.</p>
+                  )}
+                </div>
+
+                {selectedApplication.interviews.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="mb-4 text-lg font-semibold">Interviews</h3>
+                    <div className="space-y-4">
+                      {selectedApplication.interviews.map((interview, index) => (
+                        <div key={index} className="rounded-md border border-gray-200 p-4">
+                          <div className="mb-2 flex justify-between">
+                            <h4 className="font-medium">{interview.type}</h4>
+                            <span className="text-sm text-gray-500">
+                              {formatDate(interview.date)}
+                            </span>
+                          </div>
+                          <p className="mb-2 text-sm text-gray-600">With: {interview.with}</p>
+                          {interview.notes && (
+                            <div>
+                              <h5 className="mb-1 text-xs font-medium text-gray-500">Notes:</h5>
+                              <p className="text-sm text-gray-700">{interview.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={closeApplicationDetails}
+                    className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                  <Link
+                    to={`/job-seeker/job/${selectedApplication.id}`}
+                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-md shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 flex items-center"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    View Job
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Note Modal */}
+        {showNoteModal && (
+          <div className="bg-opacity-100 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="w-full max-w-lg rounded-lg bg-white">
+              <div className="p-6">
+                <div className="mb-4 flex items-start justify-between">
+                  <h2 className="text-lg font-semibold">
+                    {selectedApplication.notes ? 'Edit Note' : 'Add Note'}
+                  </h2>
+                  <button onClick={closeNoteModal} className="text-gray-500 hover:text-gray-700">
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <div className="mb-6">
+                  <textarea
+                    value={noteText}
+                    onChange={e => setNoteText(e.target.value)}
+                    rows="6"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    placeholder="Add notes about this application, interviews, or follow-ups..."
+                  ></textarea>
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={closeNoteModal}
+                    className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button onClick={saveNote} className="btn-primary">
+                    Save Note
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
       </div>
-
-      {/* Application Stats */}
-      <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="mb-2 text-lg font-semibold">Total Applications</h3>
-          <p className="text-3xl font-bold text-purple-600">{applications.length}</p>
-        </div>
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="mb-2 text-lg font-semibold">Interviews</h3>
-          <p className="text-3xl font-bold text-purple-600">
-            {applications.filter(app => app.status === 'Interview').length}
-          </p>
-        </div>
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="mb-2 text-lg font-semibold">Offers</h3>
-          <p className="text-3xl font-bold text-green-600">
-            {applications.filter(app => app.status === 'Offer').length}
-          </p>
-        </div>
-        <div className="rounded-lg bg-white p-6 shadow-md">
-          <h3 className="mb-2 text-lg font-semibold">Rejection Rate</h3>
-          <p className="text-3xl font-bold text-gray-700">
-            {applications.length > 0
-              ? `${Math.round((applications.filter(app => app.status === 'Rejected').length / applications.length) * 100)}%`
-              : '0%'}
-          </p>
-        </div>
-      </div>
-
-      {/* Application Details Modal */}
-      {selectedApplication && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white">
-            <div className="p-6">
-              <div className="mb-6 flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    {selectedApplication.position}
-                  </h2>
-                  <p className="text-gray-600">
-                    {selectedApplication.company} - {selectedApplication.location}
-                  </p>
-                </div>
-                <button
-                  onClick={closeApplicationDetails}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Applied Date</h3>
-                  <p className="text-gray-900">{selectedApplication.appliedDate}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                  <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs leading-5 font-semibold ${getStatusColor(selectedApplication.status)}`}
-                  >
-                    {selectedApplication.status}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold">Notes</h3>
-                  <button
-                    onClick={openNoteModal}
-                    className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                  >
-                    <MessageCircle className="mr-1 h-4 w-4" />
-                    {selectedApplication.notes ? 'Edit Note' : 'Add Note'}
-                  </button>
-                </div>
-                {selectedApplication.notes ? (
-                  <p className="rounded-md bg-gray-50 p-4 text-gray-700">
-                    {selectedApplication.notes}
-                  </p>
-                ) : (
-                  <p className="text-gray-500 italic">No notes added yet.</p>
-                )}
-              </div>
-
-              {selectedApplication.interviews.length > 0 && (
-                <div className="mb-6">
-                  <h3 className="mb-4 text-lg font-semibold">Interviews</h3>
-                  <div className="space-y-4">
-                    {selectedApplication.interviews.map((interview, index) => (
-                      <div key={index} className="rounded-md border border-gray-200 p-4">
-                        <div className="mb-2 flex justify-between">
-                          <h4 className="font-medium">{interview.type}</h4>
-                          <span className="text-sm text-gray-500">
-                            {formatDate(interview.date)}
-                          </span>
-                        </div>
-                        <p className="mb-2 text-sm text-gray-600">With: {interview.with}</p>
-                        {interview.notes && (
-                          <div>
-                            <h5 className="mb-1 text-xs font-medium text-gray-500">Notes:</h5>
-                            <p className="text-sm text-gray-700">{interview.notes}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={closeApplicationDetails}
-                  className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
-                >
-                  Close
-                </button>
-                <Link
-                  to={`/job-seeker/job/${selectedApplication.id}`}
-                  className="btn-primary flex items-center"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  View Job
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Note Modal */}
-      {showNoteModal && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
-          <div className="w-full max-w-lg rounded-lg bg-white">
-            <div className="p-6">
-              <div className="mb-4 flex items-start justify-between">
-                <h2 className="text-lg font-semibold">
-                  {selectedApplication.notes ? 'Edit Note' : 'Add Note'}
-                </h2>
-                <button onClick={closeNoteModal} className="text-gray-500 hover:text-gray-700">
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="mb-6">
-                <textarea
-                  value={noteText}
-                  onChange={e => setNoteText(e.target.value)}
-                  rows="6"
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  placeholder="Add notes about this application, interviews, or follow-ups..."
-                ></textarea>
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  onClick={closeNoteModal}
-                  className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button onClick={saveNote} className="btn-primary">
-                  Save Note
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
