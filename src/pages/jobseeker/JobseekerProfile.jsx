@@ -1,5 +1,7 @@
 'use client';
 
+import React from 'react';
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -12,8 +14,13 @@ import {
   GraduationCap,
   Plus,
   Trash2,
-  Upload,
   X,
+  Star,
+  Target,
+  CheckCircle,
+  Camera,
+  Save,
+  Eye,
 } from 'lucide-react';
 
 const JobseekerProfile = () => {
@@ -85,6 +92,42 @@ const JobseekerProfile = () => {
   const [errors, setErrors] = useState({});
   const [activeSection, setActiveSection] = useState('personalInfo');
   const [newSkill, setNewSkill] = useState('');
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+
+  // Calculate profile completion percentage
+  const calculateProfileCompletion = () => {
+    let completed = 0;
+    let total = 0;
+
+    // Personal info checks
+    total += 6;
+    if (formData.personalInfo.firstName) completed++;
+    if (formData.personalInfo.lastName) completed++;
+    if (formData.personalInfo.email) completed++;
+    if (formData.personalInfo.phone) completed++;
+    if (formData.personalInfo.location) completed++;
+    if (formData.personalInfo.bio) completed++;
+
+    // Experience check
+    total += 1;
+    if (formData.experience.length > 0) completed++;
+
+    // Education check
+    total += 1;
+    if (formData.education.length > 0) completed++;
+
+    // Skills check
+    total += 1;
+    if (formData.skills.length > 0) completed++;
+
+    // Social links check
+    total += 1;
+    if (Object.values(formData.socialLinks).some(link => link)) completed++;
+
+    return Math.round((completed / total) * 100);
+  };
+
+  const profileCompletion = calculateProfileCompletion();
 
   const handlePersonalInfoChange = e => {
     const { name, value } = e.target;
@@ -96,7 +139,6 @@ const JobseekerProfile = () => {
       },
     });
 
-    // Clear error when user types
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -245,7 +287,6 @@ const JobseekerProfile = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Validate personal info
     if (!formData.personalInfo.firstName) newErrors.firstName = 'First name is required';
     if (!formData.personalInfo.lastName) newErrors.lastName = 'Last name is required';
     if (!formData.personalInfo.email) {
@@ -254,7 +295,6 @@ const JobseekerProfile = () => {
       newErrors.email = 'Email is invalid';
     }
 
-    // Validate experience
     formData.experience.forEach((exp, index) => {
       if (!exp.title) newErrors[`experience_${index}_title`] = 'Job title is required';
       if (!exp.company) newErrors[`experience_${index}_company`] = 'Company name is required';
@@ -263,7 +303,6 @@ const JobseekerProfile = () => {
         newErrors[`experience_${index}_endDate`] = 'End date is required';
     });
 
-    // Validate education
     formData.education.forEach((edu, index) => {
       if (!edu.degree) newErrors[`education_${index}_degree`] = 'Degree is required';
       if (!edu.school) newErrors[`education_${index}_school`] = 'School name is required';
@@ -280,765 +319,899 @@ const JobseekerProfile = () => {
     e.preventDefault();
 
     if (validateForm()) {
-      // In a real app, you would send this data to your backend
       console.log('Profile data submitted:', formData);
-
-      // Redirect to dashboard
       navigate('/job-seeker/dashboard');
     }
   };
 
+  const sectionIcons = {
+    personalInfo: User,
+    experience: Briefcase,
+    education: GraduationCap,
+    skills: Star,
+    socialLinks: Globe,
+  };
+
+  const sectionTitles = {
+    personalInfo: 'Personal Info',
+    experience: 'Experience',
+    education: 'Education',
+    skills: 'Skills',
+    socialLinks: 'Social Links',
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Edit Profile</h1>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-          >
-            Save Changes
-          </button>
-        </div>
-
-        {/* Profile Navigation */}
-        <div className="mb-6 overflow-x-auto rounded-lg bg-white shadow-md">
-          <div className="flex p-1">
-            <button
-              className={`rounded-md px-4 py-2 text-sm font-medium ${
-                activeSection === 'personalInfo'
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveSection('personalInfo')}
-            >
-              Personal Info
-            </button>
-            <button
-              className={`rounded-md px-4 py-2 text-sm font-medium ${
-                activeSection === 'experience'
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveSection('experience')}
-            >
-              Experience
-            </button>
-            <button
-              className={`rounded-md px-4 py-2 text-sm font-medium ${
-                activeSection === 'education'
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveSection('education')}
-            >
-              Education
-            </button>
-            <button
-              className={`rounded-md px-4 py-2 text-sm font-medium ${
-                activeSection === 'skills'
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveSection('skills')}
-            >
-              Skills
-            </button>
-            <button
-              className={`rounded-md px-4 py-2 text-sm font-medium ${
-                activeSection === 'socialLinks'
-                  ? 'bg-purple-100 text-purple-700'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-              onClick={() => setActiveSection('socialLinks')}
-            >
-              Social Links
-            </button>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mx-auto max-w-6xl">
+          {/* Header */}
+          <div className="mb-8 flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+            <div>
+              <h1 className="mb-2 text-3xl font-bold text-gray-900">
+                Build Your Professional Profile
+              </h1>
+              <p className="text-gray-600">
+                Create a compelling profile that stands out to employers
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setIsPreviewMode(!isPreviewMode)}
+                className="flex items-center gap-2 rounded-lg border border-purple-200 px-4 py-2 text-purple-600 transition-colors hover:bg-purple-50"
+              >
+                <Eye className="h-4 w-4" />
+                {isPreviewMode ? 'Edit Mode' : 'Preview'}
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 text-white transition-all duration-200 hover:shadow-lg"
+              >
+                <Save className="h-4 w-4" />
+                Save Profile
+              </button>
+            </div>
           </div>
-        </div>
 
-        <form className="rounded-lg bg-white p-6 shadow-md">
-          {/* Personal Info Section */}
-          {activeSection === 'personalInfo' && (
-            <div>
-              <h2 className="mb-6 text-xl font-semibold">Personal Information</h2>
-
-              <div className="mb-6 flex flex-col gap-6 md:flex-row">
-                <div className="flex flex-col items-center md:w-1/3">
-                  <div className="relative mb-4 h-40 w-40 overflow-hidden rounded-full bg-gray-200">
-                    {formData.personalInfo.profileImage ? (
-                      <img
-                        src={
-                          URL.createObjectURL(formData.personalInfo.profileImage) ||
-                          '/placeholder.svg'
-                        }
-                        alt="Profile"
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <User className="h-full w-full p-8 text-gray-400" />
-                    )}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
+            {/* Sidebar Navigation */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+                {/* Profile Completion */}
+                <div className="mb-6">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Profile Strength</span>
+                    <span className="text-sm font-bold text-purple-600">{profileCompletion}%</span>
                   </div>
-                  <label className="btn-secondary flex cursor-pointer items-center">
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload Photo
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleProfileImageChange}
-                    />
-                  </label>
+                  <div className="h-2 w-full rounded-full bg-gray-200">
+                    <div
+                      className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+                      style={{ width: `${profileCompletion}%` }}
+                    ></div>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500">
+                    {profileCompletion < 70
+                      ? 'Complete your profile to attract more employers'
+                      : 'Great! Your profile looks professional'}
+                  </p>
                 </div>
 
-                <div className="md:w-2/3">
-                  <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label htmlFor="firstName" className="form-label">
-                        First Name <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <User className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          id="firstName"
-                          name="firstName"
-                          value={formData.personalInfo.firstName}
-                          onChange={handlePersonalInfoChange}
-                          className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.firstName ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors.firstName && (
-                        <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
-                      )}
-                    </div>
+                {/* Navigation Menu */}
+                <nav className="space-y-2">
+                  {Object.entries(sectionTitles).map(([key, title]) => {
+                    const Icon = sectionIcons[key];
+                    const isActive = activeSection === key;
 
-                    <div>
-                      <label htmlFor="lastName" className="form-label">
-                        Last Name <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <User className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          id="lastName"
-                          name="lastName"
-                          value={formData.personalInfo.lastName}
-                          onChange={handlePersonalInfoChange}
-                          className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.lastName ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors.lastName && (
-                        <p className="mt-1 text-xs text-red-500">{errors.lastName}</p>
-                      )}
-                    </div>
-                  </div>
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => setActiveSection(key)}
+                        className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-all duration-200 ${
+                          isActive
+                            ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span className="font-medium">{title}</span>
+                        {isActive && <CheckCircle className="ml-auto h-4 w-4" />}
+                      </button>
+                    );
+                  })}
+                </nav>
 
-                  <div className="mb-6">
-                    <label htmlFor="email" className="form-label">
-                      Email <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Mail className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.personalInfo.email}
-                        onChange={handlePersonalInfoChange}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.email ? 'border-red-500' : ''}`}
-                      />
+                {/* Quick Stats */}
+                <div className="mt-6 border-t border-gray-100 pt-6">
+                  <h3 className="mb-3 text-sm font-semibold text-gray-700">Quick Stats</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Experience</span>
+                      <span className="font-medium">{formData.experience.length} roles</span>
                     </div>
-                    {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
-                  </div>
-
-                  <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label htmlFor="phone" className="form-label">
-                        Phone
-                      </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Phone className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="tel"
-                          id="phone"
-                          name="phone"
-                          value={formData.personalInfo.phone}
-                          onChange={handlePersonalInfoChange}
-                          className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                        />
-                      </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Education</span>
+                      <span className="font-medium">{formData.education.length} degrees</span>
                     </div>
-
-                    <div>
-                      <label htmlFor="location" className="form-label">
-                        Location
-                      </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <MapPin className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          id="location"
-                          name="location"
-                          value={formData.personalInfo.location}
-                          onChange={handlePersonalInfoChange}
-                          className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                          placeholder="City, State"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <label htmlFor="website" className="form-label">
-                      Website
-                    </label>
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Globe className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="url"
-                        id="website"
-                        name="website"
-                        value={formData.personalInfo.website}
-                        onChange={handlePersonalInfoChange}
-                        className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                        placeholder="https://yourwebsite.com"
-                      />
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Skills</span>
+                      <span className="font-medium">{formData.skills.length} skills</span>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="bio" className="form-label">
-                  Professional Summary
-                </label>
-                <textarea
-                  id="bio"
-                  name="bio"
-                  value={formData.personalInfo.bio}
-                  onChange={handlePersonalInfoChange}
-                  rows="4"
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  placeholder="Write a short summary about yourself..."
-                ></textarea>
               </div>
             </div>
-          )}
 
-          {/* Experience Section */}
-          {activeSection === 'experience' && (
-            <div>
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Work Experience</h2>
-                <button
-                  type="button"
-                  onClick={addExperience}
-                  className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  <Plus className="mr-1 h-4 w-4" />
-                  Add Experience
-                </button>
-              </div>
-
-              {formData.experience.map((exp, index) => (
-                <div
-                  key={exp.id}
-                  className="mb-8 border-b border-gray-200 pb-8 last:border-0 last:pb-0"
-                >
-                  <div className="mb-4 flex items-start justify-between">
-                    <h3 className="text-lg font-medium">
-                      {exp.title ? exp.title : `Experience ${index + 1}`}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => removeExperience(exp.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+                {/* Section Header */}
+                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    {React.createElement(sectionIcons[activeSection], {
+                      className: 'w-6 h-6 text-white',
+                    })}
+                    <h2 className="text-xl font-semibold text-white">
+                      {sectionTitles[activeSection]}
+                    </h2>
                   </div>
+                </div>
 
-                  <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label htmlFor={`title-${index}`} className="form-label">
-                        Job Title <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Briefcase className="h-5 w-5 text-gray-400" />
+                <div className="p-6">
+                  {/* Personal Info Section */}
+                  {activeSection === 'personalInfo' && (
+                    <div className="space-y-6">
+                      {/* Profile Photo Section */}
+                      <div className="flex flex-col items-start gap-6 md:flex-row">
+                        <div className="flex flex-col items-center">
+                          <div className="group relative">
+                            <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-gradient-to-br from-purple-100 to-indigo-100 shadow-lg">
+                              {formData.personalInfo.profileImage ? (
+                                <img
+                                  src={
+                                    URL.createObjectURL(formData.personalInfo.profileImage) ||
+                                    '/placeholder.svg'
+                                  }
+                                  alt="Profile"
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                <User className="h-full w-full p-6 text-purple-300" />
+                              )}
+                            </div>
+                            <label className="bg-opacity-50 absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black opacity-0 transition-opacity group-hover:opacity-100">
+                              <Camera className="h-6 w-6 text-white" />
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={handleProfileImageChange}
+                              />
+                            </label>
+                          </div>
+                          <p className="mt-2 text-center text-sm text-gray-500">
+                            Click to upload photo
+                          </p>
                         </div>
-                        <input
-                          type="text"
-                          id={`title-${index}`}
-                          name="title"
-                          value={exp.title}
-                          onChange={e => handleExperienceChange(e, index)}
-                          className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`experience_${index}_title`] ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors[`experience_${index}_title`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`experience_${index}_title`]}
-                        </p>
-                      )}
-                    </div>
 
-                    <div>
-                      <label htmlFor={`company-${index}`} className="form-label">
-                        Company <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id={`company-${index}`}
-                        name="company"
-                        value={exp.company}
-                        onChange={e => handleExperienceChange(e, index)}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`experience_${index}_company`] ? 'border-red-500' : ''}`}
-                      />
-                      {errors[`experience_${index}_company`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`experience_${index}_company`]}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                        <div className="flex-1 space-y-4">
+                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div>
+                              <label className="mb-2 block text-sm font-medium text-gray-700">
+                                First Name <span className="text-red-500">*</span>
+                              </label>
+                              <div className="relative">
+                                <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                                <input
+                                  type="text"
+                                  name="firstName"
+                                  value={formData.personalInfo.firstName}
+                                  onChange={handlePersonalInfoChange}
+                                  className={`w-full rounded-lg border py-3 pr-4 pl-10 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                    errors.firstName ? 'border-red-300' : 'border-gray-300'
+                                  }`}
+                                  placeholder="Enter your first name"
+                                />
+                              </div>
+                              {errors.firstName && (
+                                <p className="mt-1 text-sm text-red-500">{errors.firstName}</p>
+                              )}
+                            </div>
 
-                  <div className="mb-6">
-                    <label htmlFor={`location-${index}`} className="form-label">
-                      Location
-                    </label>
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        id={`location-${index}`}
-                        name="location"
-                        value={exp.location}
-                        onChange={e => handleExperienceChange(e, index)}
-                        className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                        placeholder="City, State or Remote"
-                      />
-                    </div>
-                  </div>
+                            <div>
+                              <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Last Name <span className="text-red-500">*</span>
+                              </label>
+                              <div className="relative">
+                                <User className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                                <input
+                                  type="text"
+                                  name="lastName"
+                                  value={formData.personalInfo.lastName}
+                                  onChange={handlePersonalInfoChange}
+                                  className={`w-full rounded-lg border py-3 pr-4 pl-10 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                    errors.lastName ? 'border-red-300' : 'border-gray-300'
+                                  }`}
+                                  placeholder="Enter your last name"
+                                />
+                              </div>
+                              {errors.lastName && (
+                                <p className="mt-1 text-sm text-red-500">{errors.lastName}</p>
+                              )}
+                            </div>
+                          </div>
 
-                  <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label htmlFor={`startDate-${index}`} className="form-label">
-                        Start Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="month"
-                        id={`startDate-${index}`}
-                        name="startDate"
-                        value={exp.startDate}
-                        onChange={e => handleExperienceChange(e, index)}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`experience_${index}_startDate`] ? 'border-red-500' : ''}`}
-                      />
-                      {errors[`experience_${index}_startDate`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`experience_${index}_startDate`]}
-                        </p>
-                      )}
-                    </div>
+                          <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                              Email Address <span className="text-red-500">*</span>
+                            </label>
+                            <div className="relative">
+                              <Mail className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                              <input
+                                type="email"
+                                name="email"
+                                value={formData.personalInfo.email}
+                                onChange={handlePersonalInfoChange}
+                                className={`w-full rounded-lg border py-3 pr-4 pl-10 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                  errors.email ? 'border-red-300' : 'border-gray-300'
+                                }`}
+                                placeholder="Enter your email address"
+                              />
+                            </div>
+                            {errors.email && (
+                              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+                            )}
+                          </div>
 
-                    <div>
-                      <label htmlFor={`endDate-${index}`} className="form-label">
-                        End Date {!exp.current && <span className="text-red-500">*</span>}
-                      </label>
-                      <input
-                        type="month"
-                        id={`endDate-${index}`}
-                        name="endDate"
-                        value={exp.endDate}
-                        onChange={e => handleExperienceChange(e, index)}
-                        disabled={exp.current}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`experience_${index}_endDate`] ? 'border-red-500' : ''}`}
-                      />
-                      {errors[`experience_${index}_endDate`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`experience_${index}_endDate`]}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            <div>
+                              <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Phone Number
+                              </label>
+                              <div className="relative">
+                                <Phone className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                                <input
+                                  type="tel"
+                                  name="phone"
+                                  value={formData.personalInfo.phone}
+                                  onChange={handlePersonalInfoChange}
+                                  className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-10 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Enter your phone number"
+                                />
+                              </div>
+                            </div>
 
-                  <div className="mb-6">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`current-${index}`}
-                        name="current"
-                        checked={exp.current}
-                        onChange={e => handleExperienceChange(e, index)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <label
-                        htmlFor={`current-${index}`}
-                        className="ml-2 block text-sm text-gray-900"
-                      >
-                        I currently work here
-                      </label>
-                    </div>
-                  </div>
+                            <div>
+                              <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Location
+                              </label>
+                              <div className="relative">
+                                <MapPin className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                                <input
+                                  type="text"
+                                  name="location"
+                                  value={formData.personalInfo.location}
+                                  onChange={handlePersonalInfoChange}
+                                  className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-10 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                  placeholder="City, State"
+                                />
+                              </div>
+                            </div>
+                          </div>
 
-                  <div className="mb-6">
-                    <label htmlFor={`description-${index}`} className="form-label">
-                      Job Description
-                    </label>
-                    <textarea
-                      id={`description-${index}`}
-                      name="description"
-                      value={exp.description}
-                      onChange={e => handleExperienceChange(e, index)}
-                      rows="4"
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder="Describe your responsibilities and achievements..."
-                    ></textarea>
-                  </div>
-                </div>
-              ))}
-
-              {formData.experience.length === 0 && (
-                <div className="py-8 text-center">
-                  <Briefcase className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-                  <p className="mb-4 text-gray-500">No work experience added yet.</p>
-                  <button
-                    type="button"
-                    onClick={addExperience}
-                    className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    Add Experience
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Education Section */}
-          {activeSection === 'education' && (
-            <div>
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Education</h2>
-                <button
-                  type="button"
-                  onClick={addEducation}
-                  className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  <Plus className="mr-1 h-4 w-4" />
-                  Add Education
-                </button>
-              </div>
-
-              {formData.education.map((edu, index) => (
-                <div
-                  key={edu.id}
-                  className="mb-8 border-b border-gray-200 pb-8 last:border-0 last:pb-0"
-                >
-                  <div className="mb-4 flex items-start justify-between">
-                    <h3 className="text-lg font-medium">
-                      {edu.degree ? edu.degree : `Education ${index + 1}`}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={() => removeEducation(edu.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  </div>
-
-                  <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label htmlFor={`degree-${index}`} className="form-label">
-                        Degree <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                          <GraduationCap className="h-5 w-5 text-gray-400" />
+                          <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                              Website
+                            </label>
+                            <div className="relative">
+                              <Globe className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+                              <input
+                                type="url"
+                                name="website"
+                                value={formData.personalInfo.website}
+                                onChange={handlePersonalInfoChange}
+                                className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-10 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                placeholder="https://yourwebsite.com"
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <input
-                          type="text"
-                          id={`degree-${index}`}
-                          name="degree"
-                          value={edu.degree}
-                          onChange={e => handleEducationChange(e, index)}
-                          className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`education_${index}_degree`] ? 'border-red-500' : ''}`}
+                      </div>
+
+                      <div>
+                        <label className="mb-2 block text-sm font-medium text-gray-700">
+                          Professional Summary
+                        </label>
+                        <textarea
+                          name="bio"
+                          value={formData.personalInfo.bio}
+                          onChange={handlePersonalInfoChange}
+                          rows="4"
+                          className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                          placeholder="Write a compelling summary that highlights your key skills and experience..."
                         />
+                        <p className="mt-1 text-sm text-gray-500">
+                          {formData.personalInfo.bio.length}/500 characters
+                        </p>
                       </div>
-                      {errors[`education_${index}_degree`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`education_${index}_degree`]}
-                        </p>
-                      )}
                     </div>
+                  )}
 
-                    <div>
-                      <label htmlFor={`school-${index}`} className="form-label">
-                        School <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id={`school-${index}`}
-                        name="school"
-                        value={edu.school}
-                        onChange={e => handleEducationChange(e, index)}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`education_${index}_school`] ? 'border-red-500' : ''}`}
-                      />
-                      {errors[`education_${index}_school`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`education_${index}_school`]}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <label htmlFor={`location-${index}`} className="form-label">
-                      Location
-                    </label>
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        id={`location-${index}`}
-                        name="location"
-                        value={edu.location}
-                        onChange={e => handleEducationChange(e, index)}
-                        className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                        placeholder="City, State"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                      <label htmlFor={`startDate-${index}`} className="form-label">
-                        Start Date <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="month"
-                        id={`startDate-${index}`}
-                        name="startDate"
-                        value={edu.startDate}
-                        onChange={e => handleEducationChange(e, index)}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`education_${index}_startDate`] ? 'border-red-500' : ''}`}
-                      />
-                      {errors[`education_${index}_startDate`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`education_${index}_startDate`]}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label htmlFor={`endDate-${index}`} className="form-label">
-                        End Date {!edu.current && <span className="text-red-500">*</span>}
-                      </label>
-                      <input
-                        type="month"
-                        id={`endDate-${index}`}
-                        name="endDate"
-                        value={edu.endDate}
-                        onChange={e => handleEducationChange(e, index)}
-                        disabled={edu.current}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors[`education_${index}_endDate`] ? 'border-red-500' : ''}`}
-                      />
-                      {errors[`education_${index}_endDate`] && (
-                        <p className="mt-1 text-xs text-red-500">
-                          {errors[`education_${index}_endDate`]}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`current-${index}`}
-                        name="current"
-                        checked={edu.current}
-                        onChange={e => handleEducationChange(e, index)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <label
-                        htmlFor={`current-${index}`}
-                        className="ml-2 block text-sm text-gray-900"
-                      >
-                        I'm currently studying here
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <label htmlFor={`description-${index}`} className="form-label">
-                      Description
-                    </label>
-                    <textarea
-                      id={`description-${index}`}
-                      name="description"
-                      value={edu.description}
-                      onChange={e => handleEducationChange(e, index)}
-                      rows="4"
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder="Describe your studies, achievements, etc..."
-                    ></textarea>
-                  </div>
-                </div>
-              ))}
-
-              {formData.education.length === 0 && (
-                <div className="py-8 text-center">
-                  <GraduationCap className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-                  <p className="mb-4 text-gray-500">No education added yet.</p>
-                  <button
-                    type="button"
-                    onClick={addEducation}
-                    className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    Add Education
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Skills Section */}
-          {activeSection === 'skills' && (
-            <div>
-              <h2 className="mb-6 text-xl font-semibold">Skills</h2>
-
-              <div className="mb-6">
-                <label htmlFor="skills" className="form-label">
-                  Add Skills
-                </label>
-                <div className="flex">
-                  <input
-                    type="text"
-                    id="skills"
-                    value={newSkill}
-                    onChange={e => setNewSkill(e.target.value)}
-                    className="w-full flex-grow rounded-md rounded-r-none border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    placeholder="e.g. JavaScript, Project Management, etc."
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddSkill}
-                    className="rounded-r-md bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
-                  >
-                    Add
-                  </button>
-                </div>
-                <p className="mt-1 text-sm text-gray-500">Press "Add" after typing each skill</p>
-              </div>
-
-              <div className="mb-6">
-                <label className="form-label">Your Skills</label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {formData.skills.length > 0 ? (
-                    formData.skills.map((skill, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center rounded-full bg-purple-100 px-3 py-1 text-purple-700"
-                      >
-                        <span>{skill}</span>
+                  {/* Experience Section */}
+                  {activeSection === 'experience' && (
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Work Experience</h3>
+                          <p className="text-gray-600">Add your professional experience</p>
+                        </div>
                         <button
                           type="button"
-                          onClick={() => removeSkill(skill)}
-                          className="ml-2 text-purple-700 hover:text-purple-900"
+                          onClick={addExperience}
+                          className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
                         >
-                          <X className="h-4 w-4" />
+                          <Plus className="h-4 w-4" />
+                          Add Experience
                         </button>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500">No skills added yet.</p>
+
+                      {formData.experience.length === 0 ? (
+                        <div className="py-12 text-center">
+                          <Briefcase className="mx-auto mb-4 h-16 w-16 text-gray-300" />
+                          <h3 className="mb-2 text-lg font-medium text-gray-900">
+                            No experience added yet
+                          </h3>
+                          <p className="mb-4 text-gray-600">
+                            Start building your professional timeline
+                          </p>
+                          <button
+                            type="button"
+                            onClick={addExperience}
+                            className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-purple-700"
+                          >
+                            Add Your First Experience
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {formData.experience.map((exp, index) => (
+                            <div
+                              key={exp.id}
+                              className="rounded-lg border border-gray-200 bg-gray-50 p-6"
+                            >
+                              <div className="mb-4 flex items-start justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
+                                    <Briefcase className="h-5 w-5 text-purple-600" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium text-gray-900">
+                                      {exp.title || `Experience ${index + 1}`}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">{exp.company}</p>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeExperience(exp.id)}
+                                  className="p-1 text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+
+                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Job Title <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="title"
+                                    value={exp.title}
+                                    onChange={e => handleExperienceChange(e, index)}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      errors[`experience_${index}_title`]
+                                        ? 'border-red-300'
+                                        : 'border-gray-300'
+                                    }`}
+                                    placeholder="e.g. Senior Software Engineer"
+                                  />
+                                  {errors[`experience_${index}_title`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`experience_${index}_title`]}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Company <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="company"
+                                    value={exp.company}
+                                    onChange={e => handleExperienceChange(e, index)}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      errors[`experience_${index}_company`]
+                                        ? 'border-red-300'
+                                        : 'border-gray-300'
+                                    }`}
+                                    placeholder="e.g. Google"
+                                  />
+                                  {errors[`experience_${index}_company`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`experience_${index}_company`]}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="mb-4">
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                  Location
+                                </label>
+                                <input
+                                  type="text"
+                                  name="location"
+                                  value={exp.location}
+                                  onChange={e => handleExperienceChange(e, index)}
+                                  className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                  placeholder="City, State or Remote"
+                                />
+                              </div>
+
+                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Start Date <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="month"
+                                    name="startDate"
+                                    value={exp.startDate}
+                                    onChange={e => handleExperienceChange(e, index)}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      errors[`experience_${index}_startDate`]
+                                        ? 'border-red-300'
+                                        : 'border-gray-300'
+                                    }`}
+                                  />
+                                  {errors[`experience_${index}_startDate`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`experience_${index}_startDate`]}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    End Date{' '}
+                                    {!exp.current && <span className="text-red-500">*</span>}
+                                  </label>
+                                  <input
+                                    type="month"
+                                    name="endDate"
+                                    value={exp.endDate}
+                                    onChange={e => handleExperienceChange(e, index)}
+                                    disabled={exp.current}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      exp.current ? 'bg-gray-100' : ''
+                                    } ${errors[`experience_${index}_endDate`] ? 'border-red-300' : 'border-gray-300'}`}
+                                  />
+                                  {errors[`experience_${index}_endDate`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`experience_${index}_endDate`]}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="mb-4">
+                                <label className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    name="current"
+                                    checked={exp.current}
+                                    onChange={e => handleExperienceChange(e, index)}
+                                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                  />
+                                  <span className="text-sm text-gray-700">
+                                    I currently work here
+                                  </span>
+                                </label>
+                              </div>
+
+                              <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                  Description
+                                </label>
+                                <textarea
+                                  name="description"
+                                  value={exp.description}
+                                  onChange={e => handleExperienceChange(e, index)}
+                                  rows="4"
+                                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Describe your key responsibilities and achievements..."
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Education Section */}
+                  {activeSection === 'education' && (
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Education</h3>
+                          <p className="text-gray-600">Add your educational background</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={addEducation}
+                          className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add Education
+                        </button>
+                      </div>
+
+                      {formData.education.length === 0 ? (
+                        <div className="py-12 text-center">
+                          <GraduationCap className="mx-auto mb-4 h-16 w-16 text-gray-300" />
+                          <h3 className="mb-2 text-lg font-medium text-gray-900">
+                            No education added yet
+                          </h3>
+                          <p className="mb-4 text-gray-600">Add your educational qualifications</p>
+                          <button
+                            type="button"
+                            onClick={addEducation}
+                            className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-purple-700"
+                          >
+                            Add Education
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {formData.education.map((edu, index) => (
+                            <div
+                              key={edu.id}
+                              className="rounded-lg border border-gray-200 bg-gray-50 p-6"
+                            >
+                              <div className="mb-4 flex items-start justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100">
+                                    <GraduationCap className="h-5 w-5 text-indigo-600" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium text-gray-900">
+                                      {edu.degree || `Education ${index + 1}`}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">{edu.school}</p>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeEducation(edu.id)}
+                                  className="p-1 text-red-500 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+
+                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Degree <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="degree"
+                                    value={edu.degree}
+                                    onChange={e => handleEducationChange(e, index)}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      errors[`education_${index}_degree`]
+                                        ? 'border-red-300'
+                                        : 'border-gray-300'
+                                    }`}
+                                    placeholder="e.g. Bachelor of Science in Computer Science"
+                                  />
+                                  {errors[`education_${index}_degree`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`education_${index}_degree`]}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    School <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    name="school"
+                                    value={edu.school}
+                                    onChange={e => handleEducationChange(e, index)}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      errors[`education_${index}_school`]
+                                        ? 'border-red-300'
+                                        : 'border-gray-300'
+                                    }`}
+                                    placeholder="e.g. Stanford University"
+                                  />
+                                  {errors[`education_${index}_school`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`education_${index}_school`]}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="mb-4">
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                  Location
+                                </label>
+                                <input
+                                  type="text"
+                                  name="location"
+                                  value={edu.location}
+                                  onChange={e => handleEducationChange(e, index)}
+                                  className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                  placeholder="City, State"
+                                />
+                              </div>
+
+                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    Start Date <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    type="month"
+                                    name="startDate"
+                                    value={edu.startDate}
+                                    onChange={e => handleEducationChange(e, index)}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      errors[`education_${index}_startDate`]
+                                        ? 'border-red-300'
+                                        : 'border-gray-300'
+                                    }`}
+                                  />
+                                  {errors[`education_${index}_startDate`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`education_${index}_startDate`]}
+                                    </p>
+                                  )}
+                                </div>
+
+                                <div>
+                                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                                    End Date{' '}
+                                    {!edu.current && <span className="text-red-500">*</span>}
+                                  </label>
+                                  <input
+                                    type="month"
+                                    name="endDate"
+                                    value={edu.endDate}
+                                    onChange={e => handleEducationChange(e, index)}
+                                    disabled={edu.current}
+                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                                      edu.current ? 'bg-gray-100' : ''
+                                    } ${errors[`education_${index}_endDate`] ? 'border-red-300' : 'border-gray-300'}`}
+                                  />
+                                  {errors[`education_${index}_endDate`] && (
+                                    <p className="mt-1 text-sm text-red-500">
+                                      {errors[`education_${index}_endDate`]}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="mb-4">
+                                <label className="flex items-center gap-2">
+                                  <input
+                                    type="checkbox"
+                                    name="current"
+                                    checked={edu.current}
+                                    onChange={e => handleEducationChange(e, index)}
+                                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                                  />
+                                  <span className="text-sm text-gray-700">
+                                    I'm currently studying here
+                                  </span>
+                                </label>
+                              </div>
+
+                              <div>
+                                <label className="mb-2 block text-sm font-medium text-gray-700">
+                                  Description
+                                </label>
+                                <textarea
+                                  name="description"
+                                  value={edu.description}
+                                  onChange={e => handleEducationChange(e, index)}
+                                  rows="3"
+                                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                                  placeholder="Describe your studies, achievements, etc..."
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Skills Section */}
+                  {activeSection === 'skills' && (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                          Skills & Expertise
+                        </h3>
+                        <p className="text-gray-600">Add skills that showcase your expertise</p>
+                      </div>
+
+                      <div className="rounded-lg border border-purple-100 bg-gradient-to-r from-purple-50 to-indigo-50 p-6">
+                        <div className="mb-4 flex items-center gap-3">
+                          <Star className="h-6 w-6 text-purple-600" />
+                          <h4 className="font-medium text-gray-900">Add New Skill</h4>
+                        </div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            value={newSkill}
+                            onChange={e => setNewSkill(e.target.value)}
+                            onKeyPress={e => e.key === 'Enter' && handleAddSkill()}
+                            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                            placeholder="e.g. JavaScript, Project Management, Adobe Photoshop"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddSkill}
+                            className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-purple-700"
+                          >
+                            Add
+                          </button>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-500">
+                          Press Enter or click Add to include the skill
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="mb-4 font-medium text-gray-900">
+                          Your Skills ({formData.skills.length})
+                        </h4>
+                        {formData.skills.length > 0 ? (
+                          <div className="flex flex-wrap gap-3">
+                            {formData.skills.map((skill, index) => (
+                              <div
+                                key={index}
+                                className="group flex items-center gap-2 rounded-full border border-purple-200 bg-white px-4 py-2 text-purple-700 transition-colors hover:bg-purple-50"
+                              >
+                                <span className="font-medium">{skill}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeSkill(skill)}
+                                  className="text-purple-500 opacity-0 transition-opacity group-hover:opacity-100 hover:text-purple-700"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-8 text-center">
+                            <Star className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+                            <p className="text-gray-500">
+                              No skills added yet. Start by adding your key skills above.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Social Links Section */}
+                  {activeSection === 'socialLinks' && (
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                          Social & Professional Links
+                        </h3>
+                        <p className="text-gray-600">Connect your professional profiles</p>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-gray-700">
+                            LinkedIn Profile
+                          </label>
+                          <div className="relative">
+                            <div className="absolute top-1/2 left-3 -translate-y-1/2 transform">
+                              <div className="flex h-5 w-5 items-center justify-center rounded bg-blue-600">
+                                <span className="text-xs font-bold text-white">in</span>
+                              </div>
+                            </div>
+                            <input
+                              type="url"
+                              name="linkedin"
+                              value={formData.socialLinks.linkedin}
+                              onChange={handleSocialLinksChange}
+                              className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-12 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                              placeholder="https://linkedin.com/in/username"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-gray-700">
+                            GitHub Profile
+                          </label>
+                          <div className="relative">
+                            <div className="absolute top-1/2 left-3 -translate-y-1/2 transform">
+                              <div className="flex h-5 w-5 items-center justify-center rounded bg-gray-900">
+                                <span className="text-xs font-bold text-white">GH</span>
+                              </div>
+                            </div>
+                            <input
+                              type="url"
+                              name="github"
+                              value={formData.socialLinks.github}
+                              onChange={handleSocialLinksChange}
+                              className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-12 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                              placeholder="https://github.com/username"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="mb-2 block text-sm font-medium text-gray-700">
+                            Twitter Profile
+                          </label>
+                          <div className="relative">
+                            <div className="absolute top-1/2 left-3 -translate-y-1/2 transform">
+                              <div className="flex h-5 w-5 items-center justify-center rounded bg-blue-400">
+                                <span className="text-xs font-bold text-white">X</span>
+                              </div>
+                            </div>
+                            <input
+                              type="url"
+                              name="twitter"
+                              value={formData.socialLinks.twitter}
+                              onChange={handleSocialLinksChange}
+                              className="w-full rounded-lg border border-gray-300 py-3 pr-4 pl-12 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                              placeholder="https://twitter.com/username"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                        <div className="flex items-start gap-3">
+                          <Target className="mt-0.5 h-5 w-5 text-blue-600" />
+                          <div>
+                            <h4 className="mb-1 font-medium text-blue-900">Pro Tip</h4>
+                            <p className="text-sm text-blue-700">
+                              Adding professional social links increases your profile visibility and
+                              helps employers learn more about your work and expertise.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Social Links Section */}
-          {activeSection === 'socialLinks' && (
-            <div>
-              <h2 className="mb-6 text-xl font-semibold">Social Links</h2>
-
-              <div className="mb-6">
-                <label htmlFor="linkedin" className="form-label">
-                  LinkedIn
-                </label>
-                <input
-                  type="url"
-                  id="linkedin"
-                  name="linkedin"
-                  value={formData.socialLinks.linkedin}
-                  onChange={handleSocialLinksChange}
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  placeholder="https://linkedin.com/in/username"
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="github" className="form-label">
-                  GitHub
-                </label>
-                <input
-                  type="url"
-                  id="github"
-                  name="github"
-                  value={formData.socialLinks.github}
-                  onChange={handleSocialLinksChange}
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  placeholder="https://github.com/username"
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="twitter" className="form-label">
-                  Twitter
-                </label>
-                <input
-                  type="url"
-                  id="twitter"
-                  name="twitter"
-                  value={formData.socialLinks.twitter}
-                  onChange={handleSocialLinksChange}
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  placeholder="https://twitter.com/username"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="mt-8 flex justify-end">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-            >
-              Save Changes
-            </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

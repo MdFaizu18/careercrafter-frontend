@@ -2,7 +2,19 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Minus, Info } from 'lucide-react';
+import {
+  Plus,
+  Minus,
+  Info,
+  Users,
+  Target,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  Star,
+  Briefcase,
+  Globe,
+} from 'lucide-react';
 
 const PostJob = () => {
   const navigate = useNavigate();
@@ -146,536 +158,767 @@ const PostJob = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Post a New Job</h1>
-          <button
-            type="button"
-            onClick={togglePreview}
-            className="rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200"
-          >
-            {previewMode ? 'Edit Job' : 'Preview Job'}
-          </button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 py-8 sm:px-24">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          {/* Creative Left Sidebar */}
+          <div className="space-y-6 lg:col-span-4">
+            {/* Hero Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-700 p-8 text-white">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 h-32 w-32 translate-x-16 -translate-y-16 rounded-full bg-white/10"></div>
+              <div className="absolute bottom-0 left-0 h-24 w-24 -translate-x-12 translate-y-12 rounded-full bg-white/10"></div>
 
-        {previewMode ? (
-          <div className="rounded-lg bg-white p-6 shadow-md">
-            <div className="mb-6">
-              <h2 className="mb-2 text-2xl font-bold text-gray-900">{formData.title}</h2>
-              <div className="mb-4 flex flex-wrap gap-3">
-                <span className="rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
-                  {formData.type}
-                </span>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">
-                  {formData.locationType}
-                </span>
-                <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
-                  {formData.location}
-                </span>
-                {formData.experience && (
-                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm text-yellow-700">
-                    {formData.experience} experience
-                  </span>
-                )}
+              <div className="relative z-10">
+                <div className="mb-4 flex items-center">
+                  <div className="mr-3 flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+                    <Briefcase className="h-6 w-6" />
+                  </div>
+                  <h1 className="text-2xl font-bold">CareerCrafter</h1>
+                </div>
+                <h2 className="mb-3 text-3xl font-bold">Find Your Perfect Candidate</h2>
+                <p className="text-lg leading-relaxed text-purple-100">
+                  Post your job and connect with talented professionals ready to make an impact at
+                  your company.
+                </p>
+              </div>
+            </div>
+
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                    <Users className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <TrendingUp className="h-5 w-5 text-green-500" />
+                </div>
+                <div className="mb-1 text-2xl font-bold text-gray-900">50K+</div>
+                <div className="text-sm text-gray-600">Active Job Seekers</div>
               </div>
 
-              {formData.salary.showSalary && formData.salary.min && formData.salary.max && (
-                <div className="mb-4">
-                  <h3 className="mb-1 text-lg font-semibold">Salary</h3>
-                  <p className="text-gray-700">
-                    {formData.salary.currency} {formData.salary.min} - {formData.salary.max}{' '}
-                    {formData.salary.period}
-                  </p>
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+                    <Target className="h-5 w-5 text-green-600" />
+                  </div>
+                  <TrendingUp className="h-5 w-5 text-green-500" />
                 </div>
-              )}
-
-              <div className="mb-4">
-                <h3 className="mb-1 text-lg font-semibold">Job Description</h3>
-                <p className="whitespace-pre-line text-gray-700">{formData.description}</p>
+                <div className="mb-1 text-2xl font-bold text-gray-900">95%</div>
+                <div className="text-sm text-gray-600">Match Success Rate</div>
               </div>
 
-              {formData.requirements.length > 0 && formData.requirements[0] && (
-                <div className="mb-4">
-                  <h3 className="mb-1 text-lg font-semibold">Requirements</h3>
-                  <ul className="list-disc pl-5 text-gray-700">
-                    {formData.requirements.map((req, index) => req && <li key={index}>{req}</li>)}
-                  </ul>
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+                    <Clock className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <TrendingUp className="h-5 w-5 text-green-500" />
                 </div>
-              )}
+                <div className="mb-1 text-2xl font-bold text-gray-900">7 Days</div>
+                <div className="text-sm text-gray-600">Avg. Time to Hire</div>
+              </div>
 
-              {formData.responsibilities.length > 0 && formData.responsibilities[0] && (
-                <div className="mb-4">
-                  <h3 className="mb-1 text-lg font-semibold">Responsibilities</h3>
-                  <ul className="list-disc pl-5 text-gray-700">
-                    {formData.responsibilities.map(
-                      (resp, index) => resp && <li key={index}>{resp}</li>
-                    )}
-                  </ul>
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
+                    <Globe className="h-5 w-5 text-orange-600" />
+                  </div>
+                  <TrendingUp className="h-5 w-5 text-green-500" />
                 </div>
-              )}
+                <div className="mb-1 text-2xl font-bold text-gray-900">120+</div>
+                <div className="text-sm text-gray-600">Countries Reached</div>
+              </div>
+            </div>
 
-              {formData.benefits.length > 0 && formData.benefits[0] && (
-                <div className="mb-4">
-                  <h3 className="mb-1 text-lg font-semibold">Benefits</h3>
-                  <ul className="list-disc pl-5 text-gray-700">
-                    {formData.benefits.map(
-                      (benefit, index) => benefit && <li key={index}>{benefit}</li>
-                    )}
-                  </ul>
+            {/* Tips Section */}
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+              <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
+                <Star className="mr-2 h-5 w-5 text-yellow-500" />
+                Pro Tips for Better Results
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Write Clear Job Titles</h4>
+                    <p className="text-sm text-gray-600">
+                      Use specific, searchable titles that candidates understand
+                    </p>
+                  </div>
                 </div>
-              )}
 
-              <div className="mt-8 flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                >
-                  Publish Job
-                </button>
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Include Salary Range</h4>
+                    <p className="text-sm text-gray-600">
+                      Jobs with salary info get 3x more applications
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Highlight Benefits</h4>
+                    <p className="text-sm text-gray-600">Showcase what makes your company unique</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Be Specific</h4>
+                    <p className="text-sm text-gray-600">
+                      Detailed requirements attract better matches
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Success Story */}
+            <div className="rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-6">
+              <div className="mb-4 flex items-center">
+                <div className="mr-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                  <Users className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-green-900">Success Story</h3>
+                  <p className="text-sm text-green-700">TechCorp Inc.</p>
+                </div>
+              </div>
+              <p className="mb-3 text-sm leading-relaxed text-green-800">
+                "We found our perfect Senior Developer in just 3 days! The quality of candidates was
+                exceptional."
+              </p>
+              <div className="flex items-center">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+                <span className="ml-2 text-sm font-medium text-green-700">5.0 rating</span>
               </div>
             </div>
           </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="rounded-lg border-[2px] border-indigo-200 bg-white p-6 shadow-lg"
-          >
-            <div className="mb-8">
-              <h2 className="mb-4 border-b pb-2 text-xl font-semibold">Job Details</h2>
 
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <label htmlFor="title" className="form-label">
-                    Job Title <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleChange}
-                    className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.title ? 'border-red-500' : ''}`}
-                    placeholder="e.g. Senior Frontend Developer"
-                  />
-                  {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="department" className="form-label">
-                    Department
-                  </label>
-                  <input
-                    type="text"
-                    id="department"
-                    name="department"
-                    value={formData.department}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    placeholder="e.g. Engineering"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <label htmlFor="location" className="form-label">
-                    Location <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.location ? 'border-red-500' : ''}`}
-                    placeholder="e.g. San Francisco, CA"
-                  />
-                  {errors.location && (
-                    <p className="mt-1 text-xs text-red-500">{errors.location}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="locationType" className="form-label">
-                    Location Type
-                  </label>
-                  <select
-                    id="locationType"
-                    name="locationType"
-                    value={formData.locationType}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    <option value="on-site">On-site</option>
-                    <option value="remote">Remote</option>
-                    <option value="hybrid">Hybrid</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <label htmlFor="type" className="form-label">
-                    Job Type
-                  </label>
-                  <select
-                    id="type"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="internship">Internship</option>
-                    <option value="temporary">Temporary</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="experience" className="form-label">
-                    Experience Level
-                  </label>
-                  <select
-                    id="experience"
-                    name="experience"
-                    value={formData.experience}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    <option value="">Select experience level</option>
-                    <option value="Entry Level">Entry Level</option>
-                    <option value="Mid Level">Mid Level</option>
-                    <option value="Senior Level">Senior Level</option>
-                    <option value="Executive">Executive</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <div className="mb-1 flex items-center justify-between">
-                  <label className="form-label">Salary Range</label>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="showSalary"
-                      name="salary.showSalary"
-                      checked={formData.salary.showSalary}
-                      onChange={handleChange}
-                      className="mr-2"
-                    />
-                    <label htmlFor="showSalary" className="text-sm text-gray-600">
-                      Display salary on job post
-                    </label>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {/* Form Section */}
+          <div className="lg:col-span-8">
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl">
+              <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-6">
+                <div className="flex items-center justify-between">
                   <div>
-                    <select
-                      name="salary.currency"
-                      value={formData.salary.currency}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    >
-                      <option value="USD">USD</option>
-                      <option value="EUR">EUR</option>
-                      <option value="GBP">GBP</option>
-                      <option value="CAD">CAD</option>
-                      <option value="AUD">AUD</option>
-                    </select>
+                    <h1 className="text-2xl font-bold text-white">Post a New Job</h1>
+                    <p className="text-purple-100">
+                      Fill out the details to attract the best candidates
+                    </p>
                   </div>
-                  <div>
-                    <input
-                      type="text"
-                      name="salary.min"
-                      value={formData.salary.min}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder="Min"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="text"
-                      name="salary.max"
-                      value={formData.salary.max}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder="Max"
-                    />
-                  </div>
-                  <div>
-                    <select
-                      name="salary.period"
-                      value={formData.salary.period}
-                      onChange={handleChange}
-                      className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    >
-                      <option value="yearly">per year</option>
-                      <option value="monthly">per month</option>
-                      <option value="hourly">per hour</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="description" className="form-label">
-                  Job Description <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  rows="6"
-                  className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.description ? 'border-red-500' : ''}`}
-                  placeholder="Describe the role, responsibilities, and ideal candidate..."
-                ></textarea>
-                {errors.description && (
-                  <p className="mt-1 text-xs text-red-500">{errors.description}</p>
-                )}
-              </div>
-
-              <div className="mb-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="form-label">Requirements</label>
                   <button
                     type="button"
-                    onClick={() => addArrayItem('requirements')}
-                    className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
+                    onClick={togglePreview}
+                    className="rounded-lg bg-white/20 px-4 py-2 text-white transition-colors hover:bg-white/30"
                   >
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Requirement
+                    {previewMode ? 'Edit Job' : 'Preview Job'}
                   </button>
                 </div>
-                {errors.requirements && (
-                  <p className="mt-1 mb-2 text-xs text-red-500">{errors.requirements}</p>
-                )}
-                {formData.requirements.map((requirement, index) => (
-                  <div key={index} className="mb-2 flex items-center">
-                    <input
-                      type="text"
-                      value={requirement}
-                      onChange={e => handleArrayChange(e, index, 'requirements')}
-                      className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder={`Requirement ${index + 1}`}
-                    />
-                    {formData.requirements.length > 1 && (
+              </div>
+
+              <div className="p-8">
+                {previewMode ? (
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="mb-2 text-2xl font-bold text-gray-900">{formData.title}</h2>
+                      <div className="mb-4 flex flex-wrap gap-3">
+                        <span className="rounded-full bg-purple-100 px-3 py-1 text-sm text-purple-700">
+                          {formData.type}
+                        </span>
+                        <span className="rounded-full bg-blue-100 px-3 py-1 text-sm text-blue-700">
+                          {formData.locationType}
+                        </span>
+                        <span className="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
+                          {formData.location}
+                        </span>
+                        {formData.experience && (
+                          <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm text-yellow-700">
+                            {formData.experience} experience
+                          </span>
+                        )}
+                      </div>
+
+                      {formData.salary.showSalary && formData.salary.min && formData.salary.max && (
+                        <div className="mb-4">
+                          <h3 className="mb-1 text-lg font-semibold">Salary</h3>
+                          <p className="text-gray-700">
+                            {formData.salary.currency} {formData.salary.min} - {formData.salary.max}{' '}
+                            {formData.salary.period}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="mb-4">
+                        <h3 className="mb-1 text-lg font-semibold">Job Description</h3>
+                        <p className="whitespace-pre-line text-gray-700">{formData.description}</p>
+                      </div>
+
+                      {formData.requirements.length > 0 && formData.requirements[0] && (
+                        <div className="mb-4">
+                          <h3 className="mb-1 text-lg font-semibold">Requirements</h3>
+                          <ul className="list-disc pl-5 text-gray-700">
+                            {formData.requirements.map(
+                              (req, index) => req && <li key={index}>{req}</li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                      {formData.responsibilities.length > 0 && formData.responsibilities[0] && (
+                        <div className="mb-4">
+                          <h3 className="mb-1 text-lg font-semibold">Responsibilities</h3>
+                          <ul className="list-disc pl-5 text-gray-700">
+                            {formData.responsibilities.map(
+                              (resp, index) => resp && <li key={index}>{resp}</li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                      {formData.benefits.length > 0 && formData.benefits[0] && (
+                        <div className="mb-4">
+                          <h3 className="mb-1 text-lg font-semibold">Benefits</h3>
+                          <ul className="list-disc pl-5 text-gray-700">
+                            {formData.benefits.map(
+                              (benefit, index) => benefit && <li key={index}>{benefit}</li>
+                            )}
+                          </ul>
+                        </div>
+                      )}
+
+                      <div className="mt-8 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={handleSubmit}
+                          className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl"
+                        >
+                          Publish Job
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Job Details Section */}
+                    <div>
+                      <h2 className="mb-6 flex items-center border-b border-gray-200 pb-2 text-xl font-semibold">
+                        <Briefcase className="mr-2 h-5 w-5 text-purple-600" />
+                        Job Details
+                      </h2>
+
+                      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                          <label
+                            htmlFor="title"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Job Title <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${
+                              errors.title ? 'border-red-500' : ''
+                            }`}
+                            placeholder="e.g. Senior Frontend Developer"
+                          />
+                          {errors.title && (
+                            <p className="mt-1 text-xs text-red-500">{errors.title}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="department"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Department
+                          </label>
+                          <input
+                            type="text"
+                            id="department"
+                            name="department"
+                            value={formData.department}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            placeholder="e.g. Engineering"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                          <label
+                            htmlFor="location"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Location <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            id="location"
+                            name="location"
+                            value={formData.location}
+                            onChange={handleChange}
+                            className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${
+                              errors.location ? 'border-red-500' : ''
+                            }`}
+                            placeholder="e.g. San Francisco, CA"
+                          />
+                          {errors.location && (
+                            <p className="mt-1 text-xs text-red-500">{errors.location}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="locationType"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Location Type
+                          </label>
+                          <select
+                            id="locationType"
+                            name="locationType"
+                            value={formData.locationType}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          >
+                            <option value="on-site">On-site</option>
+                            <option value="remote">Remote</option>
+                            <option value="hybrid">Hybrid</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                          <label
+                            htmlFor="type"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Job Type
+                          </label>
+                          <select
+                            id="type"
+                            name="type"
+                            value={formData.type}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          >
+                            <option value="full-time">Full-time</option>
+                            <option value="part-time">Part-time</option>
+                            <option value="contract">Contract</option>
+                            <option value="internship">Internship</option>
+                            <option value="temporary">Temporary</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="experience"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Experience Level
+                          </label>
+                          <select
+                            id="experience"
+                            name="experience"
+                            value={formData.experience}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          >
+                            <option value="">Select experience level</option>
+                            <option value="Entry Level">Entry Level</option>
+                            <option value="Mid Level">Mid Level</option>
+                            <option value="Senior Level">Senior Level</option>
+                            <option value="Executive">Executive</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="mb-6">
+                        <div className="mb-1 flex items-center justify-between">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Salary Range
+                          </label>
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id="showSalary"
+                              name="salary.showSalary"
+                              checked={formData.salary.showSalary}
+                              onChange={handleChange}
+                              className="mr-2"
+                            />
+                            <label htmlFor="showSalary" className="text-sm text-gray-600">
+                              Display salary on job post
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                          <div>
+                            <select
+                              name="salary.currency"
+                              value={formData.salary.currency}
+                              onChange={handleChange}
+                              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            >
+                              <option value="USD">USD</option>
+                              <option value="EUR">EUR</option>
+                              <option value="GBP">GBP</option>
+                              <option value="CAD">CAD</option>
+                              <option value="AUD">AUD</option>
+                            </select>
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              name="salary.min"
+                              value={formData.salary.min}
+                              onChange={handleChange}
+                              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                              placeholder="Min"
+                            />
+                          </div>
+                          <div>
+                            <input
+                              type="text"
+                              name="salary.max"
+                              value={formData.salary.max}
+                              onChange={handleChange}
+                              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                              placeholder="Max"
+                            />
+                          </div>
+                          <div>
+                            <select
+                              name="salary.period"
+                              value={formData.salary.period}
+                              onChange={handleChange}
+                              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            >
+                              <option value="yearly">per year</option>
+                              <option value="monthly">per month</option>
+                              <option value="hourly">per hour</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mb-6">
+                        <label
+                          htmlFor="description"
+                          className="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                          Job Description <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          id="description"
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          rows="6"
+                          className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${
+                            errors.description ? 'border-red-500' : ''
+                          }`}
+                          placeholder="Describe the role, responsibilities, and ideal candidate..."
+                        ></textarea>
+                        {errors.description && (
+                          <p className="mt-1 text-xs text-red-500">{errors.description}</p>
+                        )}
+                      </div>
+
+                      <div className="mb-6">
+                        <div className="mb-2 flex items-center justify-between">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Requirements
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addArrayItem('requirements')}
+                            className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
+                          >
+                            <Plus className="mr-1 h-4 w-4" />
+                            Add Requirement
+                          </button>
+                        </div>
+                        {errors.requirements && (
+                          <p className="mb-2 text-xs text-red-500">{errors.requirements}</p>
+                        )}
+                        {formData.requirements.map((requirement, index) => (
+                          <div key={index} className="mb-2 flex items-center">
+                            <input
+                              type="text"
+                              value={requirement}
+                              onChange={e => handleArrayChange(e, index, 'requirements')}
+                              className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                              placeholder={`Requirement ${index + 1}`}
+                            />
+                            {formData.requirements.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeArrayItem(index, 'requirements')}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                              >
+                                <Minus className="h-5 w-5" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mb-6">
+                        <div className="mb-2 flex items-center justify-between">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Responsibilities
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addArrayItem('responsibilities')}
+                            className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
+                          >
+                            <Plus className="mr-1 h-4 w-4" />
+                            Add Responsibility
+                          </button>
+                        </div>
+                        {errors.responsibilities && (
+                          <p className="mb-2 text-xs text-red-500">{errors.responsibilities}</p>
+                        )}
+                        {formData.responsibilities.map((responsibility, index) => (
+                          <div key={index} className="mb-2 flex items-center">
+                            <input
+                              type="text"
+                              value={responsibility}
+                              onChange={e => handleArrayChange(e, index, 'responsibilities')}
+                              className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                              placeholder={`Responsibility ${index + 1}`}
+                            />
+                            {formData.responsibilities.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeArrayItem(index, 'responsibilities')}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                              >
+                                <Minus className="h-5 w-5" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mb-6">
+                        <div className="mb-2 flex items-center justify-between">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Benefits
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => addArrayItem('benefits')}
+                            className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
+                          >
+                            <Plus className="mr-1 h-4 w-4" />
+                            Add Benefit
+                          </button>
+                        </div>
+                        {errors.benefits && (
+                          <p className="mb-2 text-xs text-red-500">{errors.benefits}</p>
+                        )}
+                        {formData.benefits.map((benefit, index) => (
+                          <div key={index} className="mb-2 flex items-center">
+                            <input
+                              type="text"
+                              value={benefit}
+                              onChange={e => handleArrayChange(e, index, 'benefits')}
+                              className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                              placeholder={`Benefit ${index + 1}`}
+                            />
+                            {formData.benefits.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeArrayItem(index, 'benefits')}
+                                className="ml-2 text-red-500 hover:text-red-700"
+                              >
+                                <Minus className="h-5 w-5" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Application Settings Section */}
+                    <div>
+                      <h2 className="mb-6 border-b border-gray-200 pb-2 text-xl font-semibold">
+                        Application Settings
+                      </h2>
+
+                      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                          <label
+                            htmlFor="applicationDeadline"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Application Deadline
+                          </label>
+                          <input
+                            type="date"
+                            id="applicationDeadline"
+                            name="applicationDeadline"
+                            value={formData.applicationDeadline}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="applicationEmail"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Application Email
+                          </label>
+                          <input
+                            type="email"
+                            id="applicationEmail"
+                            name="applicationEmail"
+                            value={formData.applicationEmail}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            placeholder="e.g. careers@company.com"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mb-6">
+                        <label
+                          htmlFor="applicationUrl"
+                          className="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                          External Application URL
+                        </label>
+                        <input
+                          type="url"
+                          id="applicationUrl"
+                          name="applicationUrl"
+                          value={formData.applicationUrl}
+                          onChange={handleChange}
+                          className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          placeholder="e.g. https://company.com/careers/job-title"
+                        />
+                        <p className="mt-1 flex items-center text-xs text-gray-500">
+                          <Info className="mr-1 h-4 w-4" />
+                          Leave blank to use CareerCrafter's application system
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Company Information Section */}
+                    <div>
+                      <h2 className="mb-6 border-b border-gray-200 pb-2 text-xl font-semibold">
+                        Company Information
+                      </h2>
+
+                      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                          <label
+                            htmlFor="companyName"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Company Name
+                          </label>
+                          <input
+                            type="text"
+                            id="companyName"
+                            name="companyName"
+                            value={formData.companyName}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="companyWebsite"
+                            className="mb-1 block text-sm font-medium text-gray-700"
+                          >
+                            Company Website
+                          </label>
+                          <input
+                            type="url"
+                            id="companyWebsite"
+                            name="companyWebsite"
+                            value={formData.companyWebsite}
+                            onChange={handleChange}
+                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                            placeholder="e.g. https://company.com"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mb-6">
+                        <label
+                          htmlFor="companyLogo"
+                          className="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                          Company Logo
+                        </label>
+                        <input
+                          type="file"
+                          id="companyLogo"
+                          name="companyLogo"
+                          accept="image/*"
+                          onChange={handleLogoChange}
+                          className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                          Recommended size: 400x400px. Max file size: 2MB.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6">
                       <button
                         type="button"
-                        onClick={() => removeArrayItem(index, 'requirements')}
-                        className="ml-2 text-red-500 hover:text-red-700"
+                        onClick={() => navigate('/employer/dashboard')}
+                        className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 transition-colors hover:bg-gray-50"
                       >
-                        <Minus className="h-5 w-5" />
+                        Cancel
                       </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mb-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="form-label">Responsibilities</label>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('responsibilities')}
-                    className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                  >
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Responsibility
-                  </button>
-                </div>
-                {errors.responsibilities && (
-                  <p className="mt-1 mb-2 text-xs text-red-500">{errors.responsibilities}</p>
-                )}
-                {formData.responsibilities.map((responsibility, index) => (
-                  <div key={index} className="mb-2 flex items-center">
-                    <input
-                      type="text"
-                      value={responsibility}
-                      onChange={e => handleArrayChange(e, index, 'responsibilities')}
-                      className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder={`Responsibility ${index + 1}`}
-                    />
-                    {formData.responsibilities.length > 1 && (
                       <button
-                        type="button"
-                        onClick={() => removeArrayItem(index, 'responsibilities')}
-                        className="ml-2 text-red-500 hover:text-red-700"
+                        type="submit"
+                        className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-3 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl"
                       >
-                        <Minus className="h-5 w-5" />
+                        Post Job
                       </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mb-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <label className="form-label">Benefits</label>
-                  <button
-                    type="button"
-                    onClick={() => addArrayItem('benefits')}
-                    className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                  >
-                    <Plus className="mr-1 h-4 w-4" />
-                    Add Benefit
-                  </button>
-                </div>
-                {errors.benefits && (
-                  <p className="mt-1 mb-2 text-xs text-red-500">{errors.benefits}</p>
+                    </div>
+                  </form>
                 )}
-                {formData.benefits.map((benefit, index) => (
-                  <div key={index} className="mb-2 flex items-center">
-                    <input
-                      type="text"
-                      value={benefit}
-                      onChange={e => handleArrayChange(e, index, 'benefits')}
-                      className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                      placeholder={`Benefit ${index + 1}`}
-                    />
-                    {formData.benefits.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeArrayItem(index, 'benefits')}
-                        className="ml-2 text-red-500 hover:text-red-700"
-                      >
-                        <Minus className="h-5 w-5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
               </div>
             </div>
-
-            <div className="mb-8">
-              <h2 className="mb-4 border-b pb-2 text-xl font-semibold">Application Settings</h2>
-
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <label htmlFor="applicationDeadline" className="form-label">
-                    Application Deadline
-                  </label>
-                  <input
-                    type="date"
-                    id="applicationDeadline"
-                    name="applicationDeadline"
-                    value={formData.applicationDeadline}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="applicationEmail" className="form-label">
-                    Application Email
-                  </label>
-                  <input
-                    type="email"
-                    id="applicationEmail"
-                    name="applicationEmail"
-                    value={formData.applicationEmail}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    placeholder="e.g. careers@company.com"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="applicationUrl" className="form-label">
-                  External Application URL
-                </label>
-                <input
-                  type="url"
-                  id="applicationUrl"
-                  name="applicationUrl"
-                  value={formData.applicationUrl}
-                  onChange={handleChange}
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  placeholder="e.g. https://company.com/careers/job-title"
-                />
-                <p className="mt-1 flex items-center text-xs text-gray-500">
-                  <Info className="mr-1 h-4 w-4" />
-                  Leave blank to use CareerCrafter's application system
-                </p>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h2 className="mb-4 border-b pb-2 text-xl font-semibold">Company Information</h2>
-
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div>
-                  <label htmlFor="companyName" className="form-label">
-                    Company Name
-                  </label>
-                  <input
-                    type="text"
-                    id="companyName"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="companyWebsite" className="form-label">
-                    Company Website
-                  </label>
-                  <input
-                    type="url"
-                    id="companyWebsite"
-                    name="companyWebsite"
-                    value={formData.companyWebsite}
-                    onChange={handleChange}
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    placeholder="e.g. https://company.com"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="companyLogo" className="form-label">
-                  Company Logo
-                </label>
-                <input
-                  type="file"
-                  id="companyLogo"
-                  name="companyLogo"
-                  accept="image/*"
-                  onChange={handleLogoChange}
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Recommended size: 400x400px. Max file size: 2MB.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate('/employer/dashboard')}
-                className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              >
-                Post Job
-              </button>
-            </div>
-          </form>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

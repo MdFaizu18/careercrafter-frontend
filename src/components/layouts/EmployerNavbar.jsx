@@ -94,13 +94,13 @@ const EmployerNavbar = ({ isAuthenticated, userRole, onLogout }) => {
                       <BriefcaseBusinessIcon className="h-4 w-4" />
                       <span>Manage Jobs</span>
                     </Link>
-                    <Link
+                    {/* <Link
                       to="/employer/support"
                       className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 transition-all duration-150 hover:bg-purple-50 hover:text-purple-700"
                     >
                       <CircleArrowOutDownRightIcon className="h-4 w-4" />
                       <span>Support</span>
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={handleLogout}
                       className="flex w-full items-center space-x-2 px-4 py-2 text-sm text-red-600 transition-all duration-150 hover:bg-red-50 hover:text-red-700"

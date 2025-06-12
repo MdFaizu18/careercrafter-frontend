@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
-import { Briefcase, Users, Clock, BarChart2, TrendingUp, Eye, Plus } from 'lucide-react';
-import StatsCard from '../../components/common/StatsCard';
+import {
+  Briefcase,
+  Users,
+  Clock,
+  BarChart2,
+  Eye,
+  Plus,
+  ChevronRight,
+  Search,
+  Bell,
+  Filter,
+  MapPin,
+} from 'lucide-react';
 
 const DashboardEmployer = () => {
   // Sample data
@@ -9,25 +20,25 @@ const DashboardEmployer = () => {
       title: 'Active Jobs',
       value: '12',
       icon: <Briefcase className="h-6 w-6 text-white" />,
-      color: 'bg-purple-600',
+      color: 'bg-gradient-to-br from-purple-500 to-purple-700',
     },
     {
-      title: 'Total Applications',
+      title: 'Applications',
       value: '143',
       icon: <Users className="h-6 w-6 text-white" />,
-      color: 'bg-blue-600',
+      color: 'bg-gradient-to-br from-blue-500 to-blue-700',
     },
     {
-      title: 'Interviews Scheduled',
+      title: 'Interviews',
       value: '28',
       icon: <Clock className="h-6 w-6 text-white" />,
-      color: 'bg-green-600',
+      color: 'bg-gradient-to-br from-green-500 to-green-700',
     },
     {
       title: 'Profile Views',
       value: '1,254',
       icon: <Eye className="h-6 w-6 text-white" />,
-      color: 'bg-orange-600',
+      color: 'bg-gradient-to-br from-orange-500 to-orange-700',
     },
   ];
 
@@ -38,6 +49,7 @@ const DashboardEmployer = () => {
       applicant: 'John Smith',
       date: '2 days ago',
       status: 'New',
+      avatar: '/placeholder.svg?height=40&width=40',
     },
     {
       id: 2,
@@ -45,6 +57,7 @@ const DashboardEmployer = () => {
       applicant: 'Emily Johnson',
       date: '3 days ago',
       status: 'Reviewed',
+      avatar: '/placeholder.svg?height=40&width=40',
     },
     {
       id: 3,
@@ -52,6 +65,7 @@ const DashboardEmployer = () => {
       applicant: 'Michael Brown',
       date: '1 week ago',
       status: 'Interview',
+      avatar: '/placeholder.svg?height=40&width=40',
     },
     {
       id: 4,
@@ -59,13 +73,7 @@ const DashboardEmployer = () => {
       applicant: 'Sarah Wilson',
       date: '1 week ago',
       status: 'Rejected',
-    },
-    {
-      id: 5,
-      position: 'Marketing Specialist',
-      applicant: 'David Lee',
-      date: '2 weeks ago',
-      status: 'Hired',
+      avatar: '/placeholder.svg?height=40&width=40',
     },
   ];
 
@@ -76,6 +84,8 @@ const DashboardEmployer = () => {
       applications: 24,
       posted: '2 weeks ago',
       expires: '2 weeks left',
+      location: 'San Francisco, CA',
+      type: 'Full-time',
     },
     {
       id: 2,
@@ -83,6 +93,8 @@ const DashboardEmployer = () => {
       applications: 18,
       posted: '1 week ago',
       expires: '3 weeks left',
+      location: 'Remote',
+      type: 'Contract',
     },
     {
       id: 3,
@@ -90,187 +102,236 @@ const DashboardEmployer = () => {
       applications: 32,
       posted: '3 days ago',
       expires: '27 days left',
+      location: 'New York, NY',
+      type: 'Full-time',
     },
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-24">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Employer Dashboard</h1>
-          <p className="text-gray-600">
-            Welcome back! Here's what's happening with your job postings.
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Link
-            to="/employer/post-job"
-            className="focus:ring-opacity-50 flex items-center rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Post New Job
-          </Link>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with gradient background */}
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-8 text-white">
+        <div className="container mx-auto">
+          <div className="flex flex-col items-start justify-between space-y-4 md:flex-row md:items-center md:space-y-0">
+            <div>
+              <h1 className="text-3xl font-bold">Employer Dashboard</h1>
+              <p className="mt-1 text-purple-100">
+                Welcome back! Here's your recruitment overview.
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Bell className="h-6 w-6 cursor-pointer text-purple-100 hover:text-white" />
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
+                  3
+                </span>
+              </div>
+
+              <Link
+                to="/employer/post-job"
+                className="flex items-center rounded-full bg-white px-6 py-2 font-medium text-purple-700 shadow-md transition-all hover:bg-purple-50"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                Post Job
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <StatsCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            icon={stat.icon}
-            color={stat.color}
-          />
-        ))}
-      </div>
+      <div className="container mx-auto px-6 py-8">
+        {/* Search and filter bar */}
+        <div className="mb-8 flex flex-col items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm md:flex-row md:items-center">
+          <div className="relative flex-grow">
+            <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search applications, candidates or jobs..."
+              className="w-full rounded-lg border-0 bg-gray-50 py-2 pr-4 pl-10 text-gray-900 focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
 
-      {/* Charts Section */}
-      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-lg bg-white p-6 shadow-md transition-shadow duration-200 hover:shadow-lg">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Applications Trend</h2>
-            <select className="w-auto w-full rounded-md border border-gray-300 px-3 px-4 py-1 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none">
-              <option>Last 7 days</option>
+          <div className="flex items-center gap-3">
+            <button className="flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <Filter className="mr-2 h-4 w-4" />
+              Filters
+            </button>
+
+            <select className="rounded-lg border-0 bg-gray-50 px-4 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-purple-500">
               <option>Last 30 days</option>
+              <option>Last 7 days</option>
               <option>Last 90 days</option>
             </select>
           </div>
-          <div className="flex h-64 items-center justify-center rounded-lg bg-gray-50">
-            <div className="text-center">
-              <BarChart2 className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-gray-500">Applications chart would render here</p>
-            </div>
-          </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-md transition-shadow duration-200 hover:shadow-lg">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Job Performance</h2>
-            <select className="w-auto w-full rounded-md border border-gray-300 px-3 px-4 py-1 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none">
-              <option>All Jobs</option>
-              <option>Active Jobs</option>
-              <option>Closed Jobs</option>
-            </select>
-          </div>
-          <div className="flex h-64 items-center justify-center rounded-lg bg-gray-50">
-            <div className="text-center">
-              <TrendingUp className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-gray-500">Performance chart would render here</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Applications */}
-      <div className="mb-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Recent Applications</h2>
-          <Link
-            to="/employer/applications"
-            className="font-medium text-purple-600 hover:text-purple-700"
-          >
-            View All
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full overflow-hidden rounded-lg bg-white shadow">
-            <thead className="bg-gray-50 text-gray-700">
-              <tr>
-                <th className="px-4 py-3 text-left font-medium">Position</th>
-                <th className="px-4 py-3 text-left font-medium">Applicant</th>
-                <th className="px-4 py-3 text-left font-medium">Date</th>
-                <th className="px-4 py-3 text-left font-medium">Status</th>
-                <th className="px-4 py-3 text-left font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {recentApplications.map(application => (
-                <tr key={application.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">{application.position}</td>
-                  <td className="px-4 py-3">{application.applicant}</td>
-                  <td className="px-4 py-3 text-gray-500">{application.date}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2 py-1 text-xs font-medium ${
-                        application.status === 'New'
-                          ? 'bg-blue-100 text-blue-800'
-                          : application.status === 'Reviewed'
-                            ? 'bg-purple-100 text-purple-800'
-                            : application.status === 'Interview'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : application.status === 'Rejected'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-green-100 text-green-800'
-                      }`}
-                    >
-                      {application.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      to={`/employer/applications/${application.id}`}
-                      className="text-purple-600 hover:text-purple-700"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Active Jobs */}
-      <div>
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Active Job Listings</h2>
-          <Link
-            to="/employer/manage-jobs"
-            className="font-medium text-purple-600 hover:text-purple-700"
-          >
-            Manage Jobs
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {activeJobs.map(job => (
+        {/* Stats Cards - Simplified and more stylish */}
+        <div className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => (
             <div
-              key={job.id}
-              className="rounded-lg bg-white p-6 shadow-md transition-shadow duration-200 hover:shadow-lg"
+              key={index}
+              className="group overflow-hidden rounded-xl bg-white p-6 shadow-sm transition-all hover:shadow-md"
             >
-              <h3 className="mb-2 text-lg font-semibold">{job.title}</h3>
-              <div className="mb-4 flex items-center text-gray-500">
-                <Clock className="mr-1 h-4 w-4" />
-                <span className="text-sm">Posted {job.posted}</span>
-              </div>
-              <div className="mb-4 flex justify-between">
-                <div className="text-sm">
-                  <span className="text-gray-500">Applications:</span>
-                  <span className="ml-1 font-medium">{job.applications}</span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">{stat.title}</p>
+                  <h3 className="mt-1 text-2xl font-bold">{stat.value}</h3>
                 </div>
-                <div className="text-sm">
-                  <span className="text-gray-500">Expires:</span>
-                  <span className="ml-1 font-medium">{job.expires}</span>
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.color} shadow-sm transition-transform group-hover:scale-110`}
+                >
+                  {stat.icon}
                 </div>
               </div>
-              <div className="flex space-x-2">
-                <Link
-                  to={`/employer/applications?job=${job.id}`}
-                  className="rounded bg-purple-100 px-3 py-1 text-sm text-purple-700 hover:bg-purple-200"
-                >
-                  View Applications
-                </Link>
-                <Link
-                  to={`/employer/manage-jobs/${job.id}`}
-                  className="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200"
-                >
-                  Edit
-                </Link>
+              <div className="mt-4 flex items-center text-xs font-medium text-green-600">
+                <span>↑ 12% from last month</span>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Left column - Active Jobs */}
+          <div className="lg:col-span-1">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">Active Jobs</h2>
+              <Link
+                to="/employer/manage-jobs"
+                className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-800"
+              >
+                View all
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="space-y-4">
+              {activeJobs.map(job => (
+                <div
+                  key={job.id}
+                  className="overflow-hidden rounded-xl bg-white p-5 shadow-sm transition-all hover:shadow-md"
+                >
+                  <div className="mb-3 flex items-start justify-between">
+                    <h3 className="font-semibold text-gray-900">{job.title}</h3>
+                    <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-800">
+                      {job.applications} apps
+                    </span>
+                  </div>
+
+                  <div className="mb-3 flex items-center text-sm text-gray-500">
+                    <MapPin className="mr-1.5 h-4 w-4 flex-shrink-0" />
+                    <span>{job.location}</span>
+                    <span className="mx-2">•</span>
+                    <span>{job.type}</span>
+                  </div>
+
+                  <div className="mb-4 flex justify-between text-xs">
+                    <span className="text-gray-500">Posted {job.posted}</span>
+                    <span className="font-medium text-amber-600">Expires in {job.expires}</span>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <Link
+                      to={`/employer/applications?job=${job.id}`}
+                      className="flex-1 rounded-lg bg-purple-50 py-2 text-center text-sm font-medium text-purple-700 transition-colors hover:bg-purple-100"
+                    >
+                      View Applications
+                    </Link>
+                    <Link
+                      to={`/employer/manage-jobs/${job.id}`}
+                      className="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200"
+                    >
+                      Edit
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right column - Applications and Chart */}
+          <div className="lg:col-span-2">
+            {/* Recent Applications - Redesigned */}
+            <div className="mb-8">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">Recent Applications</h2>
+                <Link
+                  to="/employer/applications"
+                  className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-800"
+                >
+                  View all
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Link>
+              </div>
+
+              <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+                {recentApplications.map((application, index) => (
+                  <div
+                    key={application.id}
+                    className={`flex items-center justify-between p-4 hover:bg-gray-50 ${
+                      index !== recentApplications.length - 1 ? 'border-b border-gray-100' : ''
+                    }`}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <img
+                        src={application.avatar || '/placeholder.svg'}
+                        alt={application.applicant}
+                        className="h-10 w-10 rounded-full bg-gray-200"
+                      />
+                      <div>
+                        <h4 className="font-medium text-gray-900">{application.applicant}</h4>
+                        <p className="text-sm text-gray-500">{application.position}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-4">
+                      <span className="text-sm text-gray-500">{application.date}</span>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          application.status === 'New'
+                            ? 'bg-blue-100 text-blue-800'
+                            : application.status === 'Reviewed'
+                              ? 'bg-purple-100 text-purple-800'
+                              : application.status === 'Interview'
+                                ? 'bg-amber-100 text-amber-800'
+                                : application.status === 'Rejected'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-green-100 text-green-800'
+                        }`}
+                      >
+                        {application.status}
+                      </span>
+                      <Link
+                        to={`/employer/applications/${application.id}`}
+                        className="rounded-lg bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200"
+                      >
+                        View
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Chart - Simplified and more stylish */}
+            <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Applications Trend</h2>
+                <select className="rounded-lg border-0 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:ring-2 focus:ring-purple-500">
+                  <option>Last 7 days</option>
+                  <option>Last 30 days</option>
+                  <option>Last 90 days</option>
+                </select>
+              </div>
+
+              <div className="flex h-64 items-center justify-center rounded-lg bg-gray-50">
+                <div className="text-center">
+                  <BarChart2 className="mx-auto h-12 w-12 text-gray-300" />
+                  <p className="mt-2 text-gray-500">Applications chart would render here</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

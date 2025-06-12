@@ -9,17 +9,28 @@ import {
   Briefcase,
   Calendar,
   Share2,
-  Bookmark,
   Flag,
   CheckCircle,
   XCircle,
   Send,
+  Users,
+  Building,
+  Globe,
+  Star,
+  Heart,
+  ArrowRight,
+  Download,
+  Eye,
+  TrendingUp,
+  Award,
+  Zap,
 } from 'lucide-react';
 
 const JobDetails = () => {
   const { id } = useParams();
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [formData, setFormData] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -29,9 +40,9 @@ const JobDetails = () => {
   });
   const [errors, setErrors] = useState({});
 
-  // Sample job data (in a real app, this would be fetched from an API)
+  // Sample job data
   const job = {
-    id: parseInt(id),
+    id: Number.parseInt(id),
     title: 'Senior Frontend Developer',
     company: 'TechCorp Inc.',
     companyLogo: '/placeholder.svg?height=80&width=80',
@@ -41,6 +52,11 @@ const JobDetails = () => {
     experience: '5+ years',
     postedDate: '2 days ago',
     applicationDeadline: '30 days left',
+    applicants: 47,
+    views: 1234,
+    matchScore: 92,
+    urgency: 'high',
+    featured: true,
     description: `
       <p>TechCorp Inc. is looking for a Senior Frontend Developer to join our growing team. You will be responsible for building beautiful, responsive web applications that provide exceptional user experiences.</p>
       
@@ -83,6 +99,8 @@ const JobDetails = () => {
     companyWebsite: 'https://techcorp-example.com',
     companySize: '51-200 employees',
     companyIndustry: 'Software Development',
+    companyRating: 4.8,
+    companyReviews: 156,
   };
 
   const handleChange = e => {
@@ -92,7 +110,6 @@ const JobDetails = () => {
       [name]: value,
     });
 
-    // Clear error when user types
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -109,7 +126,6 @@ const JobDetails = () => {
         resume: file,
       });
 
-      // Clear error when user uploads a file
       if (errors.resume) {
         setErrors({
           ...errors,
@@ -139,268 +155,376 @@ const JobDetails = () => {
     e.preventDefault();
 
     if (validateForm()) {
-      // In a real app, you would send this data to your backend
       console.log('Application submitted:', formData);
-
-      // Show success message
       setApplicationSubmitted(true);
     }
   };
 
-  // Function to create HTML from string (for job description)
   const createMarkup = html => {
     return { __html: html };
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-4xl">
-        {/* Breadcrumbs */}
-        <div className="mb-6">
-          <nav className="flex" aria-label="Breadcrumb">
-            <ol className="inline-flex items-center space-x-1 md:space-x-3">
-              <li className="inline-flex items-center">
-                <Link to="/" className="text-sm text-gray-600 hover:text-purple-600">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <div className="flex items-center">
-                  <span className="mx-2 text-gray-400">/</span>
-                  <Link
-                    to="/job-seeker/search-jobs"
-                    className="text-sm text-gray-600 hover:text-purple-600"
-                  >
-                    Jobs
-                  </Link>
-                </div>
-              </li>
-              <li aria-current="page">
-                <div className="flex items-center">
-                  <span className="mx-2 text-gray-400">/</span>
-                  <span className="text-sm text-gray-500">{job.title}</span>
-                </div>
-              </li>
-            </ol>
-          </nav>
-        </div>
-
-        {/* Job Header */}
-        <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-          <div className="flex flex-col md:flex-row md:items-center">
-            <div className="mb-4 md:mr-6 md:mb-0">
-              <div className="flex h-16 w-16 items-center justify-center rounded-md bg-purple-100">
-                {job.companyLogo ? (
-                  <img
-                    src={job.companyLogo || '/placeholder.svg'}
-                    alt={job.company}
-                    className="h-12 w-12 object-contain"
-                  />
-                ) : (
-                  <Briefcase className="h-8 w-8 text-purple-600" />
-                )}
-              </div>
-            </div>
-            <div className="flex-1">
-              <h1 className="mb-1 text-2xl font-bold text-gray-900">{job.title}</h1>
-              <p className="mb-4 text-lg text-gray-600">{job.company}</p>
-
-              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                <div className="flex items-center">
-                  <MapPin className="mr-1 h-4 w-4 text-gray-400" />
-                  {job.location}
-                </div>
-                <div className="flex items-center">
-                  <Briefcase className="mr-1 h-4 w-4 text-gray-400" />
-                  {job.type}
-                </div>
-                <div className="flex items-center">
-                  <DollarSign className="mr-1 h-4 w-4 text-gray-400" />
-                  {job.salary}
-                </div>
-                <div className="flex items-center">
-                  <Clock className="mr-1 h-4 w-4 text-gray-400" />
-                  {job.experience}
-                </div>
-              </div>
-            </div>
-            <div className="mt-6 flex flex-col space-y-2 md:mt-0">
-              <button
-                className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                onClick={() => setShowApplyForm(true)}
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mx-auto max-w-7xl">
+          {/* Breadcrumbs */}
+          <div className="mb-8">
+            <nav className="flex items-center space-x-2 text-sm">
+              <Link to="/" className="text-gray-500 transition-colors hover:text-purple-600">
+                Home
+              </Link>
+              <ArrowRight className="h-4 w-4 text-gray-400" />
+              <Link
+                to="/jobseeker/find-jobs"
+                className="text-gray-500 transition-colors hover:text-purple-600"
               >
-                Apply Now
-              </button>
-              <div className="flex space-x-2">
-                {/* <button className="flex flex-1 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
-                  <Bookmark className="mr-1 h-4 w-4" />
-                  Save
-                </button> */}
-                {/* <button className="flex flex-1 items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50">
-                  <Share2 className="mr-1 h-4 w-4" />
-                  Share
-                </button> */}
-              </div>
-            </div>
+                Jobs
+              </Link>
+              <ArrowRight className="h-4 w-4 text-gray-400" />
+              <span className="font-medium text-gray-900">{job.title}</span>
+            </nav>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-3 border-t border-gray-200 pt-6">
-            <div className="flex items-center text-sm text-gray-500">
-              <Calendar className="mr-1 h-4 w-4 text-gray-400" />
-              Posted {job.postedDate}
-            </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <Clock className="mr-1 h-4 w-4 text-gray-400" />
-              Apply before: {job.applicationDeadline}
-            </div>
-          </div>
-        </div>
+          {/* Hero Section */}
+          <div className="mb-8 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl">
+            {/* Header with gradient background */}
+            <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 px-8 py-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start space-x-6">
+                  {/* Company Logo */}
+                  <div className="relative">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
+                      {job.companyLogo ? (
+                        <img
+                          src={job.companyLogo || '/placeholder.svg'}
+                          alt={job.company}
+                          className="h-12 w-12 object-contain"
+                        />
+                      ) : (
+                        <Briefcase className="h-10 w-10 text-purple-600" />
+                      )}
+                    </div>
+                    {job.featured && (
+                      <div className="absolute -top-2 -right-2 rounded-full bg-yellow-400 p-1">
+                        <Star className="h-4 w-4 text-yellow-800" />
+                      </div>
+                    )}
+                  </div>
 
-        {/* Job Details */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-              <h2 className="mb-4 text-xl font-semibold">Job Description</h2>
-              <div
-                className="prose mb-6 max-w-none"
-                dangerouslySetInnerHTML={createMarkup(job.description)}
-              ></div>
+                  {/* Job Info */}
+                  <div className="flex-1">
+                    <div className="mb-2 flex items-center space-x-3">
+                      <h1 className="text-3xl font-bold text-white">{job.title}</h1>
+                      {job.urgency === 'high' && (
+                        <span className="flex items-center rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">
+                          <Zap className="mr-1 h-4 w-4" />
+                          Urgent
+                        </span>
+                      )}
+                    </div>
+                    <div className="mb-4 flex items-center space-x-4 text-purple-100">
+                      <span className="text-xl font-semibold">{job.company}</span>
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 fill-current text-yellow-400" />
+                        <span className="text-sm">{job.companyRating}</span>
+                        <span className="text-sm">({job.companyReviews} reviews)</span>
+                      </div>
+                    </div>
 
-              <h3 className="mb-3 text-lg font-semibold">Responsibilities</h3>
-              <ul className="mb-6 list-disc space-y-2 pl-5">
-                {job.responsibilities.map((item, index) => (
-                  <li key={index} className="text-gray-700">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <h3 className="mb-3 text-lg font-semibold">Requirements</h3>
-              <ul className="mb-6 list-disc space-y-2 pl-5">
-                {job.requirements.map((item, index) => (
-                  <li key={index} className="text-gray-700">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <h3 className="mb-3 text-lg font-semibold">Benefits</h3>
-              <ul className="mb-6 list-disc space-y-2 pl-5">
-                {job.benefits.map((item, index) => (
-                  <li key={index} className="text-gray-700">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-              <h2 className="mb-4 text-xl font-semibold">About {job.company}</h2>
-              <p className="mb-4 text-gray-700">{job.companyDescription}</p>
-
-              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Company Size</h3>
-                  <p className="text-gray-700">{job.companySize}</p>
+                    {/* Job Details */}
+                    <div className="grid grid-cols-2 gap-4 text-purple-100 lg:grid-cols-4">
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="h-5 w-5 text-purple-300" />
+                        <span className="text-sm">{job.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Briefcase className="h-5 w-5 text-purple-300" />
+                        <span className="text-sm">{job.type}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <DollarSign className="h-5 w-5 text-purple-300" />
+                        <span className="text-sm font-semibold">{job.salary}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-5 w-5 text-purple-300" />
+                        <span className="text-sm">{job.experience}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Industry</h3>
-                  <p className="text-gray-700">{job.companyIndustry}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Website</h3>
-                  <a
-                    href={job.companyWebsite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-purple-600 hover:underline"
+
+                {/* Action Buttons */}
+                <div className="mt-6 flex flex-col space-y-3 lg:mt-0">
+                  <button
+                    onClick={() => setShowApplyForm(true)}
+                    className="flex transform items-center justify-center space-x-2 rounded-xl bg-white px-8 py-4 font-semibold text-purple-700 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
                   >
-                    {job.companyWebsite.replace(/^https?:\/\//, '')}
-                  </a>
+                    <Send className="h-5 w-5" />
+                    <span>Apply Now</span>
+                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setIsBookmarked(!isBookmarked)}
+                      className={`flex flex-1 items-center justify-center space-x-2 rounded-lg border-2 border-white/20 px-4 py-2 backdrop-blur-sm transition-all duration-200 ${
+                        isBookmarked ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Heart className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                      <span className="text-sm">Save</span>
+                    </button>
+                    <button className="flex flex-1 items-center justify-center space-x-2 rounded-lg border-2 border-white/20 px-4 py-2 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/10">
+                      <Share2 className="h-4 w-4" />
+                      <span className="text-sm">Share</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Bar */}
+            <div className="border-b border-gray-100 bg-gray-50 px-8 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-8">
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Calendar className="h-4 w-4" />
+                    <span>Posted {job.postedDate}</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Users className="h-4 w-4" />
+                    <span>{job.applicants} applicants</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Eye className="h-4 w-4" />
+                    <span>{job.views} views</span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
+                    <TrendingUp className="h-4 w-4" />
+                    <span>{job.matchScore}% match</span>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    Apply before: {job.applicationDeadline}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div>
-            <div className="mb-6 rounded-lg bg-white p-6 shadow-md">
-              <h2 className="mb-4 text-lg font-semibold">Job Summary</h2>
+          {/* Main Content */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {/* Left Column - Job Details */}
+            <div className="space-y-8 lg:col-span-2">
+              {/* Job Description */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
+                <h2 className="mb-6 flex items-center text-2xl font-bold text-gray-900">
+                  <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
+                    <Briefcase className="h-5 w-5 text-purple-600" />
+                  </div>
+                  Job Description
+                </h2>
+                <div
+                  className="prose max-w-none leading-relaxed text-gray-700"
+                  dangerouslySetInnerHTML={createMarkup(job.description)}
+                ></div>
+              </div>
 
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Job Title</h3>
-                  <p className="text-gray-700">{job.title}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Location</h3>
-                  <p className="text-gray-700">{job.location}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Job Type</h3>
-                  <p className="text-gray-700">{job.type}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Salary Range</h3>
-                  <p className="text-gray-700">{job.salary}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Experience</h3>
-                  <p className="text-gray-700">{job.experience}</p>
+              {/* Responsibilities */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
+                <h3 className="mb-6 flex items-center text-xl font-bold text-gray-900">
+                  <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+                    <Award className="h-5 w-5 text-blue-600" />
+                  </div>
+                  Key Responsibilities
+                </h3>
+                <div className="grid gap-4">
+                  {job.responsibilities.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-start space-x-3 rounded-xl bg-gray-50 p-4"
+                    >
+                      <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-100">
+                        <span className="text-sm font-semibold text-purple-600">{index + 1}</span>
+                      </div>
+                      <span className="text-gray-700">{item}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="mt-6 border-t border-gray-200 pt-6">
+              {/* Requirements */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
+                <h3 className="mb-6 flex items-center text-xl font-bold text-gray-900">
+                  <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-green-100">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  Requirements
+                </h3>
+                <div className="grid gap-3">
+                  {job.requirements.map((item, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
+                      <span className="text-gray-700">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Benefits */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
+                <h3 className="mb-6 flex items-center text-xl font-bold text-gray-900">
+                  <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100">
+                    <Star className="h-5 w-5 text-yellow-600" />
+                  </div>
+                  Benefits & Perks
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {job.benefits.map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-3 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 p-3"
+                    >
+                      <Star className="h-4 w-4 text-purple-500" />
+                      <span className="text-gray-700">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Company Info */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
+                <h3 className="mb-6 flex items-center text-xl font-bold text-gray-900">
+                  <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
+                    <Building className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  About {job.company}
+                </h3>
+                <p className="mb-6 leading-relaxed text-gray-700">{job.companyDescription}</p>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <div className="rounded-xl bg-gray-50 p-4 text-center">
+                    <Users className="mx-auto mb-2 h-8 w-8 text-purple-600" />
+                    <div className="text-sm text-gray-500">Company Size</div>
+                    <div className="font-semibold text-gray-900">{job.companySize}</div>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 p-4 text-center">
+                    <Building className="mx-auto mb-2 h-8 w-8 text-purple-600" />
+                    <div className="text-sm text-gray-500">Industry</div>
+                    <div className="font-semibold text-gray-900">{job.companyIndustry}</div>
+                  </div>
+                  <div className="rounded-xl bg-gray-50 p-4 text-center">
+                    <Globe className="mx-auto mb-2 h-8 w-8 text-purple-600" />
+                    <div className="text-sm text-gray-500">Website</div>
+                    <a
+                      href={job.companyWebsite}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-purple-600 hover:text-purple-700"
+                    >
+                      Visit Site
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Apply Card */}
+              <div className="sticky top-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <div className="mb-6 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600">
+                    <Send className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-gray-900">Ready to Apply?</h3>
+                  <p className="text-sm text-gray-600">Join {job.applicants} other candidates</p>
+                </div>
+
                 <button
-                  className="focus:ring-opacity-50 mb-3 w-full rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   onClick={() => setShowApplyForm(true)}
+                  className="mb-4 w-full transform rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-4 font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
                 >
                   Apply Now
                 </button>
-                <button className="flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50">
-                  <Flag className="mr-2 h-4 w-4" />
-                  Report Job
-                </button>
-              </div>
-            </div>
 
-            <div className="rounded-lg bg-white p-6 shadow-md">
-              <h2 className="mb-4 text-lg font-semibold">Similar Jobs</h2>
-
-              <div className="space-y-4">
-                <div className="rounded-md border border-gray-200 p-4 transition-colors hover:border-purple-300">
-                  <h3 className="font-medium text-gray-900">Frontend Developer</h3>
-                  <p className="mb-2 text-sm text-gray-600">WebSolutions Inc.</p>
-                  <div className="flex items-center text-xs text-gray-500">
-                    <MapPin className="mr-1 h-3 w-3" />
-                    San Francisco, CA
-                  </div>
-                </div>
-
-                <div className="rounded-md border border-gray-200 p-4 transition-colors hover:border-purple-300">
-                  <h3 className="font-medium text-gray-900">React Developer</h3>
-                  <p className="mb-2 text-sm text-gray-600">AppWorks</p>
-                  <div className="flex items-center text-xs text-gray-500">
-                    <MapPin className="mr-1 h-3 w-3" />
-                    Remote
-                  </div>
-                </div>
-
-                <div className="rounded-md border border-gray-200 p-4 transition-colors hover:border-purple-300">
-                  <h3 className="font-medium text-gray-900">UI Engineer</h3>
-                  <p className="mb-2 text-sm text-gray-600">DesignHub</p>
-                  <div className="flex items-center text-xs text-gray-500">
-                    <MapPin className="mr-1 h-3 w-3" />
-                    New York, NY
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setIsBookmarked(!isBookmarked)}
+                    className={`flex items-center justify-center space-x-2 rounded-lg border py-3 transition-all duration-200 ${
+                      isBookmarked
+                        ? 'border-purple-200 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-600 hover:border-purple-200 hover:text-purple-600'
+                    }`}
+                  >
+                    <Heart className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                    <span className="text-sm font-medium">Save</span>
+                  </button>
+                  <button className="flex items-center justify-center space-x-2 rounded-lg border border-gray-200 py-3 text-gray-600 transition-all duration-200 hover:border-purple-200 hover:text-purple-600">
+                    <Flag className="h-4 w-4" />
+                    <span className="text-sm font-medium">Report</span>
+                  </button>
                 </div>
               </div>
 
-              <div className="mt-4 text-center">
+              {/* Job Summary */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <h3 className="mb-4 text-lg font-bold text-gray-900">Job Summary</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                    <span className="text-gray-600">Position</span>
+                    <span className="font-semibold text-gray-900">{job.title}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                    <span className="text-gray-600">Location</span>
+                    <span className="font-semibold text-gray-900">{job.location}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                    <span className="text-gray-600">Type</span>
+                    <span className="font-semibold text-gray-900">{job.type}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                    <span className="text-gray-600">Salary</span>
+                    <span className="font-semibold text-green-600">{job.salary}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-gray-600">Experience</span>
+                    <span className="font-semibold text-gray-900">{job.experience}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Similar Jobs */}
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+                <h3 className="mb-4 text-lg font-bold text-gray-900">Similar Jobs</h3>
+                <div className="space-y-4">
+                  {[
+                    {
+                      title: 'Frontend Developer',
+                      company: 'WebSolutions Inc.',
+                      location: 'San Francisco, CA',
+                    },
+                    { title: 'React Developer', company: 'AppWorks', location: 'Remote' },
+                    { title: 'UI Engineer', company: 'DesignHub', location: 'New York, NY' },
+                  ].map((similarJob, index) => (
+                    <div
+                      key={index}
+                      className="cursor-pointer rounded-xl border border-gray-100 p-4 transition-all duration-200 hover:border-purple-200 hover:bg-purple-50"
+                    >
+                      <h4 className="mb-1 font-semibold text-gray-900">{similarJob.title}</h4>
+                      <p className="mb-2 text-sm text-gray-600">{similarJob.company}</p>
+                      <div className="flex items-center text-xs text-gray-500">
+                        <MapPin className="mr-1 h-3 w-3" />
+                        {similarJob.location}
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <Link
                   to="/job-seeker/search-jobs"
-                  className="text-sm font-medium text-purple-600 hover:text-purple-700"
+                  className="mt-4 block text-center text-sm font-medium text-purple-600 hover:text-purple-700"
                 >
-                  View More Jobs
+                  View More Jobs →
                 </Link>
               </div>
             </div>
@@ -408,22 +532,22 @@ const JobDetails = () => {
         </div>
       </div>
 
-      {/* Application Form Modal */}
-      {/* <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"> */}
+      {/* Application Modal */}
       {showApplyForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white">
-            <div className="p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="p-8">
               {applicationSubmitted ? (
                 <div className="py-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                    <CheckCircle className="h-8 w-8 text-green-600" />
+                  <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-10 w-10 text-green-600" />
                   </div>
-                  <h2 className="mb-2 text-2xl font-bold text-gray-900">Application Submitted!</h2>
-                  <p className="mb-6 text-gray-600">
-                    Your application for <span className="font-medium">{job.title}</span> at{' '}
-                    <span className="font-medium">{job.company}</span> has been submitted
-                    successfully.
+                  <h2 className="mb-4 text-3xl font-bold text-gray-900">Application Submitted!</h2>
+                  <p className="mb-8 text-lg text-gray-600">
+                    Your application for{' '}
+                    <span className="font-semibold text-purple-600">{job.title}</span> at{' '}
+                    <span className="font-semibold text-purple-600">{job.company}</span> has been
+                    submitted successfully.
                   </p>
                   <div className="flex flex-col justify-center gap-4 sm:flex-row">
                     <button
@@ -431,13 +555,13 @@ const JobDetails = () => {
                         setShowApplyForm(false);
                         setApplicationSubmitted(false);
                       }}
-                      className="btn-secondary"
+                      className="rounded-xl border border-gray-300 px-6 py-3 text-gray-700 transition-colors hover:bg-gray-50"
                     >
                       Close
                     </button>
                     <Link
                       to="/job-seeker/applications"
-                      className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg"
                     >
                       View My Applications
                     </Link>
@@ -445,24 +569,29 @@ const JobDetails = () => {
                 </div>
               ) : (
                 <>
-                  <div className="mb-6 flex items-start justify-between">
+                  <div className="mb-8 flex items-start justify-between">
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">Apply for {job.title}</h2>
+                      <h2 className="mb-2 text-2xl font-bold text-gray-900">
+                        Apply for {job.title}
+                      </h2>
                       <p className="text-gray-600">
-                        {job.company} - {job.location}
+                        {job.company} • {job.location}
                       </p>
                     </div>
                     <button
                       onClick={() => setShowApplyForm(false)}
-                      className="text-gray-500 hover:text-gray-700"
+                      className="text-gray-400 transition-colors hover:text-gray-600"
                     >
                       <XCircle className="h-6 w-6" />
                     </button>
                   </div>
 
-                  <form onSubmit={handleSubmit}>
-                    <div className="mb-6">
-                      <label htmlFor="name" className="form-label">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="mb-2 block text-sm font-semibold text-gray-900"
+                      >
                         Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -471,14 +600,20 @@ const JobDetails = () => {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.name ? 'border-red-500' : ''}`}
+                        className={`w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                          errors.name ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your full name"
                       />
-                      {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                      {errors.name && <p className="mt-2 text-sm text-red-500">{errors.name}</p>}
                     </div>
 
-                    <div className="mb-6">
-                      <label htmlFor="email" className="form-label">
-                        Email <span className="text-red-500">*</span>
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="mb-2 block text-sm font-semibold text-gray-900"
+                      >
+                        Email Address <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="email"
@@ -486,37 +621,53 @@ const JobDetails = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className={`w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none ${errors.email ? 'border-red-500' : ''}`}
+                        className={`w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                          errors.email ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your email address"
                       />
-                      {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+                      {errors.email && <p className="mt-2 text-sm text-red-500">{errors.email}</p>}
                     </div>
 
-                    <div className="mb-6">
-                      <label htmlFor="resume" className="form-label">
+                    <div>
+                      <label
+                        htmlFor="phone"
+                        className="mb-2 block text-sm font-semibold text-gray-900"
+                      >
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className={`w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
+                          errors.phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter your phone number"
+                      />
+                      {errors.phone && <p className="mt-2 text-sm text-red-500">{errors.phone}</p>}
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="resume"
+                        className="mb-2 block text-sm font-semibold text-gray-900"
+                      >
                         Resume <span className="text-red-500">*</span>
                       </label>
-                      <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
-                        <div className="space-y-1 text-center">
-                          <svg
-                            className="mx-auto h-12 w-12 text-gray-400"
-                            stroke="currentColor"
-                            fill="none"
-                            viewBox="0 0 48 48"
-                            aria-hidden="true"
-                          >
-                            <path
-                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                          <div className="flex text-sm text-gray-600">
+                      <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400">
+                        <div className="space-y-4">
+                          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+                            <Download className="h-6 w-6 text-purple-600" />
+                          </div>
+                          <div>
                             <label
                               htmlFor="resume-upload"
-                              className="relative cursor-pointer rounded-md bg-white font-medium text-purple-600 focus-within:outline-none hover:text-purple-500"
+                              className="cursor-pointer font-semibold text-purple-600 hover:text-purple-700"
                             >
-                              <span>Upload a file</span>
+                              Choose file
                               <input
                                 id="resume-upload"
                                 name="resume-upload"
@@ -526,54 +677,79 @@ const JobDetails = () => {
                                 onChange={handleResumeChange}
                               />
                             </label>
-                            <p className="pl-1">or drag and drop</p>
+                            <span className="text-gray-600"> or drag and drop</span>
                           </div>
-                          <p className="text-xs text-gray-500">PDF, DOC, DOCX up to 10MB</p>
+                          <p className="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
                         </div>
                       </div>
                       {formData.resume && (
-                        <p className="mt-2 text-sm text-gray-600">
-                          Selected file: {formData.resume.name}
+                        <p className="mt-2 flex items-center text-sm text-green-600">
+                          <CheckCircle className="mr-1 h-4 w-4" />
+                          {formData.resume.name}
                         </p>
                       )}
                       {errors.resume && (
-                        <p className="mt-1 text-xs text-red-500">{errors.resume}</p>
+                        <p className="mt-2 text-sm text-red-500">{errors.resume}</p>
                       )}
                     </div>
 
-                    <div className="mb-6 flex items-center">
+                    <div>
+                      <label
+                        htmlFor="coverLetter"
+                        className="mb-2 block text-sm font-semibold text-gray-900"
+                      >
+                        Cover Letter (Optional)
+                      </label>
+                      <textarea
+                        id="coverLetter"
+                        name="coverLetter"
+                        rows="4"
+                        value={formData.coverLetter}
+                        onChange={handleChange}
+                        className="w-full rounded-xl border border-gray-300 px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500"
+                        placeholder="Tell us why you're perfect for this role..."
+                      ></textarea>
+                    </div>
+
+                    <div className="flex items-start space-x-3">
                       <input
                         id="terms"
                         name="terms"
                         type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
                       />
-                      <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
+                      <label htmlFor="terms" className="text-sm text-gray-700">
                         I agree to the{' '}
-                        <Link to="/terms" className="text-purple-600 hover:text-purple-500">
+                        <Link
+                          to="/terms"
+                          className="font-medium text-purple-600 hover:text-purple-700"
+                        >
                           Terms of Service
                         </Link>{' '}
                         and{' '}
-                        <Link to="/privacy" className="text-purple-600 hover:text-purple-500">
+                        <Link
+                          to="/privacy"
+                          className="font-medium text-purple-600 hover:text-purple-700"
+                        >
                           Privacy Policy
                         </Link>
                       </label>
                     </div>
 
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex justify-end space-x-4 pt-6">
                       <button
                         type="button"
                         onClick={() => setShowApplyForm(false)}
-                        className="rounded-md border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
+                        className="rounded-xl border border-gray-300 px-6 py-3 text-gray-700 transition-colors hover:bg-gray-50"
                       >
                         Cancel
                       </button>
                       <button
                         type="submit"
-                        className="focus:ring-opacity-50 flex items-center rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg"
                       >
-                        <Send className="mr-2 h-4 w-4" />
-                        Submit Application
+                        <Send className="h-4 w-4" />
+                        <span>Submit Application</span>
                       </button>
                     </div>
                   </form>
