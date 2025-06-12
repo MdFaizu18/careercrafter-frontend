@@ -20,6 +20,7 @@ import DashboardEmployer from './pages/employer/DashboardEmployer';
 import PostJob from './pages/employer/PostJobs';
 import ViewApplications from './pages/employer/ViewApplications';
 import ManageJobs from './pages/employer/ManageJobs';
+import EmployerProfile from './pages/employer/EmployerProfile';
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <DashboardEmployer />,
+      },
+      {
+        path: 'profile',
+        element: <EmployerProfile />,
       },
       {
         path: 'post-job',

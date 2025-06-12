@@ -94,223 +94,283 @@ const ManageJobs = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:px-24">
-      <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manage Jobs</h1>
-          <p className="text-gray-600">View, edit, and manage all your job postings.</p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Link
-            to="/employer/post-job"
-            className="focus:ring-opacity-50 flex items-center rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Post New Job
-          </Link>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="mb-6 rounded-lg bg-white p-4 shadow-md">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute top-3 left-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search jobs..."
-                value={searchTerm}
-                onChange={handleSearch}
-                className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Header with gradient background */}
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+        <div className="container mx-auto px-4 py-12 sm:px-24">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="mb-2 text-3xl font-bold">Manage Jobs</h1>
+              <p className="text-purple-100">View, edit, and manage all your job postings.</p>
             </div>
-          </div>
-          <div className="w-full md:w-64">
-            <div className="relative">
-              <Filter className="absolute top-3 left-3 text-gray-400" />
-              <select
-                value={statusFilter}
-                onChange={handleStatusFilter}
-                className="w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            <div className="mt-6 md:mt-0">
+              <Link
+                to="/employer/post-job"
+                className="inline-flex items-center rounded-2xl bg-white px-6 py-3 font-medium text-purple-700 shadow-lg transition-all duration-200 hover:bg-purple-50 hover:shadow-xl"
               >
-                <option value="all">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="expired">Expired</option>
-                <option value="draft">Draft</option>
-              </select>
+                <Plus className="mr-2 h-5 w-5" />
+                Post New Job
+              </Link>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Jobs Table */}
-      <div className="overflow-hidden rounded-lg bg-white shadow-md">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+      <div className="container mx-auto px-4 py-8 sm:px-24">
+        {/* Quick Filter Buttons */}
+        <div className="mb-8 flex flex-wrap gap-3">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
+              statusFilter === 'all'
+                ? 'bg-purple-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
+            }`}
+          >
+            All Jobs ({jobs.length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('active')}
+            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
+              statusFilter === 'active'
+                ? 'bg-green-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
+            }`}
+          >
+            Active ({jobs.filter(j => j.status === 'active').length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('draft')}
+            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
+              statusFilter === 'draft'
+                ? 'bg-gray-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
+            }`}
+          >
+            Draft ({jobs.filter(j => j.status === 'draft').length})
+          </button>
+          <button
+            onClick={() => setStatusFilter('expired')}
+            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
+              statusFilter === 'expired'
+                ? 'bg-red-600 text-white shadow-lg'
+                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
+            }`}
+          >
+            Expired ({jobs.filter(j => j.status === 'expired').length})
+          </button>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
+          <div className="flex flex-col gap-4 md:flex-row">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute top-4 left-4 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search jobs by title or location..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  className="w-full rounded-xl border border-gray-200 py-4 pr-4 pl-12 text-gray-900 placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
+                />
+              </div>
+            </div>
+            <div className="w-full md:w-64">
+              <div className="relative">
+                <Filter className="absolute top-4 left-4 h-5 w-5 text-gray-400" />
+                <select
+                  value={statusFilter}
+                  onChange={handleStatusFilter}
+                  className="w-full rounded-xl border border-gray-200 py-4 pr-4 pl-12 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
                 >
-                  Job Title
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                >
-                  Location
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                >
-                  Applications
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                >
-                  Status
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                >
-                  Posted
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-                >
-                  Expires
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {filteredJobs.length > 0 ? (
-                filteredJobs.map(job => (
-                  <tr key={job.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{job.title}</div>
-                      <div className="text-sm text-gray-500">{job.type}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{job.location}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{job.applications}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs leading-5 font-semibold ${
-                          job.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : job.status === 'expired'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                      {job.posted}
-                    </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                      {job.expires}
-                    </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                      <div className="flex items-center justify-end space-x-2">
-                        <Link
-                          to={`/employer/applications?job=${job.id}`}
-                          className="text-purple-600 hover:text-purple-900"
-                          title="View Applications"
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="expired">Expired</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Summary */}
+        <div className="mb-6">
+          <p className="text-gray-600">
+            Showing {filteredJobs.length} of {jobs.length} job{jobs.length !== 1 ? 's' : ''}
+          </p>
+        </div>
+
+        {/* Jobs Table */}
+        <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Job Title
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Location
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Applications
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Posted
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Expires
+                  </th>
+                  <th className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-600 uppercase">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50 bg-white">
+                {filteredJobs.length > 0 ? (
+                  filteredJobs.map(job => (
+                    <tr key={job.id} className="transition-colors hover:bg-gray-50">
+                      <td className="px-6 py-6">
+                        <div>
+                          <div className="text-sm font-semibold text-gray-900">{job.title}</div>
+                          <div className="text-sm text-gray-500">{job.type}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="text-sm text-gray-900">{job.location}</div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <div className="flex items-center">
+                          <span className="text-sm font-medium text-gray-900">
+                            {job.applications}
+                          </span>
+                          <span className="ml-2 rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-700">
+                            applicants
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-6">
+                        <span
+                          className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                            job.status === 'active'
+                              ? 'bg-green-100 text-green-800'
+                              : job.status === 'expired'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
+                          }`}
                         >
-                          <Eye className="h-5 w-5" />
-                        </Link>
-                        <Link
-                          to={`/employer/edit-job/${job.id}`}
-                          className="text-blue-600 hover:text-blue-900"
-                          title="Edit Job"
-                        >
-                          <Edit className="h-5 w-5" />
-                        </Link>
-                        <button
-                          onClick={() => confirmDelete(job.id)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Delete Job"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
-                        <div className="group relative">
-                          <button className="text-gray-500 hover:text-gray-700">
-                            <MoreHorizontal className="h-5 w-5" />
+                          {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-6 text-sm text-gray-500">{job.posted}</td>
+                      <td className="px-6 py-6 text-sm text-gray-500">{job.expires}</td>
+                      <td className="px-6 py-6">
+                        <div className="flex items-center justify-end space-x-3">
+                          <Link
+                            to={`/employer/applications?job=${job.id}`}
+                            className="rounded-lg p-2 text-purple-600 transition-colors hover:bg-purple-100"
+                            title="View Applications"
+                          >
+                            <Eye className="h-5 w-5" />
+                          </Link>
+                          <Link
+                            to={`/employer/edit-job/${job.id}`}
+                            className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-100"
+                            title="Edit Job"
+                          >
+                            <Edit className="h-5 w-5" />
+                          </Link>
+                          <button
+                            onClick={() => confirmDelete(job.id)}
+                            className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-100"
+                            title="Delete Job"
+                          >
+                            <Trash2 className="h-5 w-5" />
                           </button>
-                          <div className="absolute right-0 z-10 mt-2 hidden w-48 rounded-md bg-white py-1 shadow-lg group-hover:block">
-                            <Link
-                              to={`/job-seeker/job/${job.id}`}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                            >
-                              Preview Job
-                            </Link>
-                            <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                              Duplicate Job
+                          <div className="group relative">
+                            <button className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100">
+                              <MoreHorizontal className="h-5 w-5" />
                             </button>
-                            {job.status === 'active' ? (
+                            <div className="ring-opacity-5 absolute right-0 z-10 mt-2 hidden w-48 rounded-xl bg-white py-2 shadow-lg ring-1 ring-black group-hover:block">
+                              <Link
+                                to={`/job-seeker/job/${job.id}`}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Preview Job
+                              </Link>
                               <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                Pause Job
+                                Duplicate Job
                               </button>
-                            ) : (
-                              <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                Activate Job
-                              </button>
-                            )}
+                              {job.status === 'active' ? (
+                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
+                                  Pause Job
+                                </button>
+                              ) : (
+                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
+                                  Activate Job
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center">
+                        <div className="rounded-full bg-gray-100 p-4">
+                          <Search className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-medium text-gray-900">No jobs found</h3>
+                        <p className="mt-2 text-gray-500">
+                          Try adjusting your search criteria or create a new job posting.
+                        </p>
+                        <Link
+                          to="/employer/post-job"
+                          className="mt-4 inline-flex items-center rounded-xl bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Post New Job
+                        </Link>
                       </div>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                    No jobs found matching your criteria.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="w-full max-w-md rounded-lg bg-white p-6">
-            <h3 className="mb-4 text-lg font-bold">Confirm Deletion</h3>
-            <p className="mb-6">
-              Are you sure you want to delete this job posting? This action cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-4">
+          <div className="mx-4 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Confirm Deletion</h3>
+              <p className="mt-2 text-gray-600">
+                Are you sure you want to delete this job posting? This action cannot be undone and
+                will remove all associated applications.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
+                className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={deleteJob}
-                className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
               >
-                Delete
+                Delete Job
               </button>
             </div>
           </div>

@@ -3,7 +3,6 @@ import {
   Briefcase,
   Users,
   Clock,
-  BarChart2,
   Eye,
   Plus,
   ChevronRight,
@@ -11,7 +10,10 @@ import {
   Bell,
   Filter,
   MapPin,
+  Star,
+  CheckCircle,
 } from 'lucide-react';
+import EmployerApplicationsChart from '../../components/charts/EmployerApplicationsChart';
 
 const DashboardEmployer = () => {
   // Sample data
@@ -75,6 +77,14 @@ const DashboardEmployer = () => {
       status: 'Rejected',
       avatar: '/placeholder.svg?height=40&width=40',
     },
+    {
+      id: 4,
+      position: 'Backend Developer',
+      applicant: 'Sarah Wilson',
+      date: '1 week ago',
+      status: 'Rejected',
+      avatar: '/placeholder.svg?height=40&width=40',
+    },
   ];
 
   const activeJobs = [
@@ -110,7 +120,7 @@ const DashboardEmployer = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with gradient background */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-8 text-white">
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-8 text-white sm:px-24">
         <div className="container mx-auto">
           <div className="flex flex-col items-start justify-between space-y-4 md:flex-row md:items-center md:space-y-0">
             <div>
@@ -121,13 +131,6 @@ const DashboardEmployer = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Bell className="h-6 w-6 cursor-pointer text-purple-100 hover:text-white" />
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
-                  3
-                </span>
-              </div>
-
               <Link
                 to="/employer/post-job"
                 className="flex items-center rounded-full bg-white px-6 py-2 font-medium text-purple-700 shadow-md transition-all hover:bg-purple-50"
@@ -140,32 +143,7 @@ const DashboardEmployer = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
-        {/* Search and filter bar */}
-        <div className="mb-8 flex flex-col items-stretch justify-between gap-4 rounded-xl bg-white p-4 shadow-sm md:flex-row md:items-center">
-          <div className="relative flex-grow">
-            <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search applications, candidates or jobs..."
-              className="w-full rounded-lg border-0 bg-gray-50 py-2 pr-4 pl-10 text-gray-900 focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button className="flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <Filter className="mr-2 h-4 w-4" />
-              Filters
-            </button>
-
-            <select className="rounded-lg border-0 bg-gray-50 px-4 py-2 text-sm text-gray-700 focus:ring-2 focus:ring-purple-500">
-              <option>Last 30 days</option>
-              <option>Last 7 days</option>
-              <option>Last 90 days</option>
-            </select>
-          </div>
-        </div>
-
+      <div className="container mx-auto px-6 py-8 sm:px-24">
         {/* Stats Cards - Simplified and more stylish */}
         <div className="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
@@ -184,9 +162,6 @@ const DashboardEmployer = () => {
                   {stat.icon}
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs font-medium text-green-600">
-                <span>↑ 12% from last month</span>
-              </div>
             </div>
           ))}
         </div>
@@ -194,7 +169,61 @@ const DashboardEmployer = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Left column - Active Jobs */}
           <div className="lg:col-span-1">
-            <div className="mb-4 flex items-center justify-between">
+            {/* Tips Section */}
+            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+              <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
+                <Star className="mr-2 h-5 w-5 text-yellow-500" />
+                Pro Tips for Better Results
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Write Clear Job Titles</h4>
+                    <p className="text-sm text-gray-600">
+                      Use specific, searchable titles that candidates understand
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Include Salary Range</h4>
+                    <p className="text-sm text-gray-600">
+                      Jobs with salary info get 3x more applications
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Highlight Benefits</h4>
+                    <p className="text-sm text-gray-600">Showcase what makes your company unique</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900">Be Specific</h4>
+                    <p className="text-sm text-gray-600">
+                      Detailed requirements attract better matches
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mb-4 flex items-center justify-between pt-8">
               <h2 className="text-xl font-bold text-gray-900">Active Jobs</h2>
               <Link
                 to="/employer/manage-jobs"
@@ -204,7 +233,6 @@ const DashboardEmployer = () => {
                 <ChevronRight className="ml-1 h-4 w-4" />
               </Link>
             </div>
-
             <div className="space-y-4">
               {activeJobs.map(job => (
                 <div
@@ -248,11 +276,12 @@ const DashboardEmployer = () => {
               ))}
             </div>
           </div>
-
           {/* Right column - Applications and Chart */}
           <div className="lg:col-span-2">
+            {/* Chart - Simplified and more stylish */}
+            <EmployerApplicationsChart />
             {/* Recent Applications - Redesigned */}
-            <div className="mb-8">
+            <div className="mt-8 mb-8">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">Recent Applications</h2>
                 <Link
@@ -310,25 +339,6 @@ const DashboardEmployer = () => {
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Chart - Simplified and more stylish */}
-            <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900">Applications Trend</h2>
-                <select className="rounded-lg border-0 bg-gray-50 px-3 py-1.5 text-sm text-gray-700 focus:ring-2 focus:ring-purple-500">
-                  <option>Last 7 days</option>
-                  <option>Last 30 days</option>
-                  <option>Last 90 days</option>
-                </select>
-              </div>
-
-              <div className="flex h-64 items-center justify-center rounded-lg bg-gray-50">
-                <div className="text-center">
-                  <BarChart2 className="mx-auto h-12 w-12 text-gray-300" />
-                  <p className="mt-2 text-gray-500">Applications chart would render here</p>
-                </div>
               </div>
             </div>
           </div>

@@ -38,7 +38,7 @@ const PostJob = () => {
     benefits: [''],
     applicationDeadline: '',
     applicationEmail: '',
-    applicationUrl: '',
+    skillsRequired: '',
     companyName: 'Your Company',
     companyWebsite: '',
     companyLogo: null,
@@ -184,53 +184,6 @@ const PostJob = () => {
               </div>
             </div>
 
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                    <Users className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="mb-1 text-2xl font-bold text-gray-900">50K+</div>
-                <div className="text-sm text-gray-600">Active Job Seekers</div>
-              </div>
-
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-                    <Target className="h-5 w-5 text-green-600" />
-                  </div>
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="mb-1 text-2xl font-bold text-gray-900">95%</div>
-                <div className="text-sm text-gray-600">Match Success Rate</div>
-              </div>
-
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-                    <Clock className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="mb-1 text-2xl font-bold text-gray-900">7 Days</div>
-                <div className="text-sm text-gray-600">Avg. Time to Hire</div>
-              </div>
-
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100">
-                    <Globe className="h-5 w-5 text-orange-600" />
-                  </div>
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                </div>
-                <div className="mb-1 text-2xl font-bold text-gray-900">120+</div>
-                <div className="text-sm text-gray-600">Countries Reached</div>
-              </div>
-            </div>
-
             {/* Tips Section */}
             <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
               <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
@@ -283,31 +236,6 @@ const PostJob = () => {
                     </p>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            {/* Success Story */}
-            <div className="rounded-2xl border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-6">
-              <div className="mb-4 flex items-center">
-                <div className="mr-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                  <Users className="h-6 w-6 text-green-600" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-green-900">Success Story</h3>
-                  <p className="text-sm text-green-700">TechCorp Inc.</p>
-                </div>
-              </div>
-              <p className="mb-3 text-sm leading-relaxed text-green-800">
-                "We found our perfect Senior Developer in just 3 days! The quality of candidates was
-                exceptional."
-              </p>
-              <div className="flex items-center">
-                <div className="flex text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-current" />
-                  ))}
-                </div>
-                <span className="ml-2 text-sm font-medium text-green-700">5.0 rating</span>
               </div>
             </div>
           </div>
@@ -562,19 +490,6 @@ const PostJob = () => {
                           <label className="block text-sm font-medium text-gray-700">
                             Salary Range
                           </label>
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              id="showSalary"
-                              name="salary.showSalary"
-                              checked={formData.salary.showSalary}
-                              onChange={handleChange}
-                              className="mr-2"
-                            />
-                            <label htmlFor="showSalary" className="text-sm text-gray-600">
-                              Display salary on job post
-                            </label>
-                          </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -585,6 +500,7 @@ const PostJob = () => {
                               onChange={handleChange}
                               className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
                             >
+                              <option value="USD">INR</option>
                               <option value="USD">USD</option>
                               <option value="EUR">EUR</option>
                               <option value="GBP">GBP</option>
@@ -648,6 +564,24 @@ const PostJob = () => {
                         {errors.description && (
                           <p className="mt-1 text-xs text-red-500">{errors.description}</p>
                         )}
+                      </div>
+
+                      <div className="mb-6">
+                        <label
+                          htmlFor="skillsRequired"
+                          className="mb-1 block text-sm font-medium text-gray-700"
+                        >
+                          Skills Required
+                        </label>
+                        <input
+                          type="text"
+                          id="skillsRequired"
+                          name="skillsRequired"
+                          value={formData.skillsRequired}
+                          onChange={handleChange}
+                          className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                          placeholder="e.g. React, Node.js, MongoDB"
+                        />
                       </div>
 
                       <div className="mb-6">
@@ -727,45 +661,6 @@ const PostJob = () => {
                           </div>
                         ))}
                       </div>
-
-                      <div className="mb-6">
-                        <div className="mb-2 flex items-center justify-between">
-                          <label className="block text-sm font-medium text-gray-700">
-                            Benefits
-                          </label>
-                          <button
-                            type="button"
-                            onClick={() => addArrayItem('benefits')}
-                            className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                          >
-                            <Plus className="mr-1 h-4 w-4" />
-                            Add Benefit
-                          </button>
-                        </div>
-                        {errors.benefits && (
-                          <p className="mb-2 text-xs text-red-500">{errors.benefits}</p>
-                        )}
-                        {formData.benefits.map((benefit, index) => (
-                          <div key={index} className="mb-2 flex items-center">
-                            <input
-                              type="text"
-                              value={benefit}
-                              onChange={e => handleArrayChange(e, index, 'benefits')}
-                              className="w-full flex-grow rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                              placeholder={`Benefit ${index + 1}`}
-                            />
-                            {formData.benefits.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeArrayItem(index, 'benefits')}
-                                className="ml-2 text-red-500 hover:text-red-700"
-                              >
-                                <Minus className="h-5 w-5" />
-                              </button>
-                            )}
-                          </div>
-                        ))}
-                      </div>
                     </div>
 
                     {/* Application Settings Section */}
@@ -810,28 +705,6 @@ const PostJob = () => {
                           />
                         </div>
                       </div>
-
-                      <div className="mb-6">
-                        <label
-                          htmlFor="applicationUrl"
-                          className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                          External Application URL
-                        </label>
-                        <input
-                          type="url"
-                          id="applicationUrl"
-                          name="applicationUrl"
-                          value={formData.applicationUrl}
-                          onChange={handleChange}
-                          className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                          placeholder="e.g. https://company.com/careers/job-title"
-                        />
-                        <p className="mt-1 flex items-center text-xs text-gray-500">
-                          <Info className="mr-1 h-4 w-4" />
-                          Leave blank to use CareerCrafter's application system
-                        </p>
-                      </div>
                     </div>
 
                     {/* Company Information Section */}
@@ -839,63 +712,6 @@ const PostJob = () => {
                       <h2 className="mb-6 border-b border-gray-200 pb-2 text-xl font-semibold">
                         Company Information
                       </h2>
-
-                      <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div>
-                          <label
-                            htmlFor="companyName"
-                            className="mb-1 block text-sm font-medium text-gray-700"
-                          >
-                            Company Name
-                          </label>
-                          <input
-                            type="text"
-                            id="companyName"
-                            name="companyName"
-                            value={formData.companyName}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                          />
-                        </div>
-
-                        <div>
-                          <label
-                            htmlFor="companyWebsite"
-                            className="mb-1 block text-sm font-medium text-gray-700"
-                          >
-                            Company Website
-                          </label>
-                          <input
-                            type="url"
-                            id="companyWebsite"
-                            name="companyWebsite"
-                            value={formData.companyWebsite}
-                            onChange={handleChange}
-                            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                            placeholder="e.g. https://company.com"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="mb-6">
-                        <label
-                          htmlFor="companyLogo"
-                          className="mb-1 block text-sm font-medium text-gray-700"
-                        >
-                          Company Logo
-                        </label>
-                        <input
-                          type="file"
-                          id="companyLogo"
-                          name="companyLogo"
-                          accept="image/*"
-                          onChange={handleLogoChange}
-                          className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                        />
-                        <p className="mt-1 text-xs text-gray-500">
-                          Recommended size: 400x400px. Max file size: 2MB.
-                        </p>
-                      </div>
                     </div>
 
                     <div className="flex justify-end space-x-4 border-t border-gray-200 pt-6">
