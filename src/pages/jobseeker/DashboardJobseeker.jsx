@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Briefcase,
   FileText,
@@ -12,12 +12,37 @@ import {
   Eye,
   Heart,
   LightbulbIcon,
+  Plus,
+  Upload,
+  ChartScatter,
+  BookUserIcon,
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import QuickAdviceBox from '../../components/common/QuickAdviceBox';
+import { useContext, useEffect, useState } from 'react';
+import AuthContext from '../../context/AuthProvider';
+import JobseekerProfileService from '../../service/JobseekerProfileService';
+import UserService from '../../service/UserService';
+import ResumeService from '../../service/ResumeService';
+import SkillsService from '../../service/SkillsService';
+import ApplicationService from '../../service/ApplicationService';
 
 const DashboardJobSeeker = () => {
-  // Sample data
+  const navigate = useNavigate();
+
+  const { auth } = useContext(AuthContext);
+  const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
+  const userService = new UserService(auth?.accessToken);
+  const resumeService = new ResumeService(auth?.accessToken);
+  const skillsService = new SkillsService(auth?.accessToken);
+  const applicationService = new ApplicationService(auth?.accessToken);
+
+  const [profileCompletion, SetProfileCompletion] = useState([]);
+  const [currentUser, setCurrentUser] = useState({});
+  const [defaultResume, setDefaultResume] = useState({});
+  const [skills, setSkills] = useState([]);
+  const [recentApplications, setRecentApplications] = useState([]);
+
   const stats = [
     {
       title: 'Applications',
@@ -46,39 +71,6 @@ const DashboardJobSeeker = () => {
       change: '+5 this week',
       icon: <Heart className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-orange-500 to-orange-600',
-    },
-  ];
-
-  const recentApplications = [
-    {
-      id: 1,
-      position: 'Senior Frontend Developer',
-      company: 'TechCorp Inc.',
-      logo: '/placeholder.svg?height=40&width=40',
-      date: '2 days ago',
-      status: 'Applied',
-      salary: '$120K - $150K',
-      location: 'Remote',
-    },
-    {
-      id: 2,
-      position: 'UX Designer',
-      company: 'DesignHub',
-      logo: '/placeholder.svg?height=40&width=40',
-      date: '1 week ago',
-      status: 'Interview',
-      salary: '$90K - $110K',
-      location: 'New York, NY',
-    },
-    {
-      id: 3,
-      position: 'Product Manager',
-      company: 'InnovateTech',
-      logo: '/placeholder.svg?height=40&width=40',
-      date: '2 weeks ago',
-      status: 'Rejected',
-      salary: '$130K - $160K',
-      location: 'San Francisco, CA',
     },
   ];
 
@@ -118,7 +110,61 @@ const DashboardJobSeeker = () => {
     },
   ];
 
-  const profileCompleteness = 75;
+  useEffect(() => {
+    fetchProfileCompletion();
+    fetchCurrentUser();
+    fetchDefaultResume();
+    fetchSkillsForUser();
+    fetchRecentApplications();
+  }, []);
+
+  const fetchProfileCompletion = async () => {
+    try {
+      const response = await jobseekerProfileService.getProfileCompletion();
+      console.log(response);
+      SetProfileCompletion(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await userService.getCurrentUser();
+      console.log(response);
+      setCurrentUser(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchDefaultResume = async () => {
+    try {
+      const response = await resumeService.getDefaultResume();
+      console.log(response);
+      setDefaultResume(response || 'No Resume');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchSkillsForUser = async () => {
+    try {
+      const response = await skillsService.getSkillsForUser();
+      console.log(response);
+      setSkills(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchRecentApplications = async () => {
+    try {
+      const response = await applicationService.getApplicationsForUser();
+      console.log(response);
+      setRecentApplications(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const profileCompleteness = profileCompletion.profileCompletion;
 
   const getStatusColor = status => {
     switch (status) {
@@ -144,12 +190,12 @@ const DashboardJobSeeker = () => {
         <div className="container mx-auto px-4 py-12 sm:px-24">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="mb-2 text-3xl font-bold">Welcome back, Mohammed! </h1>
+              <h1 className="mb-2 text-3xl font-bold">Welcome back, {currentUser.userName} </h1>
               <p className="text-purple-100">Ready to find your next opportunity?</p>
             </div>
             <div className="mt-6 flex items-center space-x-4 md:mt-0">
               <Link
-                to="/job-seeker/search-jobs"
+                to="/jobseeker/search-jobs"
                 className="flex items-center space-x-2 rounded-xl bg-white px-6 py-3 font-semibold text-purple-600 shadow-lg transition-all duration-200 hover:bg-purple-50 hover:shadow-xl"
               >
                 <Search className="h-5 w-5" />
@@ -220,7 +266,7 @@ const DashboardJobSeeker = () => {
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Recent Applications</h2>
               <Link
-                to="/job-seeker/applications"
+                to="/jobseeker/applications"
                 className="flex items-center space-x-1 text-sm font-semibold text-purple-600 hover:text-purple-700"
               >
                 <span>View All</span>
@@ -229,44 +275,63 @@ const DashboardJobSeeker = () => {
             </div>
 
             <div className="space-y-4">
-              {recentApplications.map(application => (
-                <div
-                  key={application.id}
-                  className="rounded-xl border border-gray-100 p-4 transition-all duration-200 hover:border-purple-200"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4">
-                      <img
-                        src={application.logo || '/placeholder.svg'}
-                        alt={`${application.company} logo`}
-                        className="h-12 w-12 rounded-lg border border-gray-200 object-cover"
-                      />
-                      <div>
-                        <h3 className="mb-1 font-semibold text-gray-900">{application.position}</h3>
-                        <p className="mb-2 text-sm text-gray-600">{application.company}</p>
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
-                          <div className="flex items-center space-x-1">
-                            <MapPin className="h-3 w-3" />
-                            <span>{application.location}</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <DollarSign className="h-3 w-3" />
-                            <span>{application.salary}</span>
+              {recentApplications.length > 0 ? (
+                recentApplications.slice(0, 3).map(application => (
+                  <div
+                    key={application.applicationId}
+                    className="rounded-xl border border-gray-100 p-4 transition-all duration-200 hover:border-purple-200"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start space-x-4">
+                        <img
+                          src={application.logo || '/placeholder.svg'}
+                          alt={`${application.companyName} logo`}
+                          className="h-12 w-12 rounded-lg border border-gray-200 object-cover"
+                        />
+                        <div>
+                          <h3 className="mb-1 font-semibold text-gray-900">
+                            {application.jobTitle}
+                          </h3>
+                          <p className="mb-2 text-sm text-gray-600">{application.companyName}</p>
+                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                            <div className="flex items-center space-x-1">
+                              <MapPin className="h-3 w-3" />
+                              <span>{application.location || 'Location not specified'}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <DollarSign className="h-3 w-3" />
+                              <span>{application.salary || 'N/A'}</span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col items-end space-y-2">
-                      <span
-                        className={`rounded-full border px-3 py-1 text-xs font-medium ${getStatusColor(application.status)}`}
-                      >
-                        {application.status}
-                      </span>
-                      <span className="text-xs text-gray-500">{application.date}</span>
+                      <div className="flex flex-col items-end space-y-2">
+                        <span
+                          className={`rounded-full border px-3 py-1 text-xs font-medium ${getStatusColor(application.status)}`}
+                        >
+                          {application.status}
+                        </span>
+                        <span className="text-xs text-gray-500">{application.appliedAt}</span>
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="mt-20 flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-gray-50 px-6 py-10 text-center shadow-sm transition hover:border-purple-300 hover:bg-white">
+                  <BookUserIcon />
+                  <p className="text-xl font-semibold text-gray-800">No Applications Found</p>
+                  <p className="mt-2 text-sm text-gray-500">
+                    You haven’t applied to any jobs yet. Start your journey today!
+                  </p>
+                  <button
+                    onClick={() => navigate('/jobseeker/find-jobs')}
+                    className="mt-5 inline-flex items-center gap-2 rounded-md bg-purple-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Browse Jobs
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -275,21 +340,21 @@ const DashboardJobSeeker = () => {
             <h2 className="mb-6 text-xl font-bold text-gray-900">Quick Actions</h2>
             <div className="space-y-4">
               <Link
-                to="/job-seeker/search-jobs"
+                to="/jobseeker/find-jobs"
                 className="flex w-full items-center space-x-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-white transition-all duration-200 hover:shadow-lg"
               >
                 <Search className="h-5 w-5" />
                 <span className="font-semibold">Search Jobs</span>
               </Link>
               <Link
-                to="/job-seeker/resume"
+                to="/jobseeker/resume"
                 className="flex w-full items-center space-x-3 rounded-xl bg-gray-50 p-4 text-gray-700 transition-all duration-200 hover:bg-gray-100"
               >
                 <FileText className="h-5 w-5" />
                 <span className="font-semibold">Update Resume</span>
               </Link>
               <Link
-                to="/job-seeker/profile"
+                to="/jobseeker/profile"
                 className="flex w-full items-center space-x-3 rounded-xl bg-gray-50 p-4 text-gray-700 transition-all duration-200 hover:bg-gray-100"
               >
                 <User className="h-5 w-5" />
@@ -298,16 +363,40 @@ const DashboardJobSeeker = () => {
             </div>
 
             {/* Resume Status */}
-            <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4">
-              <div className="flex items-center space-x-3">
-                <FileText className="h-8 w-8 text-green-600" />
-                <div>
-                  <h3 className="font-semibold text-green-900">Resume Active</h3>
-                  <p className="text-sm text-green-700">MyResume_2023.pdf</p>
-                  <p className="text-xs text-green-600">Updated 2 weeks ago</p>
+            {defaultResume.fileName != null ? (
+              <Link to={`${defaultResume.fileUrl}`} target="_blank" rel="noopener noreferrer">
+                <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 transition-shadow hover:shadow-md">
+                  <div className="flex items-center space-x-3">
+                    <FileText className="h-8 w-8 text-green-600" />
+                    <div>
+                      <h3 className="font-semibold text-green-900">Resume Active</h3>
+                      <p className="text-sm text-green-700">{defaultResume.fileName}.pdf</p>
+                      <p className="text-xs text-green-600">Updated 2 weeks ago</p>
+                    </div>
+                  </div>
                 </div>
+              </Link>
+            ) : (
+              <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 p-6 text-center shadow-sm">
+                <FileText className="mb-2 h-8 w-8 text-indigo-500" />
+                <p className="mb-2 text-sm font-medium text-purple-800">No default resume found</p>
+                <Link
+                  to="/jobseeker/resume"
+                  className="inline-flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-600"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Upload Resume
+                </Link>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="mb-8">
@@ -318,32 +407,47 @@ const DashboardJobSeeker = () => {
         <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl font-bold text-gray-900">Your Skills</h2>
-            <Link
-              to="/job-seeker/profile"
-              className="text-sm font-semibold text-purple-600 hover:text-purple-700"
-            >
-              Manage Skills
-            </Link>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {[
-              'React',
-              'JavaScript',
-              'TypeScript',
-              'HTML/CSS',
-              'UI/UX Design',
-              'Figma',
-              'Node.js',
-              'Python',
-            ].map(skill => (
-              <span
-                key={skill}
-                className="rounded-xl border border-purple-200 bg-gradient-to-r from-purple-100 to-indigo-100 px-4 py-2 text-sm font-medium text-purple-700"
+            {skills.length > 0 && (
+              <Link
+                to="/jobseeker/profile"
+                className="text-sm font-semibold text-purple-600 hover:text-purple-700"
               >
-                {skill}
-              </span>
-            ))}
+                Manage Skills
+              </Link>
+            )}
           </div>
+
+          {skills.length > 0 ? (
+            <div className="flex flex-wrap gap-3">
+              {skills.map(skill => (
+                <span
+                  key={skill.skillId}
+                  className="rounded-xl border border-purple-200 bg-gradient-to-r from-purple-100 to-indigo-100 px-4 py-2 text-sm font-medium text-purple-700"
+                >
+                  {skill.skillName}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center gap-4 rounded-xl bg-purple-50 p-6 text-center">
+              <p className="text-sm text-gray-600">No skills added yet.</p>
+              <Link
+                to="/jobseeker/profile"
+                className="inline-flex items-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:bg-purple-700"
+              >
+                <svg
+                  className="mr-2 h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <Plus />
+                </svg>
+                Add Your Skills
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Recommended Jobs */}
@@ -351,7 +455,7 @@ const DashboardJobSeeker = () => {
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
             <Link
-              to="/job-seeker/search-jobs"
+              to="/jobseeker/search-jobs"
               className="flex items-center space-x-1 font-semibold text-purple-600 hover:text-purple-700"
             >
               <span>View All</span>

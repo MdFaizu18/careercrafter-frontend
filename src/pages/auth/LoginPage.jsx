@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import AuthService from '../../service/AuthService';
+import { toast } from 'react-toastify';
+import AuthContext from '../../context/AuthProvider';
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -11,6 +14,7 @@ const LoginPage = ({ onLogin }) => {
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const { setAuth } = useContext(AuthContext);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -44,19 +48,31 @@ const LoginPage = ({ onLogin }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
+    const authService = new AuthService();
+    try {
+      const response = await authService.loginUser(formData);
+      const role = response.userDto.role;
+      const authInfo = {
+        isAuthenticated: true,
+        accessToken: response.accessToken,
+      };
 
-    if (validateForm()) {
-      // Call the login function passed from App.js
-      onLogin(formData.role);
-
-      // Redirect based on role
-      if (formData.role === 'employer') {
+      setAuth(authInfo);
+      localStorage.setItem('auth', JSON.stringify(authInfo));
+      toast.success('Login successful!');
+      const from = location.state?.from || '/jobseeker/dashboard';
+      if (role === 'JOBSEEKER') {
+        navigate('/jobseeker/dashboard');
+      } else if (role === 'EMPLOYER') {
         navigate('/employer/dashboard');
       } else {
-        navigate('/job-seeker/dashboard');
+        navigate(from);
       }
+    } catch (error) {
+      console.error('Failed to login user:', error);
+      toast.error('Login failed. Please try again.');
     }
   };
 
@@ -80,7 +96,7 @@ const LoginPage = ({ onLogin }) => {
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6">
               <div>
                 <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
                   Email address
@@ -163,6 +179,7 @@ const LoginPage = ({ onLogin }) => {
                 <button
                   type="submit"
                   className="focus:ring-opacity-50 w-full rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  onClick={handleSubmit}
                 >
                   Sign in
                 </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   MapPin,
@@ -25,9 +25,15 @@ import {
   Award,
   Zap,
 } from 'lucide-react';
+import AuthContext from '../../context/AuthProvider';
+import JobService from '../../service/JobService';
 
 const JobDetails = () => {
+  const { auth } = useContext(AuthContext);
+  const jobService = new JobService(auth.accessToken);
+
   const { id } = useParams();
+  const [job, setJob] = useState({});
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -40,68 +46,23 @@ const JobDetails = () => {
   });
   const [errors, setErrors] = useState({});
 
-  // Sample job data
-  const job = {
-    id: Number.parseInt(id),
-    title: 'Senior Frontend Developer',
-    company: 'TechCorp Inc.',
-    companyLogo: '/placeholder.svg?height=80&width=80',
-    location: 'San Francisco, CA',
-    type: 'Full-time',
-    salary: '$120K - $150K',
-    experience: '5+ years',
-    postedDate: '2 days ago',
-    applicationDeadline: '30 days left',
-    applicants: 47,
-    views: 1234,
-    matchScore: 92,
-    urgency: 'high',
-    featured: true,
-    description: `
-      <p>TechCorp Inc. is looking for a Senior Frontend Developer to join our growing team. You will be responsible for building beautiful, responsive web applications that provide exceptional user experiences.</p>
-      
-      <p>As a Senior Frontend Developer, you will work closely with our design and backend teams to implement new features and improve existing ones. You will have the opportunity to contribute to the architecture and technical direction of our frontend codebase.</p>
-    `,
-    responsibilities: [
-      'Develop new user-facing features using React.js and related technologies',
-      'Build reusable components and libraries for future use',
-      'Translate designs and wireframes into high-quality code',
-      'Optimize applications for maximum speed and scalability',
-      'Collaborate with backend developers to integrate frontend and backend systems',
-      'Implement responsive design and ensure cross-browser compatibility',
-      'Participate in code reviews and mentor junior developers',
-    ],
-    requirements: [
-      '5+ years of experience in frontend development',
-      'Strong proficiency in JavaScript, including DOM manipulation and the JavaScript object model',
-      'Thorough understanding of React.js and its core principles',
-      'Experience with popular React.js workflows such as Redux or Context API',
-      'Familiarity with newer specifications of ECMAScript',
-      'Experience with data structure libraries (e.g., Immutable.js)',
-      'Knowledge of isomorphic React is a plus',
-      'Understanding of RESTful APIs and GraphQL',
-      'Familiarity with modern frontend build pipelines and tools',
-      'Experience with common frontend development tools such as Babel, Webpack, NPM, etc.',
-      'Good understanding of asynchronous request handling, partial page updates, and AJAX',
-    ],
-    benefits: [
-      'Competitive salary and equity package',
-      'Health, dental, and vision insurance',
-      '401(k) with company match',
-      'Flexible work hours and remote work options',
-      'Unlimited PTO policy',
-      'Professional development budget',
-      'Weekly team lunches and snacks',
-      'Modern office in downtown San Francisco',
-    ],
-    companyDescription:
-      "TechCorp Inc. is a leading technology company specializing in building innovative web and mobile applications for businesses of all sizes. Founded in 2010, we have grown to a team of over 100 talented individuals across engineering, design, and product management. Our mission is to create software that makes people's lives easier and more productive.",
-    companyWebsite: 'https://techcorp-example.com',
-    companySize: '51-200 employees',
-    companyIndustry: 'Software Development',
-    companyRating: 4.8,
-    companyReviews: 156,
-  };
+  useEffect(() => {
+    const fetchJobDetails = async () => {
+      try {
+        const response = await jobService.getJobById(id);
+        console.log('Job details response:', response);
+        if (response && response) {
+          setJob(response);
+        } else {
+          console.error('Job details not found');
+        }
+      } catch (error) {
+        console.error('Error fetching job details:', error);
+      }
+    };
+    fetchJobDetails();
+  }, []);
+  console.log('Job details:', job);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -164,6 +125,53 @@ const JobDetails = () => {
     return { __html: html };
   };
 
+  if (!job) {
+    return <div>Loading job details...</div>;
+  }
+
+  // Helper function to safely get company name
+  const getCompanyName = () => {
+    if (typeof job.company === 'string') {
+      return job.company;
+    }
+    if (job.company && job.company.name) {
+      return job.company.name;
+    }
+    return 'Company Name Not Available';
+  };
+
+  // Helper function to safely get company website
+  const getCompanyWebsite = () => {
+    if (job.company && job.company.website) {
+      return job.company.website;
+    }
+    return '#';
+  };
+
+  // Helper function to safely get company location
+  const getCompanyLocation = () => {
+    if (job.company && job.company.location) {
+      return job.company.location;
+    }
+    return job.jobLocation || 'Location Not Available';
+  };
+
+  // Helper function to safely get company description
+  const getCompanyDescription = () => {
+    if (job.company && job.company.description) {
+      return job.company.description;
+    }
+    return `${getCompanyName()} is a leading company in their industry.`;
+  };
+
+  // Helper function to safely get company logo
+  const getCompanyLogo = () => {
+    if (job.company && job.company.logo) {
+      return job.company.logo;
+    }
+    return job.companyLogo || null;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       <div className="container mx-auto px-4 py-8">
@@ -182,7 +190,7 @@ const JobDetails = () => {
                 Jobs
               </Link>
               <ArrowRight className="h-4 w-4 text-gray-400" />
-              <span className="font-medium text-gray-900">{job.title}</span>
+              <span className="font-medium text-gray-900">{job.jobTitle}</span>
             </nav>
           </div>
 
@@ -195,60 +203,44 @@ const JobDetails = () => {
                   {/* Company Logo */}
                   <div className="relative">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
-                      {job.companyLogo ? (
+                      {getCompanyLogo() ? (
                         <img
-                          src={job.companyLogo || '/placeholder.svg'}
-                          alt={job.company}
+                          src={getCompanyLogo() || '/placeholder.svg'}
+                          alt={getCompanyName()}
                           className="h-12 w-12 object-contain"
                         />
                       ) : (
                         <Briefcase className="h-10 w-10 text-purple-600" />
                       )}
                     </div>
-                    {job.featured && (
-                      <div className="absolute -top-2 -right-2 rounded-full bg-yellow-400 p-1">
-                        <Star className="h-4 w-4 text-yellow-800" />
-                      </div>
-                    )}
                   </div>
 
                   {/* Job Info */}
                   <div className="flex-1">
                     <div className="mb-2 flex items-center space-x-3">
-                      <h1 className="text-3xl font-bold text-white">{job.title}</h1>
-                      {job.urgency === 'high' && (
-                        <span className="flex items-center rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">
-                          <Zap className="mr-1 h-4 w-4" />
-                          Urgent
-                        </span>
-                      )}
+                      <h1 className="text-3xl font-bold text-white">{job.jobTitle}</h1>
                     </div>
                     <div className="mb-4 flex items-center space-x-4 text-purple-100">
-                      <span className="text-xl font-semibold">{job.company}</span>
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 fill-current text-yellow-400" />
-                        <span className="text-sm">{job.companyRating}</span>
-                        <span className="text-sm">({job.companyReviews} reviews)</span>
-                      </div>
+                      <span className="text-xl font-semibold">{getCompanyName()}</span>
                     </div>
 
                     {/* Job Details */}
                     <div className="grid grid-cols-2 gap-4 text-purple-100 lg:grid-cols-4">
                       <div className="flex items-center space-x-2">
                         <MapPin className="h-5 w-5 text-purple-300" />
-                        <span className="text-sm">{job.location}</span>
+                        <span className="text-sm">{job.jobLocation}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Briefcase className="h-5 w-5 text-purple-300" />
-                        <span className="text-sm">{job.type}</span>
+                        <span className="text-sm">{job.jobType}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <DollarSign className="h-5 w-5 text-purple-300" />
-                        <span className="text-sm font-semibold">{job.salary}</span>
+                        <span className="text-sm font-semibold">{job.salaryMin}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Clock className="h-5 w-5 text-purple-300" />
-                        <span className="text-sm">{job.experience}</span>
+                        <span className="text-sm">{job.jobExperience}</span>
                       </div>
                     </div>
                   </div>
@@ -264,15 +256,6 @@ const JobDetails = () => {
                     <span>Apply Now</span>
                   </button>
                   <div className="flex space-x-3">
-                    <button
-                      onClick={() => setIsBookmarked(!isBookmarked)}
-                      className={`flex flex-1 items-center justify-center space-x-2 rounded-lg border-2 border-white/20 px-4 py-2 backdrop-blur-sm transition-all duration-200 ${
-                        isBookmarked ? 'bg-white/20 text-white' : 'text-white hover:bg-white/10'
-                      }`}
-                    >
-                      <Heart className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
-                      <span className="text-sm">Save</span>
-                    </button>
                     <button className="flex flex-1 items-center justify-center space-x-2 rounded-lg border-2 border-white/20 px-4 py-2 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/10">
                       <Share2 className="h-4 w-4" />
                       <span className="text-sm">Share</span>
@@ -288,22 +271,14 @@ const JobDetails = () => {
                 <div className="flex items-center space-x-8">
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Calendar className="h-4 w-4" />
-                    <span>Posted {job.postedDate}</span>
+                    <span>Posted {job?.createdAt}</span>
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Users className="h-4 w-4" />
-                    <span>{job.applicants} applicants</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Eye className="h-4 w-4" />
-                    <span>{job.views} views</span>
+                    <span>120 applicants</span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <div className="flex items-center space-x-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
-                    <TrendingUp className="h-4 w-4" />
-                    <span>{job.matchScore}% match</span>
-                  </div>
                   <span className="text-sm text-gray-500">
                     Apply before: {job.applicationDeadline}
                   </span>
@@ -326,7 +301,7 @@ const JobDetails = () => {
                 </h2>
                 <div
                   className="prose max-w-none leading-relaxed text-gray-700"
-                  dangerouslySetInnerHTML={createMarkup(job.description)}
+                  dangerouslySetInnerHTML={createMarkup(job.jobDescription)}
                 ></div>
               </div>
 
@@ -339,17 +314,18 @@ const JobDetails = () => {
                   Key Responsibilities
                 </h3>
                 <div className="grid gap-4">
-                  {job.responsibilities.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start space-x-3 rounded-xl bg-gray-50 p-4"
-                    >
-                      <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-100">
-                        <span className="text-sm font-semibold text-purple-600">{index + 1}</span>
+                  {job.responsibility &&
+                    job.responsibility.map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start space-x-3 rounded-xl bg-gray-50 p-4"
+                      >
+                        <div className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-purple-100">
+                          <span className="text-sm font-semibold text-purple-600">{index + 1}</span>
+                        </div>
+                        <span className="text-gray-700">{item}</span>
                       </div>
-                      <span className="text-gray-700">{item}</span>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
 
@@ -362,33 +338,13 @@ const JobDetails = () => {
                   Requirements
                 </h3>
                 <div className="grid gap-3">
-                  {job.requirements.map((item, index) => (
-                    <div key={index} className="flex items-start space-x-3">
-                      <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
-                      <span className="text-gray-700">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Benefits */}
-              <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-lg">
-                <h3 className="mb-6 flex items-center text-xl font-bold text-gray-900">
-                  <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100">
-                    <Star className="h-5 w-5 text-yellow-600" />
-                  </div>
-                  Benefits & Perks
-                </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {job.benefits.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-3 rounded-lg bg-gradient-to-r from-purple-50 to-indigo-50 p-3"
-                    >
-                      <Star className="h-4 w-4 text-purple-500" />
-                      <span className="text-gray-700">{item}</span>
-                    </div>
-                  ))}
+                  {job.requirements &&
+                    job.requirements.map((item, index) => (
+                      <div key={index} className="flex items-start space-x-3">
+                        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
+                        <span className="text-gray-700">{item}</span>
+                      </div>
+                    ))}
                 </div>
               </div>
 
@@ -398,26 +354,26 @@ const JobDetails = () => {
                   <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100">
                     <Building className="h-5 w-5 text-indigo-600" />
                   </div>
-                  About {job.company}
+                  About {job.company?.name}
                 </h3>
-                <p className="mb-6 leading-relaxed text-gray-700">{job.companyDescription}</p>
+                <p className="mb-6 leading-relaxed text-gray-700">{job.company?.description}</p>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                   <div className="rounded-xl bg-gray-50 p-4 text-center">
                     <Users className="mx-auto mb-2 h-8 w-8 text-purple-600" />
                     <div className="text-sm text-gray-500">Company Size</div>
-                    <div className="font-semibold text-gray-900">{job.companySize}</div>
+                    <div className="font-semibold text-gray-900">100+</div>
                   </div>
                   <div className="rounded-xl bg-gray-50 p-4 text-center">
                     <Building className="mx-auto mb-2 h-8 w-8 text-purple-600" />
-                    <div className="text-sm text-gray-500">Industry</div>
-                    <div className="font-semibold text-gray-900">{job.companyIndustry}</div>
+                    <div className="text-sm text-gray-500">Location</div>
+                    <div className="font-semibold text-gray-900">{job.company?.location}</div>
                   </div>
                   <div className="rounded-xl bg-gray-50 p-4 text-center">
                     <Globe className="mx-auto mb-2 h-8 w-8 text-purple-600" />
                     <div className="text-sm text-gray-500">Website</div>
                     <a
-                      href={job.companyWebsite}
+                      href={job.company?.webiste}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="font-semibold text-purple-600 hover:text-purple-700"
@@ -438,7 +394,9 @@ const JobDetails = () => {
                     <Send className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="mb-2 text-lg font-bold text-gray-900">Ready to Apply?</h3>
-                  <p className="text-sm text-gray-600">Join {job.applicants} other candidates</p>
+                  <p className="text-sm text-gray-600">
+                    Join {job.applicants || 0} other candidates
+                  </p>
                 </div>
 
                 <button
@@ -473,23 +431,25 @@ const JobDetails = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-gray-100 py-2">
                     <span className="text-gray-600">Position</span>
-                    <span className="font-semibold text-gray-900">{job.title}</span>
+                    <span className="font-semibold text-gray-900">{job.jobTitle}</span>
                   </div>
                   <div className="flex items-center justify-between border-b border-gray-100 py-2">
                     <span className="text-gray-600">Location</span>
-                    <span className="font-semibold text-gray-900">{job.location}</span>
+                    <span className="font-semibold text-gray-900">{job.jobLocation}</span>
                   </div>
                   <div className="flex items-center justify-between border-b border-gray-100 py-2">
                     <span className="text-gray-600">Type</span>
-                    <span className="font-semibold text-gray-900">{job.type}</span>
+                    <span className="font-semibold text-gray-900">{job.jobType}</span>
                   </div>
                   <div className="flex items-center justify-between border-b border-gray-100 py-2">
                     <span className="text-gray-600">Salary</span>
-                    <span className="font-semibold text-green-600">{job.salary}</span>
+                    <span className="font-semibold text-green-600">
+                      {job.salaryMin} - {job.salaryMax}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between py-2">
                     <span className="text-gray-600">Experience</span>
-                    <span className="font-semibold text-gray-900">{job.experience}</span>
+                    <span className="font-semibold text-gray-900">{job.jobExperience}</span>
                   </div>
                 </div>
               </div>
@@ -545,9 +505,9 @@ const JobDetails = () => {
                   <h2 className="mb-4 text-3xl font-bold text-gray-900">Application Submitted!</h2>
                   <p className="mb-8 text-lg text-gray-600">
                     Your application for{' '}
-                    <span className="font-semibold text-purple-600">{job.title}</span> at{' '}
-                    <span className="font-semibold text-purple-600">{job.company}</span> has been
-                    submitted successfully.
+                    <span className="font-semibold text-purple-600">{job.jobTitle}</span> at{' '}
+                    <span className="font-semibold text-purple-600">{getCompanyName()}</span> has
+                    been submitted successfully.
                   </p>
                   <div className="flex flex-col justify-center gap-4 sm:flex-row">
                     <button
@@ -572,10 +532,10 @@ const JobDetails = () => {
                   <div className="mb-8 flex items-start justify-between">
                     <div>
                       <h2 className="mb-2 text-2xl font-bold text-gray-900">
-                        Apply for {job.title}
+                        Apply for {job.jobTitle}
                       </h2>
                       <p className="text-gray-600">
-                        {job.company} • {job.location}
+                        {getCompanyName()} • {job.jobLocation}
                       </p>
                     </div>
                     <button

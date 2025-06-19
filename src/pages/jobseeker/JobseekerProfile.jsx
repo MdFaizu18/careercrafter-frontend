@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,9 +22,73 @@ import {
   Save,
   Eye,
 } from 'lucide-react';
+import AuthContext from '../../context/AuthProvider';
+import JobseekerProfileService from '../../service/JobseekerProfileService';
+import EducationProfile from '../../components/stuffs/EducationProfile';
+import ExperienceProfile from '../../components/stuffs/ExperienceProfile';
+import SkillsProfile from '../../components/stuffs/SkillsProfile';
+import EducationService from '../../service/EducationService';
+import ExperienceService from '../../service/ExperienceService';
+import SkillsService from '../../service/SkillsService';
 
 const JobseekerProfile = () => {
+  const { auth } = useContext(AuthContext);
+  const [educations, setEducations] = useState([]);
+  const [experience, setExperience] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [profile, setProfile] = useState({});
+
+  const educationService = new EducationService(auth?.accessToken);
+  const experienceService = new ExperienceService(auth?.accessToken);
+  const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
+  const skillsService = new SkillsService(auth?.accessToken);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchUserProfile();
+    fetchEducations();
+    fetchExperience();
+    fetchSkills();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await jobseekerProfileService.getJobseekerProfile();
+      console.log(response);
+      setProfile(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchEducations = async () => {
+    try {
+      const response = await educationService.getEducationsForUser();
+      console.log(response);
+      setEducations(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchExperience = async () => {
+    try {
+      const response = await experienceService.getExperiencesForUser();
+      console.log(response);
+      setExperience(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchSkills = async () => {
+    try {
+      const response = await skillsService.getSkillsForUser();
+      console.log(response);
+      setSkills(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const [formData, setFormData] = useState({
     personalInfo: {
@@ -171,29 +235,6 @@ const JobseekerProfile = () => {
     }
   };
 
-  const handleExperienceChange = (e, index) => {
-    const { name, value, type, checked } = e.target;
-    const newExperience = [...formData.experience];
-
-    if (type === 'checkbox') {
-      newExperience[index] = {
-        ...newExperience[index],
-        [name]: checked,
-        endDate: checked ? '' : newExperience[index].endDate,
-      };
-    } else {
-      newExperience[index] = {
-        ...newExperience[index],
-        [name]: value,
-      };
-    }
-
-    setFormData({
-      ...formData,
-      experience: newExperience,
-    });
-  };
-
   const addExperience = () => {
     const newExperience = {
       id: Date.now(),
@@ -209,36 +250,6 @@ const JobseekerProfile = () => {
     setFormData({
       ...formData,
       experience: [...formData.experience, newExperience],
-    });
-  };
-
-  const removeExperience = id => {
-    setFormData({
-      ...formData,
-      experience: formData.experience.filter(exp => exp.id !== id),
-    });
-  };
-
-  const handleEducationChange = (e, index) => {
-    const { name, value, type, checked } = e.target;
-    const newEducation = [...formData.education];
-
-    if (type === 'checkbox') {
-      newEducation[index] = {
-        ...newEducation[index],
-        [name]: checked,
-        endDate: checked ? '' : newEducation[index].endDate,
-      };
-    } else {
-      newEducation[index] = {
-        ...newEducation[index],
-        [name]: value,
-      };
-    }
-
-    setFormData({
-      ...formData,
-      education: newEducation,
     });
   };
 
@@ -260,30 +271,6 @@ const JobseekerProfile = () => {
     });
   };
 
-  const removeEducation = id => {
-    setFormData({
-      ...formData,
-      education: formData.education.filter(edu => edu.id !== id),
-    });
-  };
-
-  const handleAddSkill = () => {
-    if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
-      setFormData({
-        ...formData,
-        skills: [...formData.skills, newSkill.trim()],
-      });
-      setNewSkill('');
-    }
-  };
-
-  const removeSkill = skill => {
-    setFormData({
-      ...formData,
-      skills: formData.skills.filter(s => s !== skill),
-    });
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
@@ -294,22 +281,6 @@ const JobseekerProfile = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.personalInfo.email)) {
       newErrors.email = 'Email is invalid';
     }
-
-    formData.experience.forEach((exp, index) => {
-      if (!exp.title) newErrors[`experience_${index}_title`] = 'Job title is required';
-      if (!exp.company) newErrors[`experience_${index}_company`] = 'Company name is required';
-      if (!exp.startDate) newErrors[`experience_${index}_startDate`] = 'Start date is required';
-      if (!exp.current && !exp.endDate)
-        newErrors[`experience_${index}_endDate`] = 'End date is required';
-    });
-
-    formData.education.forEach((edu, index) => {
-      if (!edu.degree) newErrors[`education_${index}_degree`] = 'Degree is required';
-      if (!edu.school) newErrors[`education_${index}_school`] = 'School name is required';
-      if (!edu.startDate) newErrors[`education_${index}_startDate`] = 'Start date is required';
-      if (!edu.current && !edu.endDate)
-        newErrors[`education_${index}_endDate`] = 'End date is required';
-    });
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -673,172 +644,7 @@ const JobseekerProfile = () => {
                           </button>
                         </div>
                       ) : (
-                        <div className="space-y-6">
-                          {formData.experience.map((exp, index) => (
-                            <div
-                              key={exp.id}
-                              className="rounded-lg border border-gray-200 bg-gray-50 p-6"
-                            >
-                              <div className="mb-4 flex items-start justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
-                                    <Briefcase className="h-5 w-5 text-purple-600" />
-                                  </div>
-                                  <div>
-                                    <h4 className="font-medium text-gray-900">
-                                      {exp.title || `Experience ${index + 1}`}
-                                    </h4>
-                                    <p className="text-sm text-gray-600">{exp.company}</p>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => removeExperience(exp.id)}
-                                  className="p-1 text-red-500 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-
-                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Job Title <span className="text-red-500">*</span>
-                                  </label>
-                                  <input
-                                    type="text"
-                                    name="title"
-                                    value={exp.title}
-                                    onChange={e => handleExperienceChange(e, index)}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      errors[`experience_${index}_title`]
-                                        ? 'border-red-300'
-                                        : 'border-gray-300'
-                                    }`}
-                                    placeholder="e.g. Senior Software Engineer"
-                                  />
-                                  {errors[`experience_${index}_title`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`experience_${index}_title`]}
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Company <span className="text-red-500">*</span>
-                                  </label>
-                                  <input
-                                    type="text"
-                                    name="company"
-                                    value={exp.company}
-                                    onChange={e => handleExperienceChange(e, index)}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      errors[`experience_${index}_company`]
-                                        ? 'border-red-300'
-                                        : 'border-gray-300'
-                                    }`}
-                                    placeholder="e.g. Google"
-                                  />
-                                  {errors[`experience_${index}_company`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`experience_${index}_company`]}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                  Location
-                                </label>
-                                <input
-                                  type="text"
-                                  name="location"
-                                  value={exp.location}
-                                  onChange={e => handleExperienceChange(e, index)}
-                                  className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                                  placeholder="City, State or Remote"
-                                />
-                              </div>
-
-                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Start Date <span className="text-red-500">*</span>
-                                  </label>
-                                  <input
-                                    type="month"
-                                    name="startDate"
-                                    value={exp.startDate}
-                                    onChange={e => handleExperienceChange(e, index)}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      errors[`experience_${index}_startDate`]
-                                        ? 'border-red-300'
-                                        : 'border-gray-300'
-                                    }`}
-                                  />
-                                  {errors[`experience_${index}_startDate`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`experience_${index}_startDate`]}
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    End Date{' '}
-                                    {!exp.current && <span className="text-red-500">*</span>}
-                                  </label>
-                                  <input
-                                    type="month"
-                                    name="endDate"
-                                    value={exp.endDate}
-                                    onChange={e => handleExperienceChange(e, index)}
-                                    disabled={exp.current}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      exp.current ? 'bg-gray-100' : ''
-                                    } ${errors[`experience_${index}_endDate`] ? 'border-red-300' : 'border-gray-300'}`}
-                                  />
-                                  {errors[`experience_${index}_endDate`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`experience_${index}_endDate`]}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    name="current"
-                                    checked={exp.current}
-                                    onChange={e => handleExperienceChange(e, index)}
-                                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                  />
-                                  <span className="text-sm text-gray-700">
-                                    I currently work here
-                                  </span>
-                                </label>
-                              </div>
-
-                              <div>
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                  Description
-                                </label>
-                                <textarea
-                                  name="description"
-                                  value={exp.description}
-                                  onChange={e => handleExperienceChange(e, index)}
-                                  rows="4"
-                                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                                  placeholder="Describe your key responsibilities and achievements..."
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <ExperienceProfile formData={formData} setFormData={setFormData} />
                       )}
                     </div>
                   )}
@@ -877,245 +683,14 @@ const JobseekerProfile = () => {
                           </button>
                         </div>
                       ) : (
-                        <div className="space-y-6">
-                          {formData.education.map((edu, index) => (
-                            <div
-                              key={edu.id}
-                              className="rounded-lg border border-gray-200 bg-gray-50 p-6"
-                            >
-                              <div className="mb-4 flex items-start justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100">
-                                    <GraduationCap className="h-5 w-5 text-indigo-600" />
-                                  </div>
-                                  <div>
-                                    <h4 className="font-medium text-gray-900">
-                                      {edu.degree || `Education ${index + 1}`}
-                                    </h4>
-                                    <p className="text-sm text-gray-600">{edu.school}</p>
-                                  </div>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => removeEducation(edu.id)}
-                                  className="p-1 text-red-500 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-
-                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Degree <span className="text-red-500">*</span>
-                                  </label>
-                                  <input
-                                    type="text"
-                                    name="degree"
-                                    value={edu.degree}
-                                    onChange={e => handleEducationChange(e, index)}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      errors[`education_${index}_degree`]
-                                        ? 'border-red-300'
-                                        : 'border-gray-300'
-                                    }`}
-                                    placeholder="e.g. Bachelor of Science in Computer Science"
-                                  />
-                                  {errors[`education_${index}_degree`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`education_${index}_degree`]}
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    School <span className="text-red-500">*</span>
-                                  </label>
-                                  <input
-                                    type="text"
-                                    name="school"
-                                    value={edu.school}
-                                    onChange={e => handleEducationChange(e, index)}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      errors[`education_${index}_school`]
-                                        ? 'border-red-300'
-                                        : 'border-gray-300'
-                                    }`}
-                                    placeholder="e.g. Stanford University"
-                                  />
-                                  {errors[`education_${index}_school`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`education_${index}_school`]}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                  Location
-                                </label>
-                                <input
-                                  type="text"
-                                  name="location"
-                                  value={edu.location}
-                                  onChange={e => handleEducationChange(e, index)}
-                                  className="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                                  placeholder="City, State"
-                                />
-                              </div>
-
-                              <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    Start Date <span className="text-red-500">*</span>
-                                  </label>
-                                  <input
-                                    type="month"
-                                    name="startDate"
-                                    value={edu.startDate}
-                                    onChange={e => handleEducationChange(e, index)}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      errors[`education_${index}_startDate`]
-                                        ? 'border-red-300'
-                                        : 'border-gray-300'
-                                    }`}
-                                  />
-                                  {errors[`education_${index}_startDate`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`education_${index}_startDate`]}
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div>
-                                  <label className="mb-2 block text-sm font-medium text-gray-700">
-                                    End Date{' '}
-                                    {!edu.current && <span className="text-red-500">*</span>}
-                                  </label>
-                                  <input
-                                    type="month"
-                                    name="endDate"
-                                    value={edu.endDate}
-                                    onChange={e => handleEducationChange(e, index)}
-                                    disabled={edu.current}
-                                    className={`w-full rounded-lg border px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                                      edu.current ? 'bg-gray-100' : ''
-                                    } ${errors[`education_${index}_endDate`] ? 'border-red-300' : 'border-gray-300'}`}
-                                  />
-                                  {errors[`education_${index}_endDate`] && (
-                                    <p className="mt-1 text-sm text-red-500">
-                                      {errors[`education_${index}_endDate`]}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="mb-4">
-                                <label className="flex items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    name="current"
-                                    checked={edu.current}
-                                    onChange={e => handleEducationChange(e, index)}
-                                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                                  />
-                                  <span className="text-sm text-gray-700">
-                                    I'm currently studying here
-                                  </span>
-                                </label>
-                              </div>
-
-                              <div>
-                                <label className="mb-2 block text-sm font-medium text-gray-700">
-                                  Description
-                                </label>
-                                <textarea
-                                  name="description"
-                                  value={edu.description}
-                                  onChange={e => handleEducationChange(e, index)}
-                                  rows="3"
-                                  className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                                  placeholder="Describe your studies, achievements, etc..."
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <EducationProfile formData={formData} setFormData={setFormData} />
                       )}
                     </div>
                   )}
 
                   {/* Skills Section */}
                   {activeSection === 'skills' && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="mb-2 text-lg font-semibold text-gray-900">
-                          Skills & Expertise
-                        </h3>
-                        <p className="text-gray-600">Add skills that showcase your expertise</p>
-                      </div>
-
-                      <div className="rounded-lg border border-purple-100 bg-gradient-to-r from-purple-50 to-indigo-50 p-6">
-                        <div className="mb-4 flex items-center gap-3">
-                          <Star className="h-6 w-6 text-purple-600" />
-                          <h4 className="font-medium text-gray-900">Add New Skill</h4>
-                        </div>
-                        <div className="flex gap-3">
-                          <input
-                            type="text"
-                            value={newSkill}
-                            onChange={e => setNewSkill(e.target.value)}
-                            onKeyPress={e => e.key === 'Enter' && handleAddSkill()}
-                            className="flex-1 rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                            placeholder="e.g. JavaScript, Project Management, Adobe Photoshop"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleAddSkill}
-                            className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-purple-700"
-                          >
-                            Add
-                          </button>
-                        </div>
-                        <p className="mt-2 text-sm text-gray-500">
-                          Press Enter or click Add to include the skill
-                        </p>
-                      </div>
-
-                      <div>
-                        <h4 className="mb-4 font-medium text-gray-900">
-                          Your Skills ({formData.skills.length})
-                        </h4>
-                        {formData.skills.length > 0 ? (
-                          <div className="flex flex-wrap gap-3">
-                            {formData.skills.map((skill, index) => (
-                              <div
-                                key={index}
-                                className="group flex items-center gap-2 rounded-full border border-purple-200 bg-white px-4 py-2 text-purple-700 transition-colors hover:bg-purple-50"
-                              >
-                                <span className="font-medium">{skill}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => removeSkill(skill)}
-                                  className="text-purple-500 opacity-0 transition-opacity group-hover:opacity-100 hover:text-purple-700"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="py-8 text-center">
-                            <Star className="mx-auto mb-3 h-12 w-12 text-gray-300" />
-                            <p className="text-gray-500">
-                              No skills added yet. Start by adding your key skills above.
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <SkillsProfile formData={formData} setFormData={setFormData} />
                   )}
 
                   {/* Social Links Section */}

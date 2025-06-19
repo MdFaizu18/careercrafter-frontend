@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use, useContext } from 'react';
 import {
   Search,
   MapPin,
@@ -17,108 +17,28 @@ import {
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import JobService from '../../service/JobService';
+import AuthContext from '../../context/AuthProvider';
+import EnhancedJobCard from '../../components/common/EnhancedJobCard';
 
 const FindJobs = () => {
-  // Sample data with enhanced information
-  const allJobs = [
-    {
-      id: 1,
-      title: 'Senior Frontend Developer',
-      company: 'TechCorp Inc.',
-      companyLogo: '/placeholder.svg?height=60&width=60',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      salary: '$120K - $150K',
-      tags: ['React', 'TypeScript', 'UI/UX'],
-      description:
-        "We're looking for a Senior Frontend Developer to join our team and help build beautiful, responsive web applications.",
-      postedDate: '2 days ago',
-      applicants: 24,
-      featured: true,
-      remote: false,
-      urgent: false,
-      rating: 4.8,
-      benefits: ['Health Insurance', 'Remote Work', '401k'],
-    },
-    {
-      id: 2,
-      title: 'Product Manager',
-      company: 'InnovateTech',
-      companyLogo: '/placeholder.svg?height=60&width=60',
-      location: 'New York, NY',
-      type: 'Full-time',
-      salary: '$110K - $140K',
-      tags: ['Product', 'Agile', 'SaaS'],
-      description:
-        'Join our product team to lead the development of innovative software solutions that solve real customer problems.',
-      postedDate: '1 week ago',
-      applicants: 18,
-      featured: false,
-      remote: true,
-      urgent: true,
-      rating: 4.6,
-      benefits: ['Stock Options', 'Flexible Hours', 'Learning Budget'],
-    },
-    {
-      id: 3,
-      title: 'UX/UI Designer',
-      company: 'DesignHub',
-      companyLogo: '/placeholder.svg?height=60&width=60',
-      location: 'Remote',
-      type: 'Contract',
-      salary: '$80K - $100K',
-      tags: ['Figma', 'UI Design', 'User Research'],
-      description:
-        "We're seeking a talented UX/UI Designer to create intuitive and engaging user experiences for our digital products.",
-      postedDate: '3 days ago',
-      applicants: 32,
-      featured: true,
-      remote: true,
-      urgent: false,
-      rating: 4.9,
-      benefits: ['Creative Freedom', 'Top Equipment', 'Conference Budget'],
-    },
-    {
-      id: 4,
-      title: 'Backend Developer',
-      company: 'ServerStack',
-      companyLogo: '/placeholder.svg?height=60&width=60',
-      location: 'Boston, MA',
-      type: 'Full-time',
-      salary: '$130K - $160K',
-      tags: ['Node.js', 'Python', 'AWS'],
-      description:
-        'Looking for an experienced Backend Developer to build scalable and secure APIs and services.',
-      postedDate: '5 days ago',
-      applicants: 15,
-      featured: false,
-      remote: false,
-      urgent: false,
-      rating: 4.7,
-      benefits: ['Health Insurance', 'Gym Membership', 'Catered Meals'],
-    },
-    {
-      id: 5,
-      title: 'DevOps Engineer',
-      company: 'CloudTech',
-      companyLogo: '/placeholder.svg?height=60&width=60',
-      location: 'Seattle, WA',
-      type: 'Full-time',
-      salary: '$125K - $155K',
-      tags: ['Docker', 'Kubernetes', 'CI/CD'],
-      description:
-        'Join our DevOps team to build and maintain our cloud infrastructure and deployment pipelines.',
-      postedDate: '1 week ago',
-      applicants: 28,
-      featured: false,
-      remote: true,
-      urgent: true,
-      rating: 4.5,
-      benefits: ['Stock Options', 'Remote Work', 'Professional Development'],
-    },
-  ];
+  const { auth } = useContext(AuthContext);
+  const jobService = new JobService(auth?.accessToken);
 
-  const [jobs, setJobs] = useState(allJobs);
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await jobService.getAllJobs();
+        console.log('Fetched jobs:', response);
+        setJobs(response);
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
   const [showFilters, setShowFilters] = useState(false);
@@ -142,18 +62,6 @@ const FindJobs = () => {
     { value: 'month', label: 'Past month' },
   ];
   const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Executive'];
-
-  const toggleSaveJob = jobId => {
-    setSavedJobs(prev => {
-      const newSaved = new Set(prev);
-      if (newSaved.has(jobId)) {
-        newSaved.delete(jobId);
-      } else {
-        newSaved.add(jobId);
-      }
-      return newSaved;
-    });
-  };
 
   const toggleFilter = (category, value) => {
     setFilters(prevFilters => {
@@ -200,7 +108,7 @@ const FindJobs = () => {
   };
 
   const handleSearch = () => {
-    let filteredJobs = [...allJobs];
+    let filteredJobs = [...jobs];
 
     // Filter by search term
     if (searchTerm) {
@@ -242,94 +150,6 @@ const FindJobs = () => {
   useEffect(() => {
     handleSearch();
   }, [filters]);
-
-  const EnhancedJobCard = ({ job }) => (
-    <div
-      className={
-        'group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-all duration-300 hover:shadow-xl'
-      }
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-4">
-          <div className="relative">
-            <img
-              src={job.companyLogo || '/placeholder.svg'}
-              alt={`${job.company} logo`}
-              className="h-14 w-14 rounded-lg object-cover shadow-sm"
-            />
-            <div className="absolute -right-1 -bottom-1 rounded-full bg-green-500 p-1">
-              <CheckCircle className="h-3 w-3 text-white" />
-            </div>
-          </div>
-
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 transition-colors group-hover:text-purple-600">
-              {job.title}
-            </h3>
-            <p className="mb-2 text-base font-medium text-gray-700">{job.company}</p>
-
-            <div className="mb-3 flex flex-wrap items-center gap-3">
-              <div className="flex items-center text-gray-600">
-                <MapPin className="mr-1 h-3.5 w-3.5" />
-                <span className="text-sm">{job.location}</span>
-              </div>
-              <div className="flex items-center text-gray-600">
-                <Briefcase className="mr-1 h-3.5 w-3.5" />
-                <span className="text-sm">{job.type}</span>
-              </div>
-              <div className="flex items-center text-green-600">
-                <DollarSign className="mr-1 h-3.5 w-3.5" />
-                <span className="text-sm font-medium">{job.salary}</span>
-              </div>
-            </div>
-
-            <p className="mb-4 line-clamp-2 text-sm text-gray-600">{job.description}</p>
-
-            <div className="mb-4 flex flex-wrap gap-2">
-              {job.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-end space-y-2"></div>
-      </div>
-
-      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
-        <div className="flex items-center space-x-8">
-          <div className="flex items-center text-gray-500">
-            <Clock className="mr-1 h-3.5 w-3.5" />
-            <span className="text-xs">{job.postedDate}</span>
-          </div>
-          <div className="mt-1 flex items-center text-gray-500">
-            <Users className="mr-1 h-3.5 w-3.5" />
-            <span className="text-xs">{job.applicants} applicants</span>
-          </div>
-        </div>
-
-        <div className="flex space-x-2">
-          <Link
-            to={`/jobseeker/job/${job.id}`}
-            className="rounded-md border border-gray-200 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-          >
-            View Details
-          </Link>
-          <Link
-            to={`/jobseeker/job/${job.id}`}
-            className="rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm text-white transition-all hover:shadow-md"
-          >
-            Apply Now
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -602,33 +422,6 @@ const FindJobs = () => {
             </div>
           )}
         </div>
-
-        {/* Pagination */}
-        {/* {jobs.length > 0 && (
-          <div className="mt-12 flex justify-center">
-            <nav className="flex items-center space-x-2">
-              <button className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
-                Previous
-              </button>
-              <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium">
-                1
-              </button>
-              <button className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
-                2
-              </button>
-              <button className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
-                3
-              </button>
-              <span className="px-4 py-2 text-gray-500">...</span>
-              <button className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
-                10
-              </button>
-              <button className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors">
-                Next
-              </button>
-            </nav>
-          </div>
-        )} */}
       </div>
     </div>
   );

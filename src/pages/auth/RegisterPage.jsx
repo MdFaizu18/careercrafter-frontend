@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Lock, CheckCircle, XCircle } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import AuthService from '../../service/AuthService';
+import { toast } from 'react-toastify';
+
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -35,8 +38,8 @@ const RegisterPage = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name) {
-      newErrors.name = 'Name is required';
+    if (!formData.username) {
+      newErrors.username = 'UserName is required';
     }
 
     if (!formData.email) {
@@ -61,15 +64,22 @@ const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
-    if (validateForm()) {
-      // In a real app, you would send this data to your backend
-      console.log('Form submitted:', formData);
-
-      // Redirect to login page
+    const authService = new AuthService();
+    try {
+      const response = await authService.registerUser(formData);
+      console.log('User registered successfully:', response);
+      console.log(response);
+      toast.success('Login Successful');
       navigate('/login');
+    } catch (error) {
+      console.error('Failed to register user:', error);
+      alert('Registration failed. Please try again.');
+      if (error.response && error.response.status === 400) {
+        alert('User already exists. Please login or use a different email.');
+      }
     }
   };
 
@@ -172,24 +182,24 @@ const RegisterPage = () => {
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
-                  Full Name
+                  User Name
                 </label>
                 <div className="relative mt-1">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <User className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
-                    id="name"
-                    name="name"
+                    id="username"
+                    name="username"
                     type="text"
-                    autoComplete="name"
+                    autoComplete="username"
                     placeholder="User Name"
-                    value={formData.name}
+                    value={formData.username}
                     onChange={handleChange}
-                    className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+                    className={`w-full border px-4 py-2 ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                 </div>
-                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                {errors.username && <p className="mt-1 text-xs text-red-500">{errors.username}</p>}
               </div>
 
               <div>

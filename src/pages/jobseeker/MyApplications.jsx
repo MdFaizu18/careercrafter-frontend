@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -22,142 +22,15 @@ import {
   DollarSign,
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
+import ApplicationService from '../../service/ApplicationService';
+import AuthContext from '../../context/AuthProvider';
 
 const MyApplications = () => {
-  // Sample data with enhanced information
-  const initialApplications = [
-    {
-      id: 1,
-      position: 'Senior Frontend Developer',
-      company: 'TechCorp Inc.',
-      companyLogo: '/placeholder.svg?height=40&width=40',
-      location: 'San Francisco, CA',
-      appliedDate: '2 days ago',
-      status: 'Applied',
-      salary: '$120K - $150K',
-      notes: '',
-      interviews: [],
-      progress: 25,
-      nextStep: 'Waiting for response',
-      urgency: 'medium',
-    },
-    {
-      id: 2,
-      position: 'UX Designer',
-      company: 'DesignHub',
-      companyLogo: '/placeholder.svg?height=40&width=40',
-      location: 'Remote',
-      appliedDate: '1 week ago',
-      status: 'Interview',
-      salary: '$90K - $110K',
-      notes: 'Had a great first interview. Second round scheduled for next week.',
-      interviews: [
-        {
-          date: '2023-05-15T14:00:00',
-          type: 'Video Call',
-          with: 'Sarah Johnson, Design Lead',
-          notes: 'Discussed portfolio and past projects. Went well overall.',
-        },
-        {
-          date: '2023-05-22T15:30:00',
-          type: 'Video Call',
-          with: 'Design Team',
-          notes: 'Technical interview and team meet.',
-        },
-      ],
-      progress: 60,
-      nextStep: 'Second interview scheduled',
-      urgency: 'high',
-    },
-    {
-      id: 3,
-      position: 'Product Manager',
-      company: 'InnovateTech',
-      companyLogo: '/placeholder.svg?height=40&width=40',
-      location: 'New York, NY',
-      appliedDate: '2 weeks ago',
-      status: 'Rejected',
-      salary: '$110K - $140K',
-      notes: 'Received rejection email. They went with a candidate with more SaaS experience.',
-      interviews: [
-        {
-          date: '2023-05-10T11:00:00',
-          type: 'Phone Screen',
-          with: 'HR Manager',
-          notes: 'Basic screening call about experience and expectations.',
-        },
-      ],
-      progress: 100,
-      nextStep: 'Application closed',
-      urgency: 'low',
-    },
-    {
-      id: 4,
-      position: 'Frontend Developer',
-      company: 'WebSolutions',
-      companyLogo: '/placeholder.svg?height=40&width=40',
-      location: 'Chicago, IL',
-      appliedDate: '3 weeks ago',
-      status: 'Offer',
-      salary: '$110K - $130K',
-      notes: 'Received offer: $110K base + benefits. Need to respond by Friday.',
-      interviews: [
-        {
-          date: '2023-04-28T13:00:00',
-          type: 'Phone Screen',
-          with: 'HR Manager',
-          notes: 'Initial screening call.',
-        },
-        {
-          date: '2023-05-05T10:00:00',
-          type: 'Video Call',
-          with: 'Tech Lead',
-          notes: 'Technical interview with coding challenge.',
-        },
-        {
-          date: '2023-05-12T14:00:00',
-          type: 'On-site',
-          with: 'Team & CTO',
-          notes: 'Final round with team and leadership.',
-        },
-      ],
-      progress: 90,
-      nextStep: 'Respond to offer',
-      urgency: 'high',
-    },
-    {
-      id: 5,
-      position: 'React Developer',
-      company: 'AppWorks',
-      companyLogo: '/placeholder.svg?height=40&width=40',
-      location: 'Austin, TX',
-      appliedDate: '1 month ago',
-      status: 'No Response',
-      salary: '$100K - $130K',
-      notes: '',
-      interviews: [],
-      progress: 10,
-      nextStep: 'Follow up recommended',
-      urgency: 'medium',
-    },
-    {
-      id: 6,
-      position: 'React Developer',
-      company: 'AppWorks',
-      companyLogo: '/placeholder.svg?height=40&width=40',
-      location: 'Austin, TX',
-      appliedDate: '1 month ago',
-      status: 'No Response',
-      salary: '$100K - $130K',
-      notes: '',
-      interviews: [],
-      progress: 10,
-      nextStep: 'Follow up recommended',
-      urgency: 'medium',
-    },
-  ];
+  const { auth } = useContext(AuthContext);
+  const applicationService = new ApplicationService(auth?.accessToken);
 
-  const [applications, setApplications] = useState(initialApplications);
+  const [application, setApplication] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewMode, setViewMode] = useState('cards'); // cards or kanban
@@ -173,14 +46,28 @@ const MyApplications = () => {
     setStatusFilter(e.target.value);
   };
 
-  const filteredApplications = applications.filter(app => {
+  useEffect(() => {
+    fetchRecentApplications();
+  }, []);
+
+  const fetchRecentApplications = async () => {
+    try {
+      const response = await applicationService.getApplicationsForUser();
+      console.log(response);
+      setApplication(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const applications = [];
+
+  const filteredApplications = application.filter(app => {
     const matchesSearch =
-      app.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.location.toLowerCase().includes(searchTerm.toLowerCase());
+      app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.companyName.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
-      statusFilter === 'all' || app.status.toLowerCase() === statusFilter.toLowerCase();
+      statusFilter === 'all' || app.status?.toLowerCase() === statusFilter.toLowerCase();
 
     return matchesSearch && matchesStatus;
   });
@@ -319,7 +206,7 @@ const MyApplications = () => {
             </div>
             <div className="mt-6 flex items-center space-x-4 md:mt-0">
               <Link
-                to="/job-seeker/search-jobs"
+                to="/jobseeker/find-jobs"
                 className="flex items-center space-x-2 rounded-lg bg-white px-6 py-3 font-medium text-purple-600 transition-colors duration-200 hover:bg-purple-50"
               >
                 <Plus className="h-5 w-5" />
@@ -432,13 +319,13 @@ const MyApplications = () => {
                           />
                         ) : (
                           <span className="text-sm font-bold text-purple-600">
-                            {application.company.charAt(0)}
+                            {application?.companyName.charAt(0)}
                           </span>
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="mb-1 truncate text-lg font-semibold text-gray-900">
-                          {application.position}
+                          {application?.jobTitle}
                         </h3>
                         <p className="mb-1 font-medium text-gray-600">{application.company}</p>
                         <div className="flex items-center gap-3 text-sm text-gray-500">
@@ -502,7 +389,7 @@ const MyApplications = () => {
                         <Eye className="h-4 w-4" />
                         Details
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => {
                           setSelectedApplication(application);
                           openNoteModal();
@@ -511,7 +398,7 @@ const MyApplications = () => {
                       >
                         <MessageCircle className="h-4 w-4" />
                         Note
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>
@@ -528,7 +415,7 @@ const MyApplications = () => {
                     : 'Start your job search journey by applying to positions that match your skills.'}
                 </p>
                 <Link
-                  to="/job-seeker/search-jobs"
+                  to="/jobseeker/find-jobs"
                   className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg"
                 >
                   <Plus className="h-5 w-5" />

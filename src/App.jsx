@@ -21,7 +21,7 @@ import PostJob from './pages/employer/PostJobs';
 import ViewApplications from './pages/employer/ViewApplications';
 import ManageJobs from './pages/employer/ManageJobs';
 import EmployerProfile from './pages/employer/EmployerProfile';
-
+import RequireAuth from './auth/RequireAuth';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -42,63 +42,39 @@ const router = createBrowserRouter([
       },
     ],
   },
+
   {
-    path: 'jobseeker',
-    element: <JobseekerOutlet />,
+    element: <RequireAuth />,
     children: [
       {
-        path: 'dashboard',
-        element: <DashboardJobseeker />,
-      },
-      {
-        path: 'find-jobs',
-        element: <FindJobs />,
-      },
-      {
-        path: 'job/:id',
-        element: <JobDetails />,
-      },
-      {
-        path: 'resume',
-        element: <ResumeManager />,
-      },
-      {
-        path: 'applications',
-        element: <MyApplications />,
-      },
-      {
-        path: 'support',
-        element: <SupportPage />,
-      },
-      {
-        path: 'profile',
-        element: <JobseekerProfile />,
+        path: 'jobseeker',
+        element: <JobseekerOutlet />,
+        children: [
+          { path: 'dashboard', element: <DashboardJobseeker /> },
+          { path: 'find-jobs', element: <FindJobs /> },
+          { path: 'job/:id', element: <JobDetails /> },
+          { path: 'resume', element: <ResumeManager /> },
+          { path: 'applications', element: <MyApplications /> },
+          { path: 'support', element: <SupportPage /> },
+          { path: 'profile', element: <JobseekerProfile /> },
+        ],
       },
     ],
   },
+
   {
-    path: 'employer',
-    element: <EmployerOutlet />,
+    element: <RequireAuth />,
     children: [
       {
-        path: 'dashboard',
-        element: <DashboardEmployer />,
-      },
-      {
-        path: 'profile',
-        element: <EmployerProfile />,
-      },
-      {
-        path: 'post-job',
-        element: <PostJob />,
-      },
-      {
-        path: 'view-applications',
-        element: <ViewApplications />,
-      },
-      {
-        path: 'manage-jobs',
-        element: <ManageJobs />,
+        path: 'employer',
+        element: <EmployerOutlet />,
+        children: [
+          { path: 'dashboard', element: <DashboardEmployer /> },
+          { path: 'profile', element: <EmployerProfile /> },
+          { path: 'post-job', element: <PostJob /> },
+          { path: 'view-applications', element: <ViewApplications /> },
+          { path: 'manage-jobs', element: <ManageJobs /> },
+        ],
       },
     ],
   },
