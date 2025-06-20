@@ -20,29 +20,18 @@ import { Link } from 'react-router-dom';
 import JobService from '../../service/JobService';
 import AuthContext from '../../context/AuthProvider';
 import EnhancedJobCard from '../../components/common/EnhancedJobCard';
+import ApplicationService from '../../service/ApplicationService';
 
 const FindJobs = () => {
   const { auth } = useContext(AuthContext);
   const jobService = new JobService(auth?.accessToken);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const response = await jobService.getAllJobs();
-        console.log('Fetched jobs:', response);
-        setJobs(response);
-      } catch (error) {
-        console.error('Error fetching jobs:', error);
-      }
-    };
-    fetchJobs();
-  }, []);
+  const applicationService = new ApplicationService(auth?.accessToken);
 
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [savedJobs, setSavedJobs] = useState(new Set());
+  const [applications, setApplications] = useState([]);
   const [filters, setFilters] = useState({
     jobType: [],
     salary: [],
@@ -62,6 +51,29 @@ const FindJobs = () => {
     { value: 'month', label: 'Past month' },
   ];
   const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Executive'];
+
+  useEffect(() => {
+    fetchApplications();
+    fetchJobs();
+  }, []);
+  const fetchJobs = async () => {
+    try {
+      const response = await jobService.getAllJobs();
+      console.log('Fetched jobs:', response);
+      setJobs(response);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+  const fetchApplications = async () => {
+    try {
+      const response = await applicationService.getApplicationsForUser();
+      console.log('Fetched jobs:', response);
+      setApplications(response);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
 
   const toggleFilter = (category, value) => {
     setFilters(prevFilters => {
@@ -402,7 +414,7 @@ const FindJobs = () => {
         {/* Job Listings */}
         <div className="grid grid-cols-1 gap-6 space-y-6 sm:grid-cols-2">
           {jobs.length > 0 ? (
-            jobs.map(job => <EnhancedJobCard key={job.id} job={job} />)
+            jobs.map(job => <EnhancedJobCard key={job.id} job={job} applications={applications} />)
           ) : (
             <div className="rounded-xl bg-white py-16 text-center shadow-md">
               <div className="mx-auto max-w-md">

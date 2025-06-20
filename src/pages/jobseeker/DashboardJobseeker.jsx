@@ -195,7 +195,7 @@ const DashboardJobSeeker = () => {
             </div>
             <div className="mt-6 flex items-center space-x-4 md:mt-0">
               <Link
-                to="/jobseeker/search-jobs"
+                to="/jobseeker/find-jobs"
                 className="flex items-center space-x-2 rounded-xl bg-white px-6 py-3 font-semibold text-purple-600 shadow-lg transition-all duration-200 hover:bg-purple-50 hover:shadow-xl"
               >
                 <Search className="h-5 w-5" />

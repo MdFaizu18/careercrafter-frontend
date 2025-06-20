@@ -47,6 +47,19 @@ export default class ResumeService {
       throw error;
     }
   }
+  async updateResume(resumeId, updatedData) {
+    try {
+      const response = await axios.put(`${API_BASE_URL}/${resumeId}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update resume:', error);
+      throw error;
+    }
+  }
 
   async deleteResume(resumeId) {
     try {

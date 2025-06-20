@@ -16,52 +16,99 @@ import {
   Users,
   Building,
   Globe,
-  Star,
   Heart,
   ArrowRight,
-  Download,
-  Eye,
-  TrendingUp,
   Award,
   Zap,
 } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';
 import JobService from '../../service/JobService';
+import ResumeService from '../../service/ResumeService';
+import JobseekerProfileService from '../../service/JobseekerProfileService';
+import ApplicationService from '../../service/ApplicationService';
 
 const JobDetails = () => {
+  const { id } = useParams();
   const { auth } = useContext(AuthContext);
   const jobService = new JobService(auth.accessToken);
-
-  const { id } = useParams();
+  const resumeService = new ResumeService(auth?.accessToken);
+  const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
+  const applicationService = new ApplicationService(auth?.accessToken);
+  const [applications, setApplications] = useState([]);
   const [job, setJob] = useState({});
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [applicationSubmitted, setApplicationSubmitted] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [profile, setProfile] = useState({});
+  const [defaultResume, setDefaultResume] = useState({});
+
   const [formData, setFormData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '(123) 456-7890',
-    resume: null,
-    coverLetter: '',
+    fullName: '',
+    email: '',
+    phoneNumber: '',
+    resumeId: '',
+    jobId: '',
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const fetchJobDetails = async () => {
-      try {
-        const response = await jobService.getJobById(id);
-        console.log('Job details response:', response);
-        if (response && response) {
-          setJob(response);
-        } else {
-          console.error('Job details not found');
-        }
-      } catch (error) {
-        console.error('Error fetching job details:', error);
-      }
-    };
+    fetchDefaultResume();
     fetchJobDetails();
+    fetchUserProfile();
+    fetchApplications();
   }, []);
+
+  useEffect(() => {
+    setFormData({
+      jobId: job.jobId || '',
+      fullName: profile.firstName || '',
+      email: profile.user?.email || '',
+      phoneNumber: profile?.phoneNumber || '',
+      resumeId: defaultResume.resumeId || '',
+    });
+  }, [profile, defaultResume]);
+
+  const fetchJobDetails = async () => {
+    try {
+      const response = await jobService.getJobById(id);
+      console.log('Job details response:', response);
+      if (response && response) {
+        setJob(response);
+      } else {
+        console.error('Job details not found');
+      }
+    } catch (error) {
+      console.error('Error fetching job details:', error);
+    }
+  };
+  const fetchDefaultResume = async () => {
+    try {
+      const response = await resumeService.getDefaultResume();
+      console.log(response);
+      setDefaultResume(response || 'No Resume');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchUserProfile = async () => {
+    try {
+      const response = await jobseekerProfileService.getJobseekerProfile();
+      console.log(response);
+      setProfile(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchApplications = async () => {
+    try {
+      const response = await applicationService.getApplicationsForUser();
+      console.log('Fetched jobs:', response);
+      setApplications(response);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
   console.log('Job details:', job);
 
   const handleChange = e => {
@@ -99,25 +146,30 @@ const JobDetails = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name) newErrors.name = 'Name is required';
+    if (!formData.fullName) newErrors.name = 'Name is required';
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    if (!formData.phone) newErrors.phone = 'Phone number is required';
-    if (!formData.resume) newErrors.resume = 'Resume is required';
+    if (!formData.phoneNumber) newErrors.phone = 'Phone number is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-
     if (validateForm()) {
-      console.log('Application submitted:', formData);
-      setApplicationSubmitted(true);
+      try {
+        const response = await applicationService.AddApplicationForJob(formData);
+        console.log('Application submitted:', formData);
+        setApplicationSubmitted(true);
+        // Refresh applications list after successful submission
+        fetchApplications();
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -140,30 +192,6 @@ const JobDetails = () => {
     return 'Company Name Not Available';
   };
 
-  // Helper function to safely get company website
-  const getCompanyWebsite = () => {
-    if (job.company && job.company.website) {
-      return job.company.website;
-    }
-    return '#';
-  };
-
-  // Helper function to safely get company location
-  const getCompanyLocation = () => {
-    if (job.company && job.company.location) {
-      return job.company.location;
-    }
-    return job.jobLocation || 'Location Not Available';
-  };
-
-  // Helper function to safely get company description
-  const getCompanyDescription = () => {
-    if (job.company && job.company.description) {
-      return job.company.description;
-    }
-    return `${getCompanyName()} is a leading company in their industry.`;
-  };
-
   // Helper function to safely get company logo
   const getCompanyLogo = () => {
     if (job.company && job.company.logo) {
@@ -171,6 +199,9 @@ const JobDetails = () => {
     }
     return job.companyLogo || null;
   };
+  
+  // Check if user has already applied to this job
+  const hasApplied = applications.some(application => application.jobId === job.jobId);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
@@ -248,13 +279,23 @@ const JobDetails = () => {
 
                 {/* Action Buttons */}
                 <div className="mt-6 flex flex-col space-y-3 lg:mt-0">
-                  <button
-                    onClick={() => setShowApplyForm(true)}
-                    className="flex transform items-center justify-center space-x-2 rounded-xl bg-white px-8 py-4 font-semibold text-purple-700 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
-                  >
-                    <Send className="h-5 w-5" />
-                    <span>Apply Now</span>
-                  </button>
+                  {!hasApplied ? (
+                    <button
+                      onClick={() => setShowApplyForm(true)}
+                      className="flex transform items-center justify-center space-x-2 rounded-xl bg-white px-8 py-4 font-semibold text-purple-700 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+                    >
+                      <Send className="h-5 w-5" />
+                      <span>Apply Now</span>
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="flex transform items-center justify-center space-x-2 rounded-xl bg-green-200 px-8 py-4 font-semibold text-green-700 shadow-lg cursor-not-allowed"
+                    >
+                      <CheckCircle className="mr-1 h-4 w-4" />
+                      Applied
+                    </button>
+                  )}
                   <div className="flex space-x-3">
                     <button className="flex flex-1 items-center justify-center space-x-2 rounded-lg border-2 border-white/20 px-4 py-2 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/10">
                       <Share2 className="h-4 w-4" />
@@ -398,14 +439,21 @@ const JobDetails = () => {
                     Join {job.applicants || 0} other candidates
                   </p>
                 </div>
-
-                <button
-                  onClick={() => setShowApplyForm(true)}
-                  className="mb-4 w-full transform rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-4 font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
-                >
-                  Apply Now
-                </button>
-
+                {!hasApplied ? (
+                  <button
+                    onClick={() => setShowApplyForm(true)}
+                    className="mb-4 w-full transform rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-4 font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
+                  >
+                    Apply Now
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className="mb-4 w-full transform rounded-xl bg-green-500 py-4 font-semibold text-white shadow-lg cursor-not-allowed opacity-80"
+                  >
+                    Already Applied
+                  </button>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setIsBookmarked(!isBookmarked)}
@@ -520,7 +568,7 @@ const JobDetails = () => {
                       Close
                     </button>
                     <Link
-                      to="/job-seeker/applications"
+                      to="/jobseeker/applications"
                       className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg"
                     >
                       View My Applications
@@ -556,16 +604,18 @@ const JobDetails = () => {
                       </label>
                       <input
                         type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
+                        id="fullName"
+                        name="fullName"
+                        value={formData.fullName}
                         onChange={handleChange}
                         className={`w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
                           errors.name ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter your full name"
                       />
-                      {errors.name && <p className="mt-2 text-sm text-red-500">{errors.name}</p>}
+                      {errors.fullName && (
+                        <p className="mt-2 text-sm text-red-500">{errors.name}</p>
+                      )}
                     </div>
 
                     <div>
@@ -598,16 +648,18 @@ const JobDetails = () => {
                       </label>
                       <input
                         type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
                         onChange={handleChange}
                         className={`w-full rounded-xl border px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500 ${
-                          errors.phone ? 'border-red-500' : 'border-gray-300'
+                          errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Enter your phone number"
                       />
-                      {errors.phone && <p className="mt-2 text-sm text-red-500">{errors.phone}</p>}
+                      {errors.phoneNumber && (
+                        <p className="mt-2 text-sm text-red-500">{errors.phone}</p>
+                      )}
                     </div>
 
                     <div>
@@ -618,82 +670,16 @@ const JobDetails = () => {
                         Resume <span className="text-red-500">*</span>
                       </label>
                       <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center transition-colors hover:border-purple-400">
-                        <div className="space-y-4">
-                          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
-                            <Download className="h-6 w-6 text-purple-600" />
-                          </div>
-                          <div>
-                            <label
-                              htmlFor="resume-upload"
-                              className="cursor-pointer font-semibold text-purple-600 hover:text-purple-700"
-                            >
-                              Choose file
-                              <input
-                                id="resume-upload"
-                                name="resume-upload"
-                                type="file"
-                                className="sr-only"
-                                accept=".pdf,.doc,.docx"
-                                onChange={handleResumeChange}
-                              />
-                            </label>
-                            <span className="text-gray-600"> or drag and drop</span>
-                          </div>
-                          <p className="text-sm text-gray-500">PDF, DOC, DOCX up to 10MB</p>
-                        </div>
+                        {formData.resumeId && (
+                          <p className="mt-2 flex items-center text-sm text-green-600">
+                            <CheckCircle className="mr-1 h-4 w-4" />
+                            {defaultResume.fileName}
+                          </p>
+                        )}
                       </div>
-                      {formData.resume && (
-                        <p className="mt-2 flex items-center text-sm text-green-600">
-                          <CheckCircle className="mr-1 h-4 w-4" />
-                          {formData.resume.name}
-                        </p>
-                      )}
                       {errors.resume && (
                         <p className="mt-2 text-sm text-red-500">{errors.resume}</p>
                       )}
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="coverLetter"
-                        className="mb-2 block text-sm font-semibold text-gray-900"
-                      >
-                        Cover Letter (Optional)
-                      </label>
-                      <textarea
-                        id="coverLetter"
-                        name="coverLetter"
-                        rows="4"
-                        value={formData.coverLetter}
-                        onChange={handleChange}
-                        className="w-full rounded-xl border border-gray-300 px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                        placeholder="Tell us why you're perfect for this role..."
-                      ></textarea>
-                    </div>
-
-                    <div className="flex items-start space-x-3">
-                      <input
-                        id="terms"
-                        name="terms"
-                        type="checkbox"
-                        className="mt-1 h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <label htmlFor="terms" className="text-sm text-gray-700">
-                        I agree to the{' '}
-                        <Link
-                          to="/terms"
-                          className="font-medium text-purple-600 hover:text-purple-700"
-                        >
-                          Terms of Service
-                        </Link>{' '}
-                        and{' '}
-                        <Link
-                          to="/privacy"
-                          className="font-medium text-purple-600 hover:text-purple-700"
-                        >
-                          Privacy Policy
-                        </Link>
-                      </label>
                     </div>
 
                     <div className="flex justify-end space-x-4 pt-6">

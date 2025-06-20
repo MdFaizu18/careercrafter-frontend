@@ -2,7 +2,9 @@ import React from 'react';
 import { MapPin, Briefcase, CheckCircle, Clock, DollarSign, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const EnhancedJobCard = ({ job }) => {
+const EnhancedJobCard = ({ job, applications }) => {
+  const hasApplied = applications.some(application => application.jobId === job.jobId);
+
   return (
     <div>
       <div
@@ -10,16 +12,21 @@ const EnhancedJobCard = ({ job }) => {
           'group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-all duration-300 hover:shadow-xl'
         }
       >
+        {/* Applied Badge */}
+        {hasApplied && (
+          <div className="absolute top-4 right-4 z-10">
+            <div className="flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+              <CheckCircle className="mr-1 h-3 w-3" />
+              Applied
+            </div>
+          </div>
+        )}
+
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-4">
             <div className="relative">
-              <img
-                src={job.companyLogo || '/placeholder.svg'}
-                alt={`${job.company} logo`}
-                className="h-14 w-14 rounded-lg object-cover shadow-sm"
-              />
-              <div className="absolute -right-1 -bottom-1 rounded-full bg-green-500 p-1">
-                <CheckCircle className="h-3 w-3 text-white" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-purple-100 text-2xl font-semibold text-black shadow-sm">
+                {job.company?.name.charAt(0)}
               </div>
             </div>
 
@@ -84,12 +91,24 @@ const EnhancedJobCard = ({ job }) => {
             >
               View Details
             </Link>
-            <Link
-              to={`/jobseeker/job/${job.jobId}`}
-              className="rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm text-white transition-all hover:shadow-md"
-            >
-              Apply Now
-            </Link>
+
+            {/* Conditional Apply Button */}
+            {hasApplied ? (
+              <button
+                disabled
+                className="flex cursor-not-allowed items-center rounded-md bg-green-100 px-4 py-2 text-sm text-green-700"
+              >
+                <CheckCircle className="mr-1 h-4 w-4" />
+                Applied
+              </button>
+            ) : (
+              <Link
+                to={`/jobseeker/job/${job.jobId}`}
+                className="rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm text-white transition-all hover:shadow-md"
+              >
+                Apply Now
+              </Link>
+            )}
           </div>
         </div>
       </div>
