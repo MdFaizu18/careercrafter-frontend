@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -13,18 +13,39 @@ import {
 } from 'lucide-react';
 import Logo from '../../assets/logo/cc.png';
 import { HashLink } from 'react-router-hash-link';
+import UserService from '../../service/UserService';
+import AuthContext from '../../context/AuthProvider';
+import { toast } from 'react-toastify';
 
 const EmployerNavbar = ({ isAuthenticated, userRole, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const { setAuth, auth } = useContext(AuthContext);
+  const userService = new UserService(auth?.accessToken);
+  const [currentUser, setCurrentUser] = useState({});
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await userService.getCurrentUser();
+      console.log(response);
+      setCurrentUser(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleLogout = () => {
+    setAuth({});
+    localStorage.removeItem('auth');
+    toast.success('Logged out successfully!');
+    navigate('/');
+  };
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLogout = () => {
-    // onLogout();
-    navigate('/');
   };
 
   return (
@@ -73,7 +94,7 @@ const EmployerNavbar = ({ isAuthenticated, userRole, onLogout }) => {
                 className="inline-flex items-center space-x-1 rounded border border-indigo-600 bg-white px-4 py-2 text-sm font-medium text-indigo-600 hover:bg-gray-50"
               >
                 <User className="h-5 w-5" />
-                <span>{userRole === 'jobseeker' ? 'Mohammed Faizulla' : 'Admin  '}</span>
+                <span>{userRole === 'employer' ? `${currentUser.userName}` : 'Admin  '}</span>
                 <ChevronDown className="h-4 w-4" />
               </button>
 

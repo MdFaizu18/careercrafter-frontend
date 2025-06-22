@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Mail,
   Phone,
@@ -12,8 +12,13 @@ import {
   Search,
   Send,
 } from 'lucide-react';
+import AuthContext from '../../context/AuthProvider';
+import SupportService from '../../service/SupportService';
 
 export default function SupportPage() {
+  const { auth } = useContext(AuthContext);
+  const supportService = new SupportService(auth?.accessToken);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,13 +41,14 @@ export default function SupportPage() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    try {
+      await supportService.addSupportTicket(formData);
+      setIsSubmitted(true);
+      toast.success('Your Support Ticket has been submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting support ticket:', error);
+      toast.error('Failed to submit your support ticket. Please try again later.');
+    }
   };
 
   const faqs = [

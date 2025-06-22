@@ -20,6 +20,32 @@ export default class ApplicationService {
       throw error;
     }
   }
+  async getApplicationsForEmployer() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/employer`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch job details:', error);
+      throw error;
+    }
+  }
+  async getApplicationsForJob(jobId) {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/job/${jobId}`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch job details:', error);
+      throw error;
+    }
+  }
 
   async AddApplicationForJob(applicationData) {
     try {

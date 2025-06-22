@@ -1,17 +1,57 @@
 import { GraduationCap, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const EducationProfile = ({ formData, setFormData }) => {
+const EducationProfile = ({ educations, setEducations }) => {
+  const [errors, setErrors] = useState({});
+
+  console.log('from education Profile', educations);
+
+  useEffect(() => {
+    if ((!educations || educations.length === 0) && educations?.length > 0) {
+      const mappedEducation = educations.map(edu => ({
+        id: edu.educationId,
+        degree: edu.degree || '',
+        school: edu.college || '',
+        location: edu.location || '',
+        startDate: edu.startDate || '',
+        endDate: edu.endDate || '',
+        description: edu.description || '',
+        current: !edu.endDate,
+      }));
+      setEducations(prev => ({
+        ...prev,
+        education: mappedEducation,
+      }));
+    }
+
+    // Optional: Add default empty form if no educations exist
+    if (!educations?.length && (!educations || educations.length === 0)) {
+      setEducations([
+        {
+          id: Date.now(),
+          degree: '',
+          school: '',
+          location: '',
+          startDate: '',
+          endDate: '',
+          current: false,
+          description: '',
+        },
+      ]);
+    }
+  }, [educations]);
+
   const removeEducation = id => {
-    setFormData({
-      ...formData,
-      education: formData.education.filter(edu => edu.id !== id),
-    });
+    setEducations(educations.filter(edu => edu.id !== id));
+  };
+
+  const handleSubmit = () => {
+    const newErrors = {};
   };
 
   const handleEducationChange = (e, index) => {
     const { name, value, type, checked } = e.target;
-    const newEducation = [...formData.education];
+    const newEducation = [...educations];
 
     if (type === 'checkbox') {
       newEducation[index] = {
@@ -26,18 +66,14 @@ const EducationProfile = ({ formData, setFormData }) => {
       };
     }
 
-    setFormData({
-      ...formData,
-      education: newEducation,
-    });
+    setEducations(newEducation);
   };
 
-  const [errors, setErrors] = useState({});
   return (
     <div>
       <div className="space-y-6">
-        {formData.education.map((edu, index) => (
-          <div key={edu.id} className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+        {educations.map((edu, index) => (
+          <div key={edu.educationId} className="rounded-lg border border-gray-200 bg-gray-50 p-6">
             <div className="mb-4 flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100">
@@ -180,6 +216,15 @@ const EducationProfile = ({ formData, setFormData }) => {
             </div>
           </div>
         ))}
+      </div>
+      <div className="pt-6 text-right">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-green-700"
+        >
+          Save Skills
+        </button>
       </div>
     </div>
   );

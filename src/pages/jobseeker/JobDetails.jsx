@@ -1,7 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin,
   Clock,
@@ -26,8 +26,11 @@ import JobService from '../../service/JobService';
 import ResumeService from '../../service/ResumeService';
 import JobseekerProfileService from '../../service/JobseekerProfileService';
 import ApplicationService from '../../service/ApplicationService';
+import { toast } from 'react-toastify';
 
 const JobDetails = () => {
+  const navigate = useNavigate();
+
   const { id } = useParams();
   const { auth } = useContext(AuthContext);
   const jobService = new JobService(auth.accessToken);
@@ -93,7 +96,7 @@ const JobDetails = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await jobseekerProfileService.getJobseekerProfile();
-      console.log(response);
+      console.log('from job details', response);
       setProfile(response);
     } catch (error) {
       console.log(error);
@@ -123,23 +126,6 @@ const JobDetails = () => {
         ...errors,
         [name]: '',
       });
-    }
-  };
-
-  const handleResumeChange = e => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({
-        ...formData,
-        resume: file,
-      });
-
-      if (errors.resume) {
-        setErrors({
-          ...errors,
-          resume: '',
-        });
-      }
     }
   };
 
@@ -177,29 +163,19 @@ const JobDetails = () => {
     return { __html: html };
   };
 
+  const handleApplyClick = () => {
+    if (!profile?.seekerId) {
+      toast.warning('Please complete your profile first.');
+      navigate('/jobseeker/profile');
+    } else {
+      setShowApplyForm(true);
+    }
+  };
+
   if (!job) {
     return <div>Loading job details...</div>;
   }
 
-  // Helper function to safely get company name
-  const getCompanyName = () => {
-    if (typeof job.company === 'string') {
-      return job.company;
-    }
-    if (job.company && job.company.name) {
-      return job.company.name;
-    }
-    return 'Company Name Not Available';
-  };
-
-  // Helper function to safely get company logo
-  const getCompanyLogo = () => {
-    if (job.company && job.company.logo) {
-      return job.company.logo;
-    }
-    return job.companyLogo || null;
-  };
-  
   // Check if user has already applied to this job
   const hasApplied = applications.some(application => application.jobId === job.jobId);
 
@@ -234,10 +210,10 @@ const JobDetails = () => {
                   {/* Company Logo */}
                   <div className="relative">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
-                      {getCompanyLogo() ? (
+                      {job.company?.logo ? (
                         <img
-                          src={getCompanyLogo() || '/placeholder.svg'}
-                          alt={getCompanyName()}
+                          src={job.company?.logo || '/placeholder.svg'}
+                          alt={job.company?.logo}
                           className="h-12 w-12 object-contain"
                         />
                       ) : (
@@ -252,7 +228,7 @@ const JobDetails = () => {
                       <h1 className="text-3xl font-bold text-white">{job.jobTitle}</h1>
                     </div>
                     <div className="mb-4 flex items-center space-x-4 text-purple-100">
-                      <span className="text-xl font-semibold">{getCompanyName()}</span>
+                      <span className="text-xl font-semibold">{job.company?.name}</span>
                     </div>
 
                     {/* Job Details */}
@@ -281,7 +257,7 @@ const JobDetails = () => {
                 <div className="mt-6 flex flex-col space-y-3 lg:mt-0">
                   {!hasApplied ? (
                     <button
-                      onClick={() => setShowApplyForm(true)}
+                      onClick={handleApplyClick}
                       className="flex transform items-center justify-center space-x-2 rounded-xl bg-white px-8 py-4 font-semibold text-purple-700 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <Send className="h-5 w-5" />
@@ -290,7 +266,7 @@ const JobDetails = () => {
                   ) : (
                     <button
                       disabled
-                      className="flex transform items-center justify-center space-x-2 rounded-xl bg-green-200 px-8 py-4 font-semibold text-green-700 shadow-lg cursor-not-allowed"
+                      className="flex transform cursor-not-allowed items-center justify-center space-x-2 rounded-xl bg-green-200 px-8 py-4 font-semibold text-green-700 shadow-lg"
                     >
                       <CheckCircle className="mr-1 h-4 w-4" />
                       Applied
@@ -441,7 +417,7 @@ const JobDetails = () => {
                 </div>
                 {!hasApplied ? (
                   <button
-                    onClick={() => setShowApplyForm(true)}
+                    onClick={handleApplyClick}
                     className="mb-4 w-full transform rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 py-4 font-semibold text-white shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl"
                   >
                     Apply Now
@@ -449,7 +425,7 @@ const JobDetails = () => {
                 ) : (
                   <button
                     disabled
-                    className="mb-4 w-full transform rounded-xl bg-green-500 py-4 font-semibold text-white shadow-lg cursor-not-allowed opacity-80"
+                    className="mb-4 w-full transform cursor-not-allowed rounded-xl bg-green-500 py-4 font-semibold text-white opacity-80 shadow-lg"
                   >
                     Already Applied
                   </button>
@@ -554,7 +530,7 @@ const JobDetails = () => {
                   <p className="mb-8 text-lg text-gray-600">
                     Your application for{' '}
                     <span className="font-semibold text-purple-600">{job.jobTitle}</span> at{' '}
-                    <span className="font-semibold text-purple-600">{getCompanyName()}</span> has
+                    <span className="font-semibold text-purple-600">{job.company?.name}</span> has
                     been submitted successfully.
                   </p>
                   <div className="flex flex-col justify-center gap-4 sm:flex-row">
@@ -583,7 +559,7 @@ const JobDetails = () => {
                         Apply for {job.jobTitle}
                       </h2>
                       <p className="text-gray-600">
-                        {getCompanyName()} • {job.jobLocation}
+                        {job.company?.name} • {job.jobLocation}
                       </p>
                     </div>
                     <button

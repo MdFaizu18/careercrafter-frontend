@@ -20,4 +20,34 @@ export default class ExperienceService {
       throw error;
     }
   }
+
+  async addExperience(experienceData) {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/save`, experienceData, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to save expreince:', error);
+      throw error;
+    }
+  }
+
+  async deleteExperience(expId) {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/delete/${expId}`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to delete job:', error);
+      throw error;
+    }
+  }
 }

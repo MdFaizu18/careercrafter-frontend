@@ -26,12 +26,15 @@ import UserService from '../../service/UserService';
 import ResumeService from '../../service/ResumeService';
 import SkillsService from '../../service/SkillsService';
 import ApplicationService from '../../service/ApplicationService';
+import JobService from '../../service/JobService';
+import EnhancedJobCard from '../../components/common/EnhancedJobCard';
 
 const DashboardJobSeeker = () => {
   const navigate = useNavigate();
 
   const { auth } = useContext(AuthContext);
   const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
+  const jobService = new JobService(auth?.accessToken);
   const userService = new UserService(auth?.accessToken);
   const resumeService = new ResumeService(auth?.accessToken);
   const skillsService = new SkillsService(auth?.accessToken);
@@ -42,6 +45,7 @@ const DashboardJobSeeker = () => {
   const [defaultResume, setDefaultResume] = useState({});
   const [skills, setSkills] = useState([]);
   const [recentApplications, setRecentApplications] = useState([]);
+  const [jobs, setJobs] = useState([]);
 
   const stats = [
     {
@@ -74,48 +78,13 @@ const DashboardJobSeeker = () => {
     },
   ];
 
-  const recommendedJobs = [
-    {
-      id: 1,
-      title: 'Frontend Developer',
-      company: 'WebSolutions Inc.',
-      logo: '/placeholder.svg?height=48&width=48',
-      location: 'Remote',
-      salary: '$90K - $110K',
-      match: '95%',
-      type: 'Full-time',
-      posted: '2 days ago',
-    },
-    {
-      id: 2,
-      title: 'UI/UX Designer',
-      company: 'CreativeMinds',
-      logo: '/placeholder.svg?height=48&width=48',
-      location: 'New York, NY',
-      salary: '$85K - $105K',
-      match: '90%',
-      type: 'Full-time',
-      posted: '1 week ago',
-    },
-    {
-      id: 3,
-      title: 'React Developer',
-      company: 'AppWorks',
-      logo: '/placeholder.svg?height=48&width=48',
-      location: 'San Francisco, CA',
-      salary: '$100K - $130K',
-      match: '85%',
-      type: 'Contract',
-      posted: '3 days ago',
-    },
-  ];
-
   useEffect(() => {
     fetchProfileCompletion();
     fetchCurrentUser();
     fetchDefaultResume();
     fetchSkillsForUser();
     fetchRecentApplications();
+    fetchJobs();
   }, []);
 
   const fetchProfileCompletion = async () => {
@@ -164,6 +133,15 @@ const DashboardJobSeeker = () => {
     }
   };
 
+  const fetchJobs = async () => {
+    try {
+      const response = await jobService.getAllJobs();
+      console.log('Fetched jobs:', response);
+      setJobs(response);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
   const profileCompleteness = profileCompletion.profileCompletion;
 
   const getStatusColor = status => {
@@ -283,11 +261,9 @@ const DashboardJobSeeker = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4">
-                        <img
-                          src={application.logo || '/placeholder.svg'}
-                          alt={`${application.companyName} logo`}
-                          className="h-12 w-12 rounded-lg border border-gray-200 object-cover"
-                        />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
+                          {application.companyName.slice(0, 1).toUpperCase()}
+                        </div>
                         <div>
                           <h3 className="mb-1 font-semibold text-gray-900">
                             {application.jobTitle}
@@ -463,54 +439,13 @@ const DashboardJobSeeker = () => {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {recommendedJobs.map(job => (
-              <div
-                key={job.id}
-                className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg transition-all duration-200 hover:border-purple-200 hover:shadow-xl"
-              >
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex items-start space-x-3">
-                    <img
-                      src={job.logo || '/placeholder.svg'}
-                      alt={`${job.company} logo`}
-                      className="h-12 w-12 rounded-xl border border-gray-200 object-cover"
-                    />
-                    <div>
-                      <h3 className="mb-1 font-bold text-gray-900">{job.title}</h3>
-                      <p className="text-sm text-gray-600">{job.company}</p>
-                    </div>
-                  </div>
-                  <div className="rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-1 text-xs font-bold text-white">
-                    {job.match}
-                  </div>
-                </div>
-
-                <div className="mb-4 space-y-2">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <MapPin className="h-4 w-4" />
-                    <span>{job.location}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <DollarSign className="h-4 w-4" />
-                    <span>{job.salary}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span className="rounded-full bg-gray-100 px-2 py-1">{job.type}</span>
-                    <span>Posted {job.posted}</span>
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Link
-                    to={`/job-seeker/job/${job.id}`}
-                    className="flex-1 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-center font-semibold text-white transition-all duration-200 hover:shadow-lg"
-                  >
-                    Apply Now
-                  </Link>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-2">
+            {jobs.length > 0 &&
+              jobs
+                .slice(0, 2)
+                .map(job => (
+                  <EnhancedJobCard key={job.id} job={job} applications={recentApplications} />
+                ))}
           </div>
         </div>
       </div>

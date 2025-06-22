@@ -1,60 +1,56 @@
 import { Briefcase, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import AuthContext from '../../context/AuthProvider';
+import SupportService from '../../service/SupportService';
+import ExperienceService from '../../service/ExperienceService';
+import { toast } from 'react-toastify';
 
-const ExperienceProfile = ({ formData, setFormData }) => {
+const ExperienceProfile = ({ setExperience, experience }) => {
+  const { auth } = useContext(AuthContext);
+  const expService = new ExperienceService(auth?.accessToken);
+  console.log('from exprience', experience);
+
   const [errors, setErrors] = useState({});
+
   const handleExperienceChange = (e, index) => {
     const { name, value, type, checked } = e.target;
-    const newExperience = [...formData.experience];
+    const updatedExperience = [...experience];
 
-    if (type === 'checkbox') {
-      newExperience[index] = {
-        ...newExperience[index],
-        [name]: checked,
-        endDate: checked ? '' : newExperience[index].endDate,
-      };
-    } else {
-      newExperience[index] = {
-        ...newExperience[index],
-        [name]: value,
-      };
-    }
-
-    setFormData({
-      ...formData,
-      experience: newExperience,
-    });
-  };
-
-  const addExperience = () => {
-    const newExperience = {
-      id: Date.now(),
-      title: '',
-      company: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      current: false,
-      description: '',
+    updatedExperience[index] = {
+      ...updatedExperience[index],
+      [name]: type === 'checkbox' ? checked : value,
     };
 
-    setFormData({
-      ...formData,
-      experience: [...formData.experience, newExperience],
-    });
+    // If checkbox is checked, clear endDate
+    if (type === 'checkbox' && checked) {
+      updatedExperience[index].endDate = '';
+    }
+
+    setExperience(updatedExperience);
   };
 
   const removeExperience = id => {
-    setFormData({
-      ...formData,
-      experience: formData.experience.filter(exp => exp.id !== id),
-    });
+    setExperience(experience.filter(exp => exp.id !== id));
   };
+
+  const handleSubmit = async () => {
+    console.log('Submitting experience data:', experience);
+    try {
+      const respone = await expService.addExperience(experience);
+      toast.success('Experience saved successfully!');
+      console.log('Experience saved:', respone);
+      setExperience(respone);
+    } catch (error) {
+      console.error('Error saving experience:', error);
+      toast.error('Failed to save experience. Please try again.');
+    }
+  };
+
   return (
     <div>
       <div className="space-y-6">
-        {formData.experience.map((exp, index) => (
-          <div key={exp.id} className="rounded-lg border border-gray-200 bg-gray-50 p-6">
+        {experience.map((exp, index) => (
+          <div key={exp.index} className="rounded-lg border border-gray-200 bg-gray-50 p-6">
             <div className="mb-4 flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
@@ -62,14 +58,14 @@ const ExperienceProfile = ({ formData, setFormData }) => {
                 </div>
                 <div>
                   <h4 className="font-medium text-gray-900">
-                    {exp.title || `Experience ${index + 1}`}
+                    {exp.jobTitle || `Experience ${index + 1}`}
                   </h4>
                   <p className="text-sm text-gray-600">{exp.company}</p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => removeExperience(exp.id)}
+                onClick={() => removeExperience(exp.experienceId)}
                 className="p-1 text-red-500 hover:text-red-700"
               >
                 <Trash2 className="h-4 w-4" />
@@ -199,6 +195,15 @@ const ExperienceProfile = ({ formData, setFormData }) => {
             </div>
           </div>
         ))}
+      </div>
+      <div className="pt-6 text-right">
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-green-700"
+        >
+          Save Skills
+        </button>
       </div>
     </div>
   );

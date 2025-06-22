@@ -1,69 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Edit, Trash2, Eye, Plus, Search, Filter, MoreHorizontal } from 'lucide-react';
+import AuthContext from '../../context/AuthProvider';
+import JobService from '../../service/JobService';
 
 const ManageJobs = () => {
-  // Sample data
-  const initialJobs = [
-    {
-      id: 1,
-      title: 'Senior Frontend Developer',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      applications: 24,
-      status: 'active',
-      posted: '2 weeks ago',
-      expires: '2 weeks left',
-    },
-    {
-      id: 2,
-      title: 'UX Designer',
-      location: 'Remote',
-      type: 'Contract',
-      applications: 18,
-      status: 'active',
-      posted: '1 week ago',
-      expires: '3 weeks left',
-    },
-    {
-      id: 3,
-      title: 'Product Manager',
-      location: 'New York, NY',
-      type: 'Full-time',
-      applications: 32,
-      status: 'active',
-      posted: '3 days ago',
-      expires: '27 days left',
-    },
-    {
-      id: 4,
-      title: 'Backend Developer',
-      location: 'Boston, MA',
-      type: 'Full-time',
-      applications: 15,
-      status: 'expired',
-      posted: '2 months ago',
-      expires: 'Expired',
-    },
-    {
-      id: 5,
-      title: 'Marketing Specialist',
-      location: 'Chicago, IL',
-      type: 'Part-time',
-      applications: 8,
-      status: 'draft',
-      posted: 'Not published',
-      expires: 'N/A',
-    },
-  ];
+  const { auth } = useContext(AuthContext);
+  const jobService = new JobService(auth?.accessToken);
 
-  const [jobs, setJobs] = useState(initialJobs);
+  const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+  const fetchJobs = async () => {
+    try {
+      const response = await jobService.getJobsForEmployer();
+      console.log(response);
+      setJobs(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Helper function to get application count
+  const getApplicationCount = applications => {
+    if (!applications) return 0;
+    if (typeof applications === 'number') return applications;
+    if (Array.isArray(applications)) return applications.length;
+    return 0;
+  };
 
   const handleSearch = e => {
     setSearchTerm(e.target.value);
@@ -73,10 +45,12 @@ const ManageJobs = () => {
     setStatusFilter(e.target.value);
   };
 
+  // Filter jobs based on search and status
   const filteredJobs = jobs.filter(job => {
     const matchesSearch =
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.location.toLowerCase().includes(searchTerm.toLowerCase());
+      searchTerm === '' ||
+      (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (job.location && job.location.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
 
     return matchesSearch && matchesStatus;
@@ -127,29 +101,10 @@ const ManageJobs = () => {
                 : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
             }`}
           >
-            All Jobs ({jobs.length})
+            All Jobs ({filteredJobs.length})
           </button>
-          <button
-            onClick={() => setStatusFilter('active')}
-            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
-              statusFilter === 'active'
-                ? 'bg-green-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
-            }`}
-          >
-            Active ({jobs.filter(j => j.status === 'active').length})
-          </button>
-          <button
-            onClick={() => setStatusFilter('draft')}
-            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
-              statusFilter === 'draft'
-                ? 'bg-gray-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
-            }`}
-          >
-            Draft ({jobs.filter(j => j.status === 'draft').length})
-          </button>
-          <button
+
+          {/* <button
             onClick={() => setStatusFilter('expired')}
             className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
               statusFilter === 'expired'
@@ -158,7 +113,7 @@ const ManageJobs = () => {
             }`}
           >
             Expired ({jobs.filter(j => j.status === 'expired').length})
-          </button>
+          </button> */}
         </div>
 
         {/* Search and Filters */}
@@ -233,20 +188,22 @@ const ManageJobs = () => {
               <tbody className="divide-y divide-gray-50 bg-white">
                 {filteredJobs.length > 0 ? (
                   filteredJobs.map(job => (
-                    <tr key={job.id} className="transition-colors hover:bg-gray-50">
+                    <tr key={job.jobId} className="transition-colors hover:bg-gray-50">
                       <td className="px-6 py-6">
                         <div>
-                          <div className="text-sm font-semibold text-gray-900">{job.title}</div>
-                          <div className="text-sm text-gray-500">{job.type}</div>
+                          <div className="text-sm font-semibold text-gray-900">
+                            {job.jobTitle || 'N/A'}
+                          </div>
+                          <div className="text-sm text-gray-500">{job.jobType || 'N/A'}</div>
                         </div>
                       </td>
                       <td className="px-6 py-6">
-                        <div className="text-sm text-gray-900">{job.location}</div>
+                        <div className="text-sm text-gray-900">{job.jobLocation || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center">
                           <span className="text-sm font-medium text-gray-900">
-                            {job.applications}
+                            {getApplicationCount(job.applications)}
                           </span>
                           <span className="ml-2 rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-700">
                             applicants
@@ -263,59 +220,39 @@ const ManageJobs = () => {
                                 : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                          {job.status
+                            ? job.status.charAt(0).toUpperCase() + job.status.slice(1)
+                            : 'Active'}
                         </span>
                       </td>
-                      <td className="px-6 py-6 text-sm text-gray-500">{job.posted}</td>
-                      <td className="px-6 py-6 text-sm text-gray-500">{job.expires}</td>
+                      <td className="px-6 py-6 text-sm text-gray-500">{job.createdAt || 'N/A'}</td>
+                      <td className="px-6 py-6 text-sm text-gray-500">
+                        {job.applicationDeadline || 'N/A'}
+                      </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center justify-end space-x-3">
                           <Link
-                            to={`/employer/applications?job=${job.id}`}
+                            to={`/employer/applications?job=${job.jobId}`}
                             className="rounded-lg p-2 text-purple-600 transition-colors hover:bg-purple-100"
                             title="View Applications"
                           >
                             <Eye className="h-5 w-5" />
                           </Link>
                           <Link
-                            to={`/employer/edit-job/${job.id}`}
+                            to={`/employer/edit-job/${job.jobId}`}
                             className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-100"
                             title="Edit Job"
                           >
                             <Edit className="h-5 w-5" />
                           </Link>
                           <button
-                            onClick={() => confirmDelete(job.id)}
+                            onClick={() => confirmDelete(job.jobId)}
                             className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-100"
                             title="Delete Job"
                           >
                             <Trash2 className="h-5 w-5" />
                           </button>
-                          <div className="group relative">
-                            <button className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100">
-                              <MoreHorizontal className="h-5 w-5" />
-                            </button>
-                            <div className="ring-opacity-5 absolute right-0 z-10 mt-2 hidden w-48 rounded-xl bg-white py-2 shadow-lg ring-1 ring-black group-hover:block">
-                              <Link
-                                to={`/job-seeker/job/${job.id}`}
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                              >
-                                Preview Job
-                              </Link>
-                              <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                Duplicate Job
-                              </button>
-                              {job.status === 'active' ? (
-                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                  Pause Job
-                                </button>
-                              ) : (
-                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                  Activate Job
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                          <div className="group relative"></div>
                         </div>
                       </td>
                     </tr>

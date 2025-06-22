@@ -20,6 +20,19 @@ export default class JobService {
       throw error;
     }
   }
+  async getJobsForEmployer() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}`, {
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch job details:', error);
+      throw error;
+    }
+  }
   async getAllJobs() {
     try {
       const response = await axios.get(`${API_BASE_URL}/all`, {

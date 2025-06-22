@@ -22,6 +22,7 @@ import ViewApplications from './pages/employer/ViewApplications';
 import ManageJobs from './pages/employer/ManageJobs';
 import EmployerProfile from './pages/employer/EmployerProfile';
 import RequireAuth from './auth/RequireAuth';
+import JobApplications from './pages/employer/JobApplications';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
           { path: 'profile', element: <EmployerProfile /> },
           { path: 'post-job', element: <PostJob /> },
           { path: 'view-applications', element: <ViewApplications /> },
+          { path: 'applications/:id', element: <JobApplications /> },
           { path: 'manage-jobs', element: <ManageJobs /> },
         ],
       },
