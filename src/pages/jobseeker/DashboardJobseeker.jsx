@@ -6,15 +6,12 @@ import {
   MapPin,
   DollarSign,
   TrendingUp,
-  Bell,
   Search,
   Calendar,
   Eye,
   Heart,
-  LightbulbIcon,
   Plus,
   Upload,
-  ChartScatter,
   BookUserIcon,
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
@@ -43,6 +40,7 @@ const DashboardJobSeeker = () => {
   const [profileCompletion, SetProfileCompletion] = useState([]);
   const [currentUser, setCurrentUser] = useState({});
   const [defaultResume, setDefaultResume] = useState({});
+  const [resume, setResume] = useState([]);
   const [skills, setSkills] = useState([]);
   const [recentApplications, setRecentApplications] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -50,14 +48,14 @@ const DashboardJobSeeker = () => {
   const stats = [
     {
       title: 'Applications',
-      value: '12',
+      value: recentApplications.length > 0 ? recentApplications.length.toString() : '0',
       change: '+3 this week',
       icon: <Briefcase className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-purple-500 to-purple-600',
     },
     {
       title: 'Skills Added',
-      value: '5',
+      value: skills.length > 0 ? skills.length.toString() : '0',
       change: '+12 this week',
       icon: <Eye className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-blue-500 to-blue-600',
@@ -71,7 +69,7 @@ const DashboardJobSeeker = () => {
     },
     {
       title: 'Resume Uploaded',
-      value: '1',
+      value: resume.length > 0 ? resume.length.toString() : '0',
       change: '+5 this week',
       icon: <Heart className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-orange-500 to-orange-600',
@@ -85,12 +83,13 @@ const DashboardJobSeeker = () => {
     fetchSkillsForUser();
     fetchRecentApplications();
     fetchJobs();
+    fetchResume();
   }, []);
 
   const fetchProfileCompletion = async () => {
     try {
       const response = await jobseekerProfileService.getProfileCompletion();
-      console.log(response);
+      console.log('from profile complete', response);
       SetProfileCompletion(response);
     } catch (error) {
       console.log(error);
@@ -110,6 +109,15 @@ const DashboardJobSeeker = () => {
       const response = await resumeService.getDefaultResume();
       console.log(response);
       setDefaultResume(response || 'No Resume');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchResume = async () => {
+    try {
+      const response = await resumeService.getAllResume();
+      console.log(response);
+      setResume(response || 'No Resume');
     } catch (error) {
       console.log(error);
     }
@@ -168,7 +176,7 @@ const DashboardJobSeeker = () => {
         <div className="container mx-auto px-4 py-12 sm:px-24">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="mb-2 text-3xl font-bold">Welcome back, {currentUser.userName} </h1>
+              <h1 className="mb-2 text-3xl font-bold">Welcome, {currentUser.userName} </h1>
               <p className="text-purple-100">Ready to find your next opportunity?</p>
             </div>
             <div className="mt-6 flex items-center space-x-4 md:mt-0">
@@ -189,17 +197,29 @@ const DashboardJobSeeker = () => {
         <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
           <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="mb-2 text-xl font-bold text-gray-900">Complete Your Profile</h2>
+              <h2 className="mb-2 text-xl font-bold text-gray-900">
+                {profileCompletion.profileCompletion < 100
+                  ? 'Complete Your Profile'
+                  : ' Profile Completed'}
+              </h2>
               <p className="text-gray-600">
                 A complete profile increases your chances of getting hired by 3x
               </p>
             </div>
-            <Link
-              to="/jobseeker/profile"
-              className="mt-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg md:mt-0"
-            >
-              Complete Profile
-            </Link>
+            {profileCompletion.profileCompletion < 100 ? (
+              <Link
+                to="/jobseeker/profile"
+                className="mt-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg md:mt-0"
+              >
+                Complete Profile
+              </Link>
+            ) : (
+              <>
+                <Link className="mt-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-semibold text-white transition-all duration-200 hover:shadow-lg md:mt-0">
+                  Yay Completed !!
+                </Link>
+              </>
+            )}
           </div>
           <div className="relative">
             <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">

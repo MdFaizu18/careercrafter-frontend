@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import AuthService from '../../service/AuthService';
@@ -8,6 +8,7 @@ import AuthContext from '../../context/AuthProvider';
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -31,23 +32,6 @@ const LoginPage = ({ onLogin }) => {
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async e => {
     e.preventDefault();
     const authService = new AuthService();
@@ -62,14 +46,21 @@ const LoginPage = ({ onLogin }) => {
       setAuth(authInfo);
       localStorage.setItem('auth', JSON.stringify(authInfo));
       toast.success('Login successful!');
-      const from = location.state?.from || '/jobseeker/dashboard';
+
+      const fromPath = location.state?.from?.pathname;
+
+      let redirectTo;
+
       if (role === 'JOBSEEKER') {
-        navigate('/jobseeker/dashboard');
+        // Allow if it's jobseeker route or default to dashboard
+        redirectTo = fromPath?.startsWith('/jobseeker') ? fromPath : '/jobseeker/dashboard';
       } else if (role === 'EMPLOYER') {
-        navigate('/employer/dashboard');
+        redirectTo = fromPath?.startsWith('/employer') ? fromPath : '/employer/dashboard';
       } else {
-        navigate(from);
+        // Fallback for unexpected role
+        redirectTo = '/';
       }
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       console.error('Failed to login user:', error);
       toast.error('Login failed. Please try again.');
@@ -150,29 +141,6 @@ const LoginPage = ({ onLogin }) => {
                   </button>
                 </div>
                 {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                    Remember me
-                  </label>
-                </div>
-
-                <div className="text-sm">
-                  <Link
-                    to="/reset-password"
-                    className="font-medium text-purple-600 hover:text-purple-500"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
               </div>
 
               <div>

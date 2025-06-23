@@ -1,7 +1,7 @@
 import { Star, X } from 'lucide-react';
 import React, { useState } from 'react';
 
-const SkillsProfile = ({ skills, setSkills, onSubmitSkills }) => {
+const SkillsProfile = ({ skills, setSkills, onSubmitSkills, onDeleteSkills }) => {
   const [newSkill, setNewSkill] = useState('');
   const [tempId, setTempId] = useState(-1);
 
@@ -11,10 +11,6 @@ const SkillsProfile = ({ skills, setSkills, onSubmitSkills }) => {
       setSkills([...skills, trimmedSkill]);
       setNewSkill('');
     }
-  };
-
-  const removeSkill = skillToRemove => {
-    setSkills(skills.filter(skill => skill !== skillToRemove));
   };
 
   const handleSubmit = () => {
@@ -68,7 +64,7 @@ const SkillsProfile = ({ skills, setSkills, onSubmitSkills }) => {
                   <span className="font-medium">{skillName}</span>
                   <button
                     type="button"
-                    onClick={() => removeSkill(skillName)}
+                    onClick={() => onDeleteSkills(skill.skillId)}
                     className="text-purple-500 opacity-0 transition-opacity group-hover:opacity-100 hover:text-purple-700"
                   >
                     <X className="h-4 w-4" />

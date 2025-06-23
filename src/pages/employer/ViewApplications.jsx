@@ -1,83 +1,80 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import {
   Search,
   Filter,
-  Star,
-  StarOff,
   Mail,
   Calendar,
   Briefcase,
-  Clock,
   Download,
   X,
   CheckCircle,
   XCircle,
-  MessageSquare,
   Phone,
   MapPin,
+  CalendarPlus,
 } from 'lucide-react';
 import ApplicationService from '../../service/ApplicationService';
 import AuthContext from '../../context/AuthProvider';
+import { toast } from 'react-toastify';
+import InterviewService from '../../service/InterviewService';
 
 const ViewApplications = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const jobId = queryParams.get('job');
-
+  // Mock data based on your API response structure
   const { auth } = useContext(AuthContext);
   const applicationService = new ApplicationService(auth?.accessToken);
-  const [applications, setApplications] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedJob, setSelectedJob] = useState(jobId || 'all');
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const interviewService = new InterviewService(auth?.accessToken);
 
   useEffect(() => {
-    fetchApplications();
+    fetchRecentApplications();
   }, []);
 
-  const fetchApplications = async () => {
+  const fetchRecentApplications = async () => {
     try {
-      setLoading(true);
       const response = await applicationService.getApplicationsForEmployer();
       console.log(response);
-
-      // Transform API response to match component structure
-      const transformedApplications = response.map(app => ({
-        id: app.applicationId,
-        name: app.fullName,
-        email: app.email,
-        position: app.jobTitle,
-        jobId: app.jobId.toString(),
-        status: app.status.toLowerCase(), // Convert PENDING to pending, etc.
-        appliedDate: new Date(app.appliedAt).toLocaleDateString(),
-        experience: 'N/A', // Not provided in API
-        skills: [], // Not provided in API
-        avatar: null, // Not provided in API
-        starred: false, // Default value
-        coverLetter: 'Cover letter not provided', // Default value
-        companyName: app.companyName,
-        location: app.location,
-        phoneNumber: app.phoneNumber,
-        fileUrl: app.fileUrl,
-        interviews: app.interviews || [],
-        seekerId: app.seekerId,
-      }));
-
-      setApplications(transformedApplications);
+      setApplications(response);
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
+  const [applications, setApplications] = useState([]);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedJob, setSelectedJob] = useState('all');
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+
+  const [interviewData, setInterviewData] = useState({
+    applicationId: '',
+    interviewDateTime: '',
+    mode: 'PHONE',
+    interviewerNames: '',
+    notes: '',
+    stage: 'Initial Interview',
+  });
+  const [schedulingInterview, setSchedulingInterview] = useState(false);
+
+  // Filter applications based on search and filters
+  const filteredApplications = applications.filter(app => {
+    const matchesSearch =
+      app.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === 'all' || app.status.toLowerCase() === statusFilter.toLowerCase();
+
+    const matchesJob = selectedJob === 'all' || app.jobId.toString() === selectedJob;
+
+    return matchesSearch && matchesStatus && matchesJob;
+  });
 
   // Get unique jobs from applications for filter dropdown
-  const jobs = [...new Set(applications.map(app => ({ id: app.jobId, title: app.position })))];
+  const jobs = [...new Set(applications.map(app => ({ id: app.jobId, title: app.jobTitle })))];
 
   const handleSearch = e => {
     setSearchTerm(e.target.value);
@@ -91,25 +88,29 @@ const ViewApplications = () => {
     setSelectedJob(e.target.value);
   };
 
-  const toggleStar = id => {
-    setApplications(
-      applications.map(app => (app.id === id ? { ...app, starred: !app.starred } : app))
-    );
-  };
-
-  const updateStatus = async (id, newStatus) => {
+  const updateStatus = async (applicationId, newStatus) => {
     try {
-      // Here you would typically call an API to update the status
-      // await applicationService.updateApplicationStatus(id, newStatus);
-
-      setApplications(
-        applications.map(app => (app.id === id ? { ...app, status: newStatus } : app))
+      const applicationData = {
+        applicationId,
+        status: newStatus.toUpperCase(),
+      };
+      await applicationService.updateApplicationStatus(applicationData);
+      setApplications(prev =>
+        prev.map(app =>
+          app.applicationId === applicationId ? { ...app, status: newStatus.toUpperCase() } : app
+        )
       );
-      if (selectedApplication && selectedApplication.id === id) {
-        setSelectedApplication({ ...selectedApplication, status: newStatus });
+      if (selectedApplication && selectedApplication.applicationId === applicationId) {
+        setSelectedApplication(prev => ({
+          ...prev,
+          status: newStatus.toUpperCase(),
+        }));
       }
+
+      toast.success(`Status updated to ${newStatus}`);
     } catch (error) {
       console.error('Error updating status:', error);
+      toast.error('Failed to update status.');
     }
   };
 
@@ -121,18 +122,94 @@ const ViewApplications = () => {
     setSelectedApplication(null);
   };
 
-  const filteredApplications = applications.filter(app => {
-    const matchesSearch =
-      app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    const matchesJob = selectedJob === 'all' || app.jobId === selectedJob;
+  const openScheduleInterview = application => {
+    setInterviewData({
+      applicationId: application.applicationId,
+      interviewDateTime: '',
+      mode: 'PHONE',
+      interviewerNames: '',
+      notes: '',
+      stage: 'Initial Interview',
+    });
+    setShowInterviewModal(true);
+  };
 
-    return matchesSearch && matchesStatus && matchesJob;
-  });
+  const closeInterviewModal = () => {
+    setShowInterviewModal(false);
+    setInterviewData({
+      applicationId: '',
+      interviewDateTime: '',
+      mode: 'PHONE',
+      interviewerNames: '',
+      notes: '',
+      stage: 'Initial Interview',
+    });
+  };
+
+  const handleInterviewInputChange = e => {
+    const { name, value } = e.target;
+    setInterviewData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const scheduleInterview = async () => {
+    try {
+      setSchedulingInterview(true);
+
+      const formattedDateTime = new Date(interviewData.interviewDateTime).toISOString();
+
+      const interviewPayload = {
+        applicationId: parseInt(interviewData.applicationId),
+        interviewDateTime: formattedDateTime,
+        mode: interviewData.mode,
+        interviewerNames: interviewData.interviewerNames,
+        notes: interviewData.notes,
+        stage: interviewData.stage,
+      };
+
+      // ✅ Call API to schedule interview
+      const savedInterview = await interviewService.scheduleInterview(interviewPayload);
+
+      // ✅ Update the application with response interview data
+      setApplications(prevApps =>
+        prevApps.map(app =>
+          app.applicationId === interviewData.applicationId
+            ? {
+                ...app,
+                interviews: [...app.interviews, savedInterview],
+                status: 'INTERVIEW_SCHEDULED',
+              }
+            : app
+        )
+      );
+
+      // ✅ Update selectedApplication if needed
+      if (
+        selectedApplication &&
+        selectedApplication.applicationId === interviewData.applicationId
+      ) {
+        setSelectedApplication(prev => ({
+          ...prev,
+          interviews: [...prev.interviews, savedInterview],
+          status: 'INTERVIEW_SCHEDULED',
+        }));
+      }
+
+      closeInterviewModal();
+      toast.success('Interview scheduled successfully!');
+    } catch (error) {
+      console.error('Error scheduling interview:', error);
+      toast.error('Failed to schedule interview. Please try again.');
+    } finally {
+      setSchedulingInterview(false);
+    }
+  };
 
   const getStatusBadge = status => {
-    switch (status) {
+    const statusLower = status.toLowerCase();
+    switch (statusLower) {
       case 'pending':
         return (
           <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-800">
@@ -145,10 +222,17 @@ const ViewApplications = () => {
             Reviewed
           </span>
         );
+      case 'interview_scheduled':
       case 'interview':
         return (
           <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
-            Interview
+            Interview Scheduled
+          </span>
+        );
+      case 'shortlisted':
+        return (
+          <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-800">
+            Shortlisted
           </span>
         );
       case 'rejected':
@@ -241,7 +325,8 @@ const ViewApplications = () => {
                   <option value="all">All Statuses</option>
                   <option value="pending">Pending</option>
                   <option value="reviewed">Reviewed</option>
-                  <option value="interview">Interview</option>
+                  <option value="interview_scheduled">Interview Scheduled</option>
+                  <option value="shortlisted">Shortlisted</option>
                   <option value="rejected">Rejected</option>
                   <option value="hired">Hired</option>
                 </select>
@@ -257,7 +342,7 @@ const ViewApplications = () => {
                 >
                   <option value="all">All Jobs</option>
                   {jobs.map(job => (
-                    <option key={job.id} value={job.id}>
+                    <option key={job.jobId} value={job.id}>
                       {job.title}
                     </option>
                   ))}
@@ -280,32 +365,24 @@ const ViewApplications = () => {
             {filteredApplications.length > 0 ? (
               filteredApplications.map(application => (
                 <div
-                  key={application.id}
+                  key={application.applicationId}
                   className="mb-4 overflow-hidden rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md"
                 >
                   <div className="flex items-start space-x-4">
                     <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 text-lg font-bold text-white">
-                      {application.name.charAt(0).toUpperCase()}
+                      {application.fullName.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">{application.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {application.fullName}
+                        </h3>
                         <div className="flex items-center space-x-2">
                           {getStatusBadge(application.status)}
-                          <button
-                            onClick={() => toggleStar(application.id)}
-                            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-yellow-500"
-                          >
-                            {application.starred ? (
-                              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                            ) : (
-                              <StarOff className="h-5 w-5" />
-                            )}
-                          </button>
                         </div>
                       </div>
 
-                      <p className="text-purple-600">{application.position}</p>
+                      <p className="text-purple-600">{application.jobTitle}</p>
 
                       <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-500">
                         <div className="flex items-center">
@@ -318,7 +395,7 @@ const ViewApplications = () => {
                         </div>
                         <div className="flex items-center">
                           <Calendar className="mr-1 h-4 w-4" />
-                          Applied {application.appliedDate}
+                          Applied {application.appliedAt}
                         </div>
                       </div>
 
@@ -328,7 +405,7 @@ const ViewApplications = () => {
                         </span>
                         {application.interviews.length > 0 && (
                           <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-                            {application.interviews.length} Interview(s)
+                            {application.interviews.length} Interview(s) Scheduled
                           </span>
                         )}
                       </div>
@@ -340,13 +417,16 @@ const ViewApplications = () => {
                         >
                           View Details
                         </button>
-                        <button
-                          onClick={() => updateStatus(application.id, 'reviewed')}
-                          className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                          disabled={application.status !== 'pending'}
-                        >
-                          Mark as Reviewed
-                        </button>
+
+                        {!['REJECTED', 'HIRED'].includes(application.status) && (
+                          <button
+                            onClick={() => openScheduleInterview(application)}
+                            className="rounded-lg bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-200"
+                          >
+                            <CalendarPlus className="mr-1 inline h-4 w-4" />
+                            Schedule Interview
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -374,49 +454,6 @@ const ViewApplications = () => {
 
           <div className="col-span-1">
             <div className="sticky top-4">
-              <div className="mb-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 p-4 text-white shadow-sm">
-                <h2 className="flex items-center text-lg font-semibold">
-                  <Star className="mr-2 h-5 w-5 fill-yellow-300 text-yellow-300" />
-                  Starred Applications
-                </h2>
-                <p className="mt-1 text-sm text-purple-100">Quick access to important candidates</p>
-              </div>
-
-              {filteredApplications.filter(app => app.starred).length > 0 ? (
-                filteredApplications
-                  .filter(app => app.starred)
-                  .map(application => (
-                    <div
-                      key={application.id}
-                      className="mb-4 overflow-hidden rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 font-bold text-white">
-                          {application.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-900">{application.name}</h3>
-                          <p className="text-sm text-purple-600">{application.position}</p>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex items-center justify-between">
-                        {getStatusBadge(application.status)}
-                        <button
-                          onClick={() => viewApplication(application)}
-                          className="text-sm font-medium text-purple-600 hover:text-purple-800"
-                        >
-                          View
-                        </button>
-                      </div>
-                    </div>
-                  ))
-              ) : (
-                <div className="rounded-xl bg-white p-4 text-center shadow-sm">
-                  <StarOff className="mx-auto mb-2 h-6 w-6 text-gray-300" />
-                  <p className="text-sm text-gray-500">No starred applications</p>
-                </div>
-              )}
-
               <div className="mt-6 rounded-xl bg-white p-4 shadow-sm">
                 <h3 className="mb-3 font-medium text-gray-900">Quick Filters</h3>
                 <div className="space-y-2">
@@ -427,16 +464,16 @@ const ViewApplications = () => {
                     Pending Applications
                   </button>
                   <button
-                    onClick={() => setStatusFilter('interview')}
+                    onClick={() => setStatusFilter('interview_scheduled')}
                     className="w-full rounded-lg bg-amber-50 px-3 py-2 text-left text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100"
                   >
                     Interview Scheduled
                   </button>
                   <button
-                    onClick={() => setStatusFilter('hired')}
+                    onClick={() => setStatusFilter('shortlisted')}
                     className="w-full rounded-lg bg-green-50 px-3 py-2 text-left text-sm font-medium text-green-700 transition-colors hover:bg-green-100"
                   >
-                    Hired Candidates
+                    Shortlisted Candidates
                   </button>
                 </div>
               </div>
@@ -445,10 +482,122 @@ const ViewApplications = () => {
         </div>
       </div>
 
+      {/* Interview Scheduling Modal */}
+      {showInterviewModal && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-gray-900 p-4">
+          <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <button
+              onClick={closeInterviewModal}
+              className="absolute top-4 right-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            >
+              <X className="h-6 w-6" />
+            </button>
+
+            <h2 className="mb-6 text-xl font-bold text-gray-900">Schedule Interview</h2>
+
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Interview Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  name="interviewDateTime"
+                  value={interviewData.interviewDateTime}
+                  onChange={handleInterviewInputChange}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Interview Mode
+                </label>
+                <select
+                  name="mode"
+                  value={interviewData.mode}
+                  onChange={handleInterviewInputChange}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
+                >
+                  <option value="PHONE">Phone</option>
+                  <option value="VIDEO">Video Call</option>
+                  <option value="IN_PERSON">In Person</option>
+                  <option value="ONLINE">Online</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Interviewer Name(s)
+                </label>
+                <input
+                  type="text"
+                  name="interviewerNames"
+                  value={interviewData.interviewerNames}
+                  onChange={handleInterviewInputChange}
+                  placeholder="Enter interviewer names"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Interview Stage
+                </label>
+                <input
+                  type="text"
+                  name="stage"
+                  value={interviewData.stage}
+                  onChange={handleInterviewInputChange}
+                  placeholder="e.g., HR Round, Technical Round, Final Round"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  Notes (Optional)
+                </label>
+                <textarea
+                  name="notes"
+                  value={interviewData.notes}
+                  onChange={handleInterviewInputChange}
+                  placeholder="Any additional notes for the candidate"
+                  rows={3}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex space-x-3">
+              <button
+                onClick={closeInterviewModal}
+                className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={scheduleInterview}
+                disabled={
+                  schedulingInterview ||
+                  !interviewData.interviewDateTime ||
+                  !interviewData.interviewerNames
+                }
+                className="flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 font-medium text-white shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {schedulingInterview ? 'Scheduling...' : 'Schedule Interview'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Application Details Modal */}
       {selectedApplication && (
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-gray-900 p-4">
-          <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div className="relative max-h-[90vh] w-full max-w-6xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
             <button
               onClick={closeApplicationView}
               className="absolute top-4 right-4 rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
@@ -456,86 +605,129 @@ const ViewApplications = () => {
               <X className="h-6 w-6" />
             </button>
 
-            <div className="mb-6 flex items-start space-x-4">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 text-2xl font-bold text-white">
-                {selectedApplication.name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{selectedApplication.name}</h2>
-                <p className="text-lg text-purple-600">{selectedApplication.position}</p>
-                <div className="mt-2 flex items-center space-x-2">
-                  {getStatusBadge(selectedApplication.status)}
-                  <span className="text-sm text-gray-500">
-                    Applied {selectedApplication.appliedDate}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div>
-                <h3 className="mb-3 text-lg font-semibold text-gray-900">Contact Information</h3>
-                <div className="space-y-3 rounded-lg bg-gray-50 p-4">
-                  <div className="flex items-center">
-                    <Mail className="mr-3 h-5 w-5 text-gray-400" />
-                    <span>{selectedApplication.email}</span>
+            {/* Split layout: left and right */}
+            <div className="flex flex-col gap-8 md:flex-row">
+              {/* LEFT SIDE - Application Info */}
+              <div className="w-full md:w-1/2">
+                <div className="mb-6 flex items-start space-x-4">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 text-2xl font-bold text-white">
+                    {selectedApplication.fullName.charAt(0).toUpperCase()}
                   </div>
-                  {selectedApplication.phoneNumber && (
-                    <div className="flex items-center">
-                      <Phone className="mr-3 h-5 w-5 text-gray-400" />
-                      <span>{selectedApplication.phoneNumber}</span>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {selectedApplication.fullName}
+                    </h2>
+                    <p className="text-lg text-purple-600">{selectedApplication.jobTitle}</p>
+                    <div className="mt-2 flex items-center space-x-2">
+                      {getStatusBadge(selectedApplication.status)}
+                      <span className="text-sm text-gray-500">
+                        Applied {selectedApplication.appliedAt}
+                      </span>
                     </div>
-                  )}
-                  <div className="flex items-center">
-                    <MapPin className="mr-3 h-5 w-5 text-gray-400" />
-                    <span>{selectedApplication.location}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Briefcase className="mr-3 h-5 w-5 text-gray-400" />
-                    <span>{selectedApplication.companyName}</span>
                   </div>
                 </div>
 
-                <h3 className="mt-6 mb-3 text-lg font-semibold text-gray-900">Resume</h3>
-                <button
-                  onClick={() =>
-                    downloadResume(
-                      selectedApplication.fileUrl,
-                      `${selectedApplication.name}_resume.pdf`
-                    )
-                  }
-                  className="flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Download Resume
-                </button>
+                <div>
+                  <h3 className="mb-3 text-lg font-semibold text-gray-900">Contact Information</h3>
+                  <div className="space-y-3 rounded-lg bg-gray-50 p-4">
+                    <div className="flex items-center">
+                      <Mail className="mr-3 h-5 w-5 text-gray-400" />
+                      <span>{selectedApplication.email}</span>
+                    </div>
+                    {selectedApplication.phoneNumber && (
+                      <div className="flex items-center">
+                        <Phone className="mr-3 h-5 w-5 text-gray-400" />
+                        <span>{selectedApplication.phoneNumber}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center">
+                      <MapPin className="mr-3 h-5 w-5 text-gray-400" />
+                      <span>{selectedApplication.location}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Briefcase className="mr-3 h-5 w-5 text-gray-400" />
+                      <span>{selectedApplication.companyName}</span>
+                    </div>
+                  </div>
+                </div>
 
-                {selectedApplication.interviews.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="mb-3 text-lg font-semibold text-gray-900">Resume</h3>
+                  <button
+                    onClick={() =>
+                      downloadResume(
+                        selectedApplication.fileUrl,
+                        `${selectedApplication.fullName}_resume.pdf`
+                      )
+                    }
+                    className="flex items-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Resume
+                  </button>
+                </div>
+
+                <div className="mt-6">
+                  <h3 className="mb-3 text-lg font-semibold text-gray-900">Actions</h3>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => updateStatus(selectedApplication.applicationId, 'SHORTLISTED')}
+                      className="flex w-full items-center justify-center rounded-lg bg-yellow-100 px-4 py-2 font-medium text-yellow-700 transition-colors hover:bg-yellow-200"
+                    >
+                      <CheckCircle className="mr-2 h-5 w-5" />
+                      Shortlist Candidate
+                    </button>
+                    <button
+                      onClick={() => updateStatus(selectedApplication.applicationId, 'SELECTED  ')}
+                      className="flex w-full items-center justify-center rounded-lg bg-green-100 px-4 py-2 font-medium text-green-700 transition-colors hover:bg-green-200"
+                    >
+                      <CheckCircle className="mr-2 h-5 w-5" />
+                      Hire Candidate
+                    </button>
+                    <button
+                      onClick={() => updateStatus(selectedApplication.applicationId, 'REJECTED')}
+                      className="flex w-full items-center justify-center rounded-lg bg-red-100 px-4 py-2 font-medium text-red-700 transition-colors hover:bg-red-200"
+                    >
+                      <XCircle className="mr-2 h-5 w-5" />
+                      Reject Application
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT SIDE - Interviews */}
+              <div className="w-full md:w-1/2">
+                {selectedApplication.interviews.length > 0 ? (
                   <>
-                    <h3 className="mt-6 mb-3 text-lg font-semibold text-gray-900">Interviews</h3>
-                    <div className="space-y-3">
+                    <h3 className="mb-3 text-lg font-semibold text-gray-900">
+                      Scheduled Interviews ({selectedApplication.interviews.length})
+                    </h3>
+                    <div className="max-h-[70vh] space-y-3 overflow-y-auto">
                       {selectedApplication.interviews.map((interview, index) => (
-                        <div key={index} className="rounded-lg border border-gray-200 p-4">
+                        <div
+                          key={index}
+                          className="rounded-lg border border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 p-4"
+                        >
                           <div className="mb-2 flex items-center justify-between">
-                            <span className="font-medium text-gray-900">
-                              Interview #{index + 1}
+                            <span className="font-medium text-gray-900">{interview.stage}</span>
+                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                              {interview.mode}
                             </span>
-                            <span className="text-sm text-gray-500">{interview.mode}</span>
                           </div>
                           <div className="space-y-1 text-sm text-gray-600">
-                            <div>
-                              <strong>Date:</strong>{' '}
+                            <div className="flex items-center">
+                              <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+                              <strong>Date:</strong>&nbsp;
                               {new Date(interview.interviewDateTime).toLocaleString()}
                             </div>
-                            <div>
-                              <strong>Interviewer:</strong> {interview.interviewerNames}
-                            </div>
-                            <div>
-                              <strong>Stage:</strong> {interview.stage}
+                            <div className="flex items-center">
+                              <Briefcase className="mr-2 h-4 w-4 text-gray-400" />
+                              <strong>Interviewer:</strong>&nbsp;{interview.interviewerNames}
                             </div>
                             {interview.notes && (
-                              <div>
-                                <strong>Notes:</strong> {interview.notes}
+                              <div className="mt-2 rounded border-l-4 border-blue-400 bg-white p-2">
+                                <strong className="text-gray-700">Notes:</strong>
+                                <p className="mt-1 text-gray-600">{interview.notes}</p>
                               </div>
                             )}
                           </div>
@@ -543,62 +735,16 @@ const ViewApplications = () => {
                       ))}
                     </div>
                   </>
+                ) : (
+                  <>
+                    <h3 className="mb-3 text-lg font-semibold text-gray-900">
+                      No Interviews Scheduled
+                    </h3>
+                    <p className="text-gray-600">
+                      You can schedule an interview using the button below.
+                    </p>
+                  </>
                 )}
-              </div>
-
-              <div>
-                <h3 className="mb-3 text-lg font-semibold text-gray-900">Cover Letter</h3>
-                <div className="rounded-lg border border-gray-200 p-4">
-                  <p className="text-gray-700">{selectedApplication.coverLetter}</p>
-                </div>
-
-                <h3 className="mt-6 mb-3 text-lg font-semibold text-gray-900">Actions</h3>
-                <div className="space-y-3">
-                  {selectedApplication.status === 'pending' && (
-                    <button
-                      onClick={() => updateStatus(selectedApplication.id, 'reviewed')}
-                      className="flex w-full items-center justify-center rounded-lg bg-purple-100 px-4 py-2 font-medium text-purple-700 transition-colors hover:bg-purple-200"
-                    >
-                      <CheckCircle className="mr-2 h-5 w-5" />
-                      Mark as Reviewed
-                    </button>
-                  )}
-
-                  {['pending', 'reviewed'].includes(selectedApplication.status) && (
-                    <button
-                      onClick={() => updateStatus(selectedApplication.id, 'interview')}
-                      className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 font-medium text-white shadow-sm transition-all hover:shadow-md"
-                    >
-                      <Calendar className="mr-2 h-5 w-5" />
-                      Schedule Interview
-                    </button>
-                  )}
-
-                  {['pending', 'reviewed', 'interview'].includes(selectedApplication.status) && (
-                    <>
-                      <button
-                        onClick={() => updateStatus(selectedApplication.id, 'hired')}
-                        className="flex w-full items-center justify-center rounded-lg bg-green-100 px-4 py-2 font-medium text-green-700 transition-colors hover:bg-green-200"
-                      >
-                        <CheckCircle className="mr-2 h-5 w-5" />
-                        Hire Candidate
-                      </button>
-
-                      <button
-                        onClick={() => updateStatus(selectedApplication.id, 'rejected')}
-                        className="flex w-full items-center justify-center rounded-lg bg-red-100 px-4 py-2 font-medium text-red-700 transition-colors hover:bg-red-200"
-                      >
-                        <XCircle className="mr-2 h-5 w-5" />
-                        Reject Application
-                      </button>
-                    </>
-                  )}
-
-                  <button className="flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                    <MessageSquare className="mr-2 h-5 w-5" />
-                    Message Candidate
-                  </button>
-                </div>
               </div>
             </div>
           </div>

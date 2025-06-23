@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, DollarSign, Briefcase, BookmarkPlus } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Briefcase, BookmarkPlus, IndianRupee } from 'lucide-react';
 
 const JobCard = ({ job, showActions = true }) => {
   return (
@@ -18,8 +18,8 @@ const JobCard = ({ job, showActions = true }) => {
             )}
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
-            <p className="text-gray-600">{job.company}</p>
+            <h3 className="text-lg font-semibold text-gray-900">{job.jobTitle}</h3>
+            <p className="text-gray-600">{job.company?.name}</p>
           </div>
         </div>
         {showActions && (
@@ -39,17 +39,9 @@ const JobCard = ({ job, showActions = true }) => {
           {job.type}
         </div>
         <div className="flex items-center text-sm text-gray-500">
-          <DollarSign className="mr-1 h-4 w-4 text-gray-400" />
-          {job.salary}
+          <IndianRupee className="mr-1 h-4 w-4 text-gray-400" />
+          {job.salaryMin} to {job.salaryMax}
         </div>
-      </div>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {job.tags.map((tag, index) => (
-          <span key={index} className="rounded-full bg-purple-50 px-2 py-1 text-xs text-purple-700">
-            {tag}
-          </span>
-        ))}
       </div>
 
       <p className="mt-4 line-clamp-2 text-gray-600">{job.description}</p>

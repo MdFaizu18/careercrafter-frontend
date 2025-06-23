@@ -201,6 +201,17 @@ const JobseekerProfile = () => {
     }
   };
 
+  const deleteSkills = async skillId => {
+    try {
+      await skillsService.deleteSKill(skillId);
+      toast.success('Skills deleted successfully');
+      setSkills(skills.filter(skill => skill.skillId !== skillId));
+    } catch (err) {
+      toast.error('Failed to save skills');
+      console.error(err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       <div className="container mx-auto px-4 py-8">
@@ -554,6 +565,7 @@ const JobseekerProfile = () => {
                       skills={skills}
                       setSkills={setSkills}
                       onSubmitSkills={submitSkills}
+                      onDeleteSkills={deleteSkills}
                     />
                   )}
 

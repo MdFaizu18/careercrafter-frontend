@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Search,
   Briefcase,
@@ -20,47 +20,28 @@ import { Helmet } from 'react-helmet-async';
 
 import JobCard from '../../components/common/JobCard';
 import AboutPage from '../../components/landing/AboutPage';
+import AuthContext from '../../context/AuthProvider';
+import JobService from '../../service/JobService';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const jobService = new JobService();
+  const [featuredJobs, setFeaturedJobs] = useState([]);
   // Sample featured jobs
-  const featuredJobs = [
-    {
-      id: 1,
-      title: 'Senior Frontend Developer',
-      company: 'TechCorp Inc.',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      salary: '$120K - $150K',
-      tags: ['React', 'TypeScript', 'UI/UX'],
-      description:
-        "We're looking for a Senior Frontend Developer to join our team and help build beautiful, responsive web applications.",
-      postedDate: '2 days ago',
-    },
-    {
-      id: 2,
-      title: 'Product Manager',
-      company: 'InnovateTech',
-      location: 'New York, NY',
-      type: 'Full-time',
-      salary: '$110K - $140K',
-      tags: ['Product', 'Agile', 'SaaS'],
-      description:
-        'Join our product team to lead the development of innovative software solutions that solve real customer problems.',
-      postedDate: '1 week ago',
-    },
-    {
-      id: 3,
-      title: 'UX/UI Designer',
-      company: 'DesignHub',
-      location: 'Remote',
-      type: 'Contract',
-      salary: '$80K - $100K',
-      tags: ['Figma', 'UI Design', 'User Research'],
-      description:
-        "We're seeking a talented UX/UI Designer to create intuitive and engaging user experiences for our digital products.",
-      postedDate: '3 days ago',
-    },
-  ];
+
+  useEffect(() => {
+    fetchFeaturedJobs();
+  }, []);
+
+  const fetchFeaturedJobs = async () => {
+    try {
+      const response = await jobService.getFeaturedJobs();
+      setFeaturedJobs(response);
+      console.log('Featured Jobs:', response);
+    } catch (error) {
+      console.error('Error fetching featured jobs:', error);
+    }
+  };
 
   return (
     <div className="">
@@ -126,7 +107,12 @@ const LandingPage = () => {
                 />
               </div>
             </div>
-            <button className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
+            <button
+              onClick={() => {
+                navigate('/jobseeker/find-jobs');
+              }}
+              className="focus:ring-opacity-50 rounded-md bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white shadow-md transition-all duration-200 hover:shadow-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            >
               Search Jobs
             </button>
           </div>
@@ -143,10 +129,7 @@ const LandingPage = () => {
             <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-4xl font-bold text-transparent">
               Featured Jobs
             </h2>
-            <Link
-              to="/job-seeker/search-jobs"
-              className="font-medium text-indigo-600 hover:underline"
-            >
+            <Link to="/jobseeker/find-jobs" className="font-medium text-indigo-600 hover:underline">
               View All Jobs →
             </Link>
           </div>

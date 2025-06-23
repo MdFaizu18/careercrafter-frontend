@@ -53,13 +53,13 @@ const DashboardEmployer = () => {
   const stats = [
     {
       title: 'Active Jobs',
-      value: '12',
+      value: activeJobs.length > 0 ? activeJobs.length : '0',
       icon: <Briefcase className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-purple-500 to-purple-700',
     },
     {
       title: 'Applications',
-      value: '143',
+      value: recentApplications.length > 0 ? recentApplications.length : '0',
       icon: <Users className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-blue-500 to-blue-700',
     },
@@ -247,7 +247,7 @@ const DashboardEmployer = () => {
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">Recent Applications</h2>
                 <Link
-                  to="/employer/applications"
+                  to="/employer/view-applications"
                   className="flex items-center text-sm font-medium text-purple-600 hover:text-purple-800"
                 >
                   View all
@@ -256,7 +256,7 @@ const DashboardEmployer = () => {
               </div>
 
               <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-                {recentApplications.map((application, index) => (
+                {recentApplications.slice(0, 5).map((application, index) => (
                   <div
                     key={application.applicationId}
                     className={`flex items-center justify-between p-4 hover:bg-gray-50 ${

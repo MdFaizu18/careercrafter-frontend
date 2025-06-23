@@ -10,6 +10,10 @@ import {
   CircleArrowOutDownRightIcon,
   ArrowDown,
   BriefcaseBusinessIcon,
+  LayoutDashboardIcon,
+  Superscript,
+  SearchCheckIcon,
+  BookCheckIcon,
 } from 'lucide-react';
 import Logo from '../../assets/logo/cc.png';
 import { HashLink } from 'react-router-hash-link';
@@ -32,7 +36,7 @@ const JobseekerNavbar = ({ isAuthenticated, userRole }) => {
   const fetchCurrentUser = async () => {
     try {
       const response = await userService.getCurrentUser();
-      console.log(response);
+      console.log('Getting this from Navbar', response);
       setCurrentUser(response);
     } catch (error) {
       console.log(error);
@@ -65,25 +69,40 @@ const JobseekerNavbar = ({ isAuthenticated, userRole }) => {
             <HashLink
               smooth
               to="/jobseeker/dashboard"
-              className="font-medium text-gray-700 hover:text-purple-600"
+              className="font-medium text-gray-500 hover:text-purple-600"
             >
-              Dashboard
+              <div className="flex items-center space-x-2">
+                <div>
+                  <LayoutDashboardIcon />
+                </div>
+                <div>Dashboard</div>
+              </div>
             </HashLink>
 
             <HashLink
               smooth
               to="/jobseeker/find-jobs"
-              className="font-medium text-gray-700 hover:text-purple-600"
+              className="font-medium text-gray-500 hover:text-purple-600"
             >
-              Find Jobs
+              <div className="flex items-center space-x-2">
+                <div>
+                  <SearchCheckIcon />
+                </div>
+                <div>Find Jobs</div>
+              </div>
             </HashLink>
 
             <HashLink
               smooth
               to="/jobseeker/applications"
-              className="font-medium text-gray-700 hover:text-purple-600"
+              className="font-medium text-gray-500 hover:text-purple-600"
             >
-              Applications
+              <div className="flex items-center space-x-2">
+                <div>
+                  <BookCheckIcon />
+                </div>
+                <div>Applications</div>
+              </div>
             </HashLink>
           </nav>
 

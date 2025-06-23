@@ -10,6 +10,13 @@ import {
   CircleArrowOutDownRightIcon,
   ArrowDown,
   BriefcaseBusinessIcon,
+  LayoutDashboardIcon,
+  PodcastIcon,
+  BoxSelect,
+  BookText,
+  Drumstick,
+  SearchCode,
+  Subtitles,
 } from 'lucide-react';
 import Logo from '../../assets/logo/cc.png';
 import { HashLink } from 'react-router-hash-link';
@@ -64,25 +71,40 @@ const EmployerNavbar = ({ isAuthenticated, userRole, onLogout }) => {
             <HashLink
               smooth
               to="/employer/dashboard"
-              className="font-medium text-gray-700 hover:text-purple-600"
+              className="font-medium text-gray-500 hover:text-purple-600"
             >
-              Dashboard
+              <div className="flex items-center space-x-1">
+                <div>
+                  <LayoutDashboardIcon />
+                </div>
+                <div>Dashboard</div>
+              </div>
             </HashLink>
 
             <HashLink
               smooth
               to="/employer/post-job"
-              className="font-medium text-gray-700 hover:text-purple-600"
+              className="font-medium text-gray-500 hover:text-purple-600"
             >
-              Post Job
+              <div className="flex items-center space-x-1">
+                <div>
+                  <Subtitles />
+                </div>
+                <div>Post Jobs</div>
+              </div>
             </HashLink>
 
             <HashLink
               smooth
               to="/employer/view-applications"
-              className="font-medium text-gray-700 hover:text-purple-600"
+              className="font-medium text-gray-500 hover:text-purple-600"
             >
-              View Applications
+              <div className="flex items-center space-x-1">
+                <div>
+                  <SearchCode />
+                </div>
+                <div>View Applications</div>
+              </div>
             </HashLink>
           </nav>
 

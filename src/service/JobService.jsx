@@ -46,6 +46,15 @@ export default class JobService {
       throw error;
     }
   }
+  async getFeaturedJobs() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/demo-jobs`, {});
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch job details:', error);
+      throw error;
+    }
+  }
 
   async updateJobById(jobId, jobData) {
     try {

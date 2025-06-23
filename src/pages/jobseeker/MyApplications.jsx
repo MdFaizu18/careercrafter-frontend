@@ -79,14 +79,6 @@ const MyApplications = () => {
     setSelectedApplication(null);
   };
 
-  const openNoteModal = () => {
-    setShowNoteModal(true);
-  };
-
-  const closeNoteModal = () => {
-    setShowNoteModal(false);
-  };
-
   const saveNote = () => {
     if (selectedApplication) {
       const updatedApplications = applications.map(app =>
@@ -112,11 +104,11 @@ const MyApplications = () => {
 
   const getStatusColor = status => {
     switch (status.toLowerCase()) {
-      case 'applied':
+      case 'pending':
         return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'interview':
+      case 'shortlisted':
         return 'bg-purple-100 text-purple-700 border-purple-200';
-      case 'offer':
+      case 'selected':
         return 'bg-green-100 text-green-700 border-green-200';
       case 'rejected':
         return 'bg-red-100 text-red-700 border-red-200';
@@ -129,11 +121,11 @@ const MyApplications = () => {
 
   const getStatusIcon = status => {
     switch (status.toLowerCase()) {
-      case 'applied':
+      case 'pending':
         return <Clock className="h-4 w-4" />;
-      case 'interview':
+      case 'shortlisted':
         return <Users className="h-4 w-4" />;
-      case 'offer':
+      case 'selected':
         return <CheckCircle className="h-4 w-4" />;
       case 'rejected':
         return <XCircle className="h-4 w-4" />;
@@ -160,28 +152,28 @@ const MyApplications = () => {
   const stats = [
     {
       title: 'Total Applications',
-      value: applications.length,
+      value: application.length.toString(),
       icon: <Briefcase className="h-6 w-6" />,
       color: 'bg-gradient-to-r from-blue-500 to-blue-600',
       change: '+12%',
     },
     {
       title: 'Active Interviews',
-      value: applications.filter(app => app.status === 'Interview').length,
+      value: application.filter(app => app.status === 'SHORTLISTED').length,
       icon: <Users className="h-6 w-6" />,
       color: 'bg-gradient-to-r from-purple-500 to-purple-600',
       change: '+25%',
     },
     {
       title: 'Pending Offers',
-      value: applications.filter(app => app.status === 'Offer').length,
+      value: application.filter(app => app.status === 'PENDING').length,
       icon: <Target className="h-6 w-6" />,
       color: 'bg-gradient-to-r from-green-500 to-green-600',
       change: '+100%',
     },
     {
       title: 'Response Rate',
-      value: `${Math.round(((applications.length - applications.filter(app => app.status === 'No Response').length) / applications.length) * 100)}%`,
+      value: `${Math.round(((application.length - application.filter(app => app.status === 'PENDING').length) / application.length) * 100)}%`,
       icon: <TrendingUp className="h-6 w-6" />,
       color: 'bg-gradient-to-r from-orange-500 to-orange-600',
       change: '+8%',
@@ -258,10 +250,10 @@ const MyApplications = () => {
                   className="appearance-none rounded-lg border border-gray-200 bg-white py-3 pr-8 pl-10 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="all">All Statuses</option>
-                  <option value="applied">Applied</option>
-                  <option value="interview">Interview</option>
-                  <option value="offer">Offer</option>
-                  <option value="rejected">Rejected</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="SHORTLISTED">Shortlisted</option>
+                  <option value="SELECTED">Selected</option>
+                  <option value="REJECTED">Rejected</option>
                   <option value="no response">No Response</option>
                 </select>
               </div>
@@ -276,16 +268,6 @@ const MyApplications = () => {
                 }`}
               >
                 Cards
-              </button>
-              <button
-                onClick={() => setViewMode('kanban')}
-                className={`rounded-lg px-4 py-2 transition-colors duration-200 ${
-                  viewMode === 'kanban'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Kanban
               </button>
             </div>
           </div>
@@ -424,35 +406,7 @@ const MyApplications = () => {
           </div>
         ) : (
           // Kanban Board View
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5">
-            {['Applied', 'Interview', 'Offer', 'Rejected', 'No Response'].map(status => (
-              <div key={status} className="rounded-xl bg-white p-4 shadow-lg">
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="font-bold text-gray-900">{status}</h3>
-                  <span className="rounded-full bg-gray-100 px-2 py-1 text-sm text-gray-600">
-                    {filteredApplications.filter(app => app.status === status).length}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  {filteredApplications
-                    .filter(app => app.status === status)
-                    .map(application => (
-                      <div
-                        key={application.id}
-                        className="cursor-pointer rounded-lg bg-gray-50 p-3 transition-shadow duration-200 hover:shadow-md"
-                        onClick={() => viewApplicationDetails(application)}
-                      >
-                        <h4 className="mb-1 text-sm font-medium text-gray-900">
-                          {application.position}
-                        </h4>
-                        <p className="text-xs text-gray-600">{application.company}</p>
-                        <p className="mt-1 text-xs text-gray-500">{application.appliedDate}</p>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5"></div>
         )}
 
         {/* Application Details Modal */}
@@ -503,7 +457,7 @@ const MyApplications = () => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <div>
+                    {/* <div>
                       <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
                         Progress
                       </h3>
@@ -520,37 +474,12 @@ const MyApplications = () => {
                           ></div>
                         </div>
                       </div>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
-                        Next Step
-                      </h3>
-                      <p className="mt-1 text-lg text-gray-900">{selectedApplication.nextStep}</p>
-                    </div>
+                    </div> */}
+                    <div></div>
                   </div>
                 </div>
 
-                <div className="mb-8">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-gray-900">Notes</h3>
-                    <button
-                      onClick={openNoteModal}
-                      className="flex items-center space-x-2 font-medium text-purple-600 hover:text-purple-700"
-                    >
-                      <MessageCircle className="h-5 w-5" />
-                      <span>{selectedApplication.notes ? 'Edit Note' : 'Add Note'}</span>
-                    </button>
-                  </div>
-                  {selectedApplication.notes ? (
-                    <div className="rounded-xl bg-gray-50 p-6">
-                      <p className="leading-relaxed text-gray-700">{selectedApplication.notes}</p>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl bg-gray-50 p-6 text-center">
-                      <p className="text-gray-500 italic">No notes added yet.</p>
-                    </div>
-                  )}
-                </div>
+                <div className="mb-8"></div>
 
                 {selectedApplication.interviews.length > 0 && (
                   <div className="mb-8">
@@ -568,14 +497,15 @@ const MyApplications = () => {
                             <div className="flex-1 rounded-xl bg-gray-50 p-6">
                               <div className="mb-3 flex items-start justify-between">
                                 <h4 className="text-lg font-bold text-gray-900">
-                                  {interview.type}
+                                  {interview.mode}
                                 </h4>
                                 <span className="rounded-full bg-white px-3 py-1 text-sm text-gray-500">
-                                  {formatDate(interview.date)}
+                                  {formatDate(interview.interviewDateTime)}
                                 </span>
                               </div>
                               <p className="mb-3 text-gray-600">
-                                <span className="font-medium">With:</span> {interview.with}
+                                <span className="font-medium">With:</span>{' '}
+                                {interview.interviewerNames}
                               </p>
                               {interview.notes && (
                                 <div>

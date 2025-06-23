@@ -202,12 +202,17 @@ const ManageJobs = () => {
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center">
-                          <span className="text-sm font-medium text-gray-900">
-                            {getApplicationCount(job.applications)}
-                          </span>
-                          <span className="ml-2 rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-700">
-                            applicants
-                          </span>
+                          <Link
+                            to={`/employer/applications/${job.jobId}`}
+                            className="flex-1 rounded-lg bg-purple-50 py-2 text-center text-sm font-medium text-purple-700 transition-colors hover:bg-purple-100"
+                          >
+                            <span className="text-sm font-medium text-gray-900">
+                              {getApplicationCount(job.applications)}
+                            </span>
+                            <span className="ml-2 rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-700">
+                              applicants
+                            </span>
+                          </Link>
                         </div>
                       </td>
                       <td className="px-6 py-6">
@@ -239,7 +244,7 @@ const ManageJobs = () => {
                             <Eye className="h-5 w-5" />
                           </Link>
                           <Link
-                            to={`/employer/edit-job/${job.jobId}`}
+                            to={`/employer/update-job/${job.jobId}`}
                             className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-100"
                             title="Edit Job"
                           >

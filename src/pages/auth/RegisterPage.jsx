@@ -291,30 +291,7 @@ const RegisterPage = () => {
                     )}
                   </button>
                 </div>
-                {errors.confirmPassword && (
-                  <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
-                )}
               </div>
-
-              <div className="flex items-center">
-                <input
-                  id="terms"
-                  name="terms"
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                />
-                <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-                  I agree to the{' '}
-                  <Link to="/terms" className="text-purple-600 hover:text-purple-500">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/privacy" className="text-purple-600 hover:text-purple-500">
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
-
               <div>
                 <button
                   type="submit"

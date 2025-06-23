@@ -6,7 +6,7 @@ import HomeOutlet from './pages/landing/HomeOutlet';
 import NotFoundPage from './pages/error/NotFoundPage';
 import LandingPage from './pages/landing/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPaGE';
+
 import DashboardJobseeker from './pages/jobseeker/DashboardJobseeker';
 import JobseekerOutlet from './pages/jobseeker/JobseekerOutlet';
 import FindJobs from './pages/jobseeker/FindJobs';
@@ -23,6 +23,7 @@ import ManageJobs from './pages/employer/ManageJobs';
 import EmployerProfile from './pages/employer/EmployerProfile';
 import RequireAuth from './auth/RequireAuth';
 import JobApplications from './pages/employer/JobApplications';
+import RegisterPage from './pages/auth/RegisterPage';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <DashboardEmployer /> },
           { path: 'profile', element: <EmployerProfile /> },
           { path: 'post-job', element: <PostJob /> },
+          { path: 'update-job/:id', element: <PostJob /> },
           { path: 'view-applications', element: <ViewApplications /> },
           { path: 'applications/:id', element: <JobApplications /> },
           { path: 'manage-jobs', element: <ManageJobs /> },

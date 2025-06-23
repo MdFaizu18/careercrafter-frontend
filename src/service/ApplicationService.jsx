@@ -63,7 +63,7 @@ export default class ApplicationService {
 
   async updateApplicationStatus(applicationData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/apply`, applicationData, {
+      const response = await axios.put(`${API_BASE_URL}/status`, applicationData, {
         headers: {
           Authorization: `Bearer ${this.token}`,
         },

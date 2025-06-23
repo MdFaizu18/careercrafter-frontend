@@ -34,9 +34,9 @@ export default class SkillsService {
     }
   }
 
-  async deleteResume(resumeId) {
+  async deleteSKill(skillId) {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/delete/${resumeId}`, {
+      const response = await axios.delete(`${API_BASE_URL}/${skillId}`, {
         headers: {
           Authorization: `Bearer ${this.token}`,
           'Content-Type': 'application/json',

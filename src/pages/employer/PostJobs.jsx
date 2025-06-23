@@ -1,13 +1,14 @@
 'use client';
 
-import { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Plus, Minus, CheckCircle, Star, Briefcase } from 'lucide-react';
 import JobService from '../../service/JobService';
 import AuthContext from '../../context/AuthProvider';
 import { toast } from 'react-toastify';
 
 const PostJob = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
   const jobService = new JobService(auth?.accessToken);
@@ -16,25 +17,77 @@ const PostJob = () => {
     jobTitle: '',
     jobDepartment: '',
     jobLocation: '',
-    locationType: 'ON_SITE', // Fixed default value
-    jobType: 'FULL_TIME', // Fixed default value
+    locationType: 'ON_SITE',
+    jobType: 'FULL_TIME',
     jobExperience: '',
     salaryMin: '',
     salaryMax: '',
     salaryCurrency: 'INR',
     jobDescription: '',
-    skillsRequired: [''], // Changed to array
+    skillsRequired: [''],
     applicationDeadline: '',
     applicationEmail: '',
     requirements: [''],
     responsibility: [''],
-    companyId: 2,
+    companyId: 1,
   });
 
   const [errors, setErrors] = useState({});
-  const [previewMode, setPreviewMode] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
 
-  // Added validation function
+  useEffect(() => {
+    const fetchJobData = async () => {
+      if (id) {
+        setIsUpdateMode(true);
+        setLoading(true);
+        try {
+          const response = await jobService.getJobById(id);
+          console.log('Job data fetched for update:', response);
+          const jobData = response;
+
+          setFormData({
+            jobTitle: jobData.jobTitle || '',
+            jobDepartment: jobData.jobDepartment || '',
+            jobLocation: jobData.jobLocation || '',
+            locationType: jobData.locationType || 'ON_SITE',
+            jobType: jobData.jobType || 'FULL_TIME',
+            jobExperience: jobData.jobExperience || '',
+            salaryMin: jobData.salaryMin ? jobData.salaryMin.toString() : '',
+            salaryMax: jobData.salaryMax ? jobData.salaryMax.toString() : '',
+            salaryCurrency: jobData.salaryCurrency || 'INR',
+            jobDescription: jobData.jobDescription || '',
+            // Handle arrays properly - ensure they're arrays with at least one empty string
+            skillsRequired:
+              Array.isArray(jobData.skillsRequired) && jobData.skillsRequired.length > 0
+                ? jobData.skillsRequired
+                : [''],
+            applicationDeadline: jobData.applicationDeadline
+              ? jobData.applicationDeadline.split('T')[0]
+              : '',
+            applicationEmail: jobData.applicationEmail || '',
+            requirements:
+              Array.isArray(jobData.requirements) && jobData.requirements.length > 0
+                ? jobData.requirements
+                : [''],
+            responsibility:
+              Array.isArray(jobData.responsibility) && jobData.responsibility.length > 0
+                ? jobData.responsibility
+                : [''],
+            companyId: jobData.companyId || jobData.company?.companyId || 1,
+          });
+        } catch (error) {
+          console.error('Error fetching job data:', error);
+          toast.error('Failed to fetch job data');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchJobData();
+  }, [id]);
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -48,6 +101,24 @@ const PostJob = () => {
 
     if (!formData.jobDescription.trim()) {
       newErrors.jobDescription = 'Job description is required';
+    }
+
+    // Validate that at least one skill is provided
+    const validSkills = formData.skillsRequired.filter(skill => skill.trim() !== '');
+    if (validSkills.length === 0) {
+      newErrors.skillsRequired = 'At least one skill is required';
+    }
+
+    // Validate that at least one requirement is provided
+    const validRequirements = formData.requirements.filter(req => req.trim() !== '');
+    if (validRequirements.length === 0) {
+      newErrors.requirements = 'At least one requirement is required';
+    }
+
+    // Validate that at least one responsibility is provided
+    const validResponsibilities = formData.responsibility.filter(resp => resp.trim() !== '');
+    if (validResponsibilities.length === 0) {
+      newErrors.responsibility = 'At least one responsibility is required';
     }
 
     setErrors(newErrors);
@@ -90,6 +161,14 @@ const PostJob = () => {
       ...formData,
       [field]: newArray,
     });
+
+    // Clear field error when user types
+    if (errors[field]) {
+      setErrors({
+        ...errors,
+        [field]: '',
+      });
+    }
   };
 
   const addArrayItem = field => {
@@ -117,7 +196,7 @@ const PostJob = () => {
       skillsRequired: formData.skillsRequired.filter(skill => skill.trim() !== ''),
       requirements: formData.requirements.filter(req => req.trim() !== ''),
       responsibility: formData.responsibility.filter(resp => resp.trim() !== ''),
-      // Convert salary to numbers
+      // Convert salary to numbers (keep as null if empty)
       salaryMin: formData.salaryMin ? parseInt(formData.salaryMin) : null,
       salaryMax: formData.salaryMax ? parseInt(formData.salaryMax) : null,
     };
@@ -131,29 +210,66 @@ const PostJob = () => {
       return;
     }
 
+    setLoading(true);
+    let response;
+
     try {
       const submissionData = prepareSubmissionData();
       console.log('Submitting job:', submissionData);
 
-      const response = await jobService.saveJob(submissionData);
-      if (response) {
-        toast.success('Job posted successfully!');
-        navigate('/employer/dashboard');
+      if (isUpdateMode && id) {
+        // Update existing job
+        response = await jobService.updateJobById(id, submissionData);
+        if (response) {
+          toast.success('Job updated successfully!');
+          navigate('/employer/dashboard');
+        } else {
+          toast.error('Failed to update job. Please try again.');
+        }
       } else {
-        toast.error('Failed to post job. Please try again.');
+        // Create new job
+        response = await jobService.saveJob(submissionData);
+        if (response) {
+          toast.success('Job posted successfully!');
+          navigate('/employer/dashboard');
+        } else {
+          toast.error('Failed to post job. Please try again.');
+        }
       }
     } catch (error) {
-      console.error('Error posting job:', error);
-      toast.error('Failed to post job. Please try again.');
+      console.error('Error submitting job:', error);
+
+      // More detailed error handling
+      if (error.response) {
+        // Server responded with error status
+        console.error('Server error:', error.response.data);
+        toast.error(
+          `Failed to ${isUpdateMode ? 'update' : 'post'} job: ${error.response.data.message || 'Server error'}`
+        );
+      } else if (error.request) {
+        // Request was made but no response
+        console.error('Network error:', error.request);
+        toast.error('Network error. Please check your connection.');
+      } else {
+        // Something else happened
+        console.error('Error:', error.message);
+        toast.error(`Failed to ${isUpdateMode ? 'update' : 'post'} job. Please try again.`);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  const togglePreview = () => {
-    if (!previewMode && !validateForm()) {
-      return;
-    }
-    setPreviewMode(!previewMode);
-  };
+  if (loading && isUpdateMode) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-purple-600"></div>
+          <p className="mt-4 text-gray-600">Loading job data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
@@ -174,10 +290,13 @@ const PostJob = () => {
                   </div>
                   <h1 className="text-2xl font-bold">CareerCrafter</h1>
                 </div>
-                <h2 className="mb-3 text-3xl font-bold">Find Your Perfect Candidate</h2>
+                <h2 className="mb-3 text-3xl font-bold">
+                  {isUpdateMode ? 'Update Job Posting' : 'Find Your Perfect Candidate'}
+                </h2>
                 <p className="text-lg leading-relaxed text-purple-100">
-                  Post your job and connect with talented professionals ready to make an impact at
-                  your company.
+                  {isUpdateMode
+                    ? 'Make changes to your job posting to attract the right candidates.'
+                    : 'Post your job and connect with talented professionals ready to make an impact at your company.'}
                 </p>
               </div>
             </div>
@@ -244,9 +363,13 @@ const PostJob = () => {
               <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-white">Post a New Job</h1>
+                    <h1 className="text-2xl font-bold text-white">
+                      {isUpdateMode ? 'Update Job' : 'Post a New Job'}
+                    </h1>
                     <p className="text-purple-100">
-                      Fill out the details to attract the best candidates
+                      {isUpdateMode
+                        ? 'Edit the job details to keep your posting up to date'
+                        : 'Fill out the details to attract the best candidates'}
                     </p>
                   </div>
                 </div>
@@ -385,7 +508,7 @@ const PostJob = () => {
                           className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none"
                         >
                           <option value="">Select experience level</option>
-                          <option value="ZERO_TWO">0 to 2 Years</option>
+                          <option value="ZERO_TO_TWO">0 to 2 Years</option>
                           <option value="THREE_TO_FOUR">2 to 4 Years</option>
                           <option value="FIVE_TO_SIX">4 to 6 Years</option>
                           <option value="MORE_THAN_SIX_YEARS">6++ Years</option>
@@ -462,11 +585,11 @@ const PostJob = () => {
                       )}
                     </div>
 
-                    {/* Fixed Skills Section */}
+                    {/* Skills Section */}
                     <div className="mb-6">
                       <div className="mb-2 flex items-center justify-between">
                         <label className="block text-sm font-medium text-gray-700">
-                          Skills Required
+                          Skills Required <span className="text-red-500">*</span>
                         </label>
                         <button
                           type="button"
@@ -477,6 +600,9 @@ const PostJob = () => {
                           Add Skill
                         </button>
                       </div>
+                      {errors.skillsRequired && (
+                        <p className="mb-2 text-xs text-red-500">{errors.skillsRequired}</p>
+                      )}
                       {formData.skillsRequired.map((skill, index) => (
                         <div key={index} className="mb-2 flex items-center">
                           <input
@@ -502,7 +628,7 @@ const PostJob = () => {
                     <div className="mb-6">
                       <div className="mb-2 flex items-center justify-between">
                         <label className="block text-sm font-medium text-gray-700">
-                          Requirements
+                          Requirements <span className="text-red-500">*</span>
                         </label>
                         <button
                           type="button"
@@ -541,7 +667,7 @@ const PostJob = () => {
                     <div className="mb-6">
                       <div className="mb-2 flex items-center justify-between">
                         <label className="block text-sm font-medium text-gray-700">
-                          Responsibilities
+                          Responsibilities <span className="text-red-500">*</span>
                         </label>
                         <button
                           type="button"
