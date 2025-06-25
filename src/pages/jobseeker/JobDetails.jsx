@@ -1,5 +1,3 @@
-'use client';
-
 import { useContext, useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
@@ -20,6 +18,7 @@ import {
   ArrowRight,
   Award,
   Zap,
+  IndianRupee,
 } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';
 import JobService from '../../service/JobService';
@@ -33,10 +32,12 @@ const JobDetails = () => {
 
   const { id } = useParams();
   const { auth } = useContext(AuthContext);
+
   const jobService = new JobService(auth.accessToken);
   const resumeService = new ResumeService(auth?.accessToken);
   const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
   const applicationService = new ApplicationService(auth?.accessToken);
+
   const [applications, setApplications] = useState([]);
   const [job, setJob] = useState({});
   const [showApplyForm, setShowApplyForm] = useState(false);
@@ -159,10 +160,6 @@ const JobDetails = () => {
     }
   };
 
-  const createMarkup = html => {
-    return { __html: html };
-  };
-
   const handleApplyClick = () => {
     if (!profile?.seekerId) {
       toast.warning('Please complete your profile first.');
@@ -210,15 +207,9 @@ const JobDetails = () => {
                   {/* Company Logo */}
                   <div className="relative">
                     <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
-                      {job.company?.logo ? (
-                        <img
-                          src={job.company?.logo || '/placeholder.svg'}
-                          alt={job.company?.logo}
-                          className="h-12 w-12 object-contain"
-                        />
-                      ) : (
-                        <Briefcase className="h-10 w-10 text-purple-600" />
-                      )}
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-3xl font-semibold text-purple-600">
+                        {job.jobTitle?.charAt(0)?.toUpperCase() || ''}
+                      </div>
                     </div>
                   </div>
 
@@ -242,12 +233,12 @@ const JobDetails = () => {
                         <span className="text-sm">{job.jobType}</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <DollarSign className="h-5 w-5 text-purple-300" />
+                        <IndianRupee className="h-5 w-5 text-purple-300" />
                         <span className="text-sm font-semibold">{job.salaryMin}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Clock className="h-5 w-5 text-purple-300" />
-                        <span className="text-sm">{job.jobExperience}</span>
+                        <span className="text-sm">EXP: {job.jobExperience} </span>
                       </div>
                     </div>
                   </div>
@@ -272,12 +263,6 @@ const JobDetails = () => {
                       Applied
                     </button>
                   )}
-                  <div className="flex space-x-3">
-                    <button className="flex flex-1 items-center justify-center space-x-2 rounded-lg border-2 border-white/20 px-4 py-2 text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/10">
-                      <Share2 className="h-4 w-4" />
-                      <span className="text-sm">Share</span>
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -289,10 +274,6 @@ const JobDetails = () => {
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Calendar className="h-4 w-4" />
                     <span>Posted {job?.createdAt}</span>
-                  </div>
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Users className="h-4 w-4" />
-                    <span>120 applicants</span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -316,10 +297,9 @@ const JobDetails = () => {
                   </div>
                   Job Description
                 </h2>
-                <div
-                  className="prose max-w-none leading-relaxed text-gray-700"
-                  dangerouslySetInnerHTML={createMarkup(job.jobDescription)}
-                ></div>
+                <div className="prose max-w-none leading-relaxed text-gray-700">
+                  {job.jobDescription}
+                </div>
               </div>
 
               {/* Responsibilities */}
@@ -393,7 +373,7 @@ const JobDetails = () => {
                       href={job.company?.webiste}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-purple-600 hover:text-purple-700"
+                      className="cursor-pointer font-semibold text-purple-600 hover:text-purple-700"
                     >
                       Visit Site
                     </a>
@@ -405,15 +385,12 @@ const JobDetails = () => {
             {/* Right Column - Sidebar */}
             <div className="space-y-6">
               {/* Quick Apply Card */}
-              <div className="sticky top-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
+              <div className="top-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
                 <div className="mb-6 text-center">
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600">
                     <Send className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="mb-2 text-lg font-bold text-gray-900">Ready to Apply?</h3>
-                  <p className="text-sm text-gray-600">
-                    Join {job.applicants || 0} other candidates
-                  </p>
                 </div>
                 {!hasApplied ? (
                   <button
@@ -430,23 +407,6 @@ const JobDetails = () => {
                     Already Applied
                   </button>
                 )}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setIsBookmarked(!isBookmarked)}
-                    className={`flex items-center justify-center space-x-2 rounded-lg border py-3 transition-all duration-200 ${
-                      isBookmarked
-                        ? 'border-purple-200 bg-purple-50 text-purple-700'
-                        : 'border-gray-200 text-gray-600 hover:border-purple-200 hover:text-purple-600'
-                    }`}
-                  >
-                    <Heart className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
-                    <span className="text-sm font-medium">Save</span>
-                  </button>
-                  <button className="flex items-center justify-center space-x-2 rounded-lg border border-gray-200 py-3 text-gray-600 transition-all duration-200 hover:border-purple-200 hover:text-purple-600">
-                    <Flag className="h-4 w-4" />
-                    <span className="text-sm font-medium">Report</span>
-                  </button>
-                </div>
               </div>
 
               {/* Job Summary */}
@@ -476,40 +436,6 @@ const JobDetails = () => {
                     <span className="font-semibold text-gray-900">{job.jobExperience}</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Similar Jobs */}
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
-                <h3 className="mb-4 text-lg font-bold text-gray-900">Similar Jobs</h3>
-                <div className="space-y-4">
-                  {[
-                    {
-                      title: 'Frontend Developer',
-                      company: 'WebSolutions Inc.',
-                      location: 'San Francisco, CA',
-                    },
-                    { title: 'React Developer', company: 'AppWorks', location: 'Remote' },
-                    { title: 'UI Engineer', company: 'DesignHub', location: 'New York, NY' },
-                  ].map((similarJob, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer rounded-xl border border-gray-100 p-4 transition-all duration-200 hover:border-purple-200 hover:bg-purple-50"
-                    >
-                      <h4 className="mb-1 font-semibold text-gray-900">{similarJob.title}</h4>
-                      <p className="mb-2 text-sm text-gray-600">{similarJob.company}</p>
-                      <div className="flex items-center text-xs text-gray-500">
-                        <MapPin className="mr-1 h-3 w-3" />
-                        {similarJob.location}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  to="/job-seeker/search-jobs"
-                  className="mt-4 block text-center text-sm font-medium text-purple-600 hover:text-purple-700"
-                >
-                  View More Jobs →
-                </Link>
               </div>
             </div>
           </div>

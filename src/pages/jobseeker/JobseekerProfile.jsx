@@ -13,29 +13,20 @@ import {
   Briefcase,
   GraduationCap,
   Plus,
-  Trash2,
-  X,
   Star,
   Target,
   CheckCircle,
-  Camera,
   Save,
-  Eye,
 } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';
 import JobseekerProfileService from '../../service/JobseekerProfileService';
-import EducationProfile from '../../components/stuffs/EducationProfile';
-import ExperienceProfile from '../../components/stuffs/ExperienceProfile';
 import SkillsProfile from '../../components/stuffs/SkillsProfile';
-import EducationService from '../../service/EducationService';
-import ExperienceService from '../../service/ExperienceService';
 import SkillsService from '../../service/SkillsService';
 import { toast } from 'react-toastify';
 
 const JobseekerProfile = () => {
   const { auth } = useContext(AuthContext);
-  const [educations, setEducations] = useState([]);
-  const [experience, setExperience] = useState([]);
+
   const [skills, setSkills] = useState([]);
   const [profile, setProfile] = useState({
     firstName: '',
@@ -49,44 +40,19 @@ const JobseekerProfile = () => {
     githubUrl: '',
     twitterUrl: '',
   });
-  const educationService = new EducationService(auth?.accessToken);
-  const experienceService = new ExperienceService(auth?.accessToken);
   const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
   const skillsService = new SkillsService(auth?.accessToken);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUserProfile();
-    fetchExperience();
     fetchSkills();
-    fetchEducation();
   }, []);
-
-  const fetchEducation = async () => {
-    try {
-      const response = await educationService.getEducationsForUser();
-      setEducations(response);
-      console.log('response from fetchEducation', response);
-    } catch (error) {
-      console.log('Error fetching education:', error);
-    }
-  };
 
   const fetchUserProfile = async () => {
     try {
       const response = await jobseekerProfileService.getJobseekerGetProfile();
       console.log(response);
       setProfile(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const fetchExperience = async () => {
-    try {
-      const response = await experienceService.getExperiencesForUser();
-      console.log(response);
-      setExperience(response);
     } catch (error) {
       console.log(error);
     }
@@ -121,43 +87,6 @@ const JobseekerProfile = () => {
       }));
     }
   };
-  const handleSocialLinksChange = e => {
-    const { name, value } = e.target;
-
-    setProfile(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const addExperience = () => {
-    const newExperience = {
-      id: Date.now(),
-      jobTitle: '',
-      company: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      description: '',
-    };
-
-    setExperience([...experience, newExperience]);
-  };
-
-  const addEducation = () => {
-    const newEducation = {
-      id: Date.now(),
-      degree: '',
-      school: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      current: false,
-      description: '',
-    };
-
-    setEducations([...educations, newEducation]);
-  };
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -173,16 +102,12 @@ const JobseekerProfile = () => {
 
   const sectionIcons = {
     personalInfo: User,
-    // experience: Briefcase,
-    // education: GraduationCap,
     skills: Star,
     socialLinks: Globe,
   };
 
   const sectionTitles = {
     personalInfo: 'Personal Info',
-    // experience: 'Experience',
-    // education: 'Education',
     skills: 'Skills',
     socialLinks: 'Social Links',
   };
@@ -233,25 +158,6 @@ const JobseekerProfile = () => {
             {/* Sidebar Navigation */}
             <div className="lg:col-span-1">
               <div className="sticky top-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                {/* Profile Completion */}
-                <div className="mb-6">
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">Profile Strength</span>
-                    <span className="text-sm font-bold text-purple-600">{profileCompletion}%</span>
-                  </div>
-                  <div className="h-2 w-full rounded-full bg-gray-200">
-                    <div
-                      className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
-                      style={{ width: `${profileCompletion}%` }}
-                    ></div>
-                  </div>
-                  <p className="mt-2 text-xs text-gray-500">
-                    {profileCompletion < 70
-                      ? 'Complete your profile to attract more employers'
-                      : 'Great! Your profile looks professional'}
-                  </p>
-                </div>
-
                 {/* Navigation Menu */}
                 <nav className="space-y-2">
                   {Object.entries(sectionTitles).map(([key, title]) => {
@@ -280,14 +186,6 @@ const JobseekerProfile = () => {
                 <div className="mt-6 border-t border-gray-100 pt-6">
                   <h3 className="mb-3 text-sm font-semibold text-gray-700">Quick Stats</h3>
                   <div className="space-y-2 text-sm">
-                    {/* <div className="flex justify-between">
-                      <span className="text-gray-600">Experience</span>
-                      <span className="font-medium text-gray-900">{experience.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Education</span>
-                      <span className="font-medium text-gray-900">{educations.length}</span>
-                    </div> */}
                     <div className="flex justify-between">
                       <span className="text-gray-600">Skills</span>
                       <span className="font-medium text-gray-900">{skills.length}</span>
@@ -478,87 +376,6 @@ const JobseekerProfile = () => {
                       Save Profile
                     </button>
                   )}
-
-                  {/* Experience Section */}
-                  {activeSection === 'experience' && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">Work Experience</h3>
-                          <p className="text-gray-600">Add your professional experience</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={addExperience}
-                          className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
-                        >
-                          <Plus className="h-4 w-4" />
-                          Add Experience
-                        </button>
-                      </div>
-
-                      {experience.length === 0 ? (
-                        <div className="py-12 text-center">
-                          <Briefcase className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                          <h3 className="mb-2 text-lg font-medium text-gray-900">
-                            No experience added yet
-                          </h3>
-                          <p className="mb-4 text-gray-600">
-                            Start building your professional timeline
-                          </p>
-                          <button
-                            type="button"
-                            onClick={addExperience}
-                            className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-purple-700"
-                          >
-                            Add Your First Experience
-                          </button>
-                        </div>
-                      ) : (
-                        <ExperienceProfile experience={experience} setExperience={setExperience} />
-                      )}
-                    </div>
-                  )}
-
-                  {/* Education Section */}
-                  {activeSection === 'education' && (
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">Education</h3>
-                          <p className="text-gray-600">Add your educational background</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={addEducation}
-                          className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
-                        >
-                          <Plus className="h-4 w-4" />
-                          Add Education
-                        </button>
-                      </div>
-
-                      {educations.length === 0 ? (
-                        <div className="py-12 text-center">
-                          <GraduationCap className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-                          <h3 className="mb-2 text-lg font-medium text-gray-900">
-                            No education added yet
-                          </h3>
-                          <p className="mb-4 text-gray-600">Add your educational qualifications</p>
-                          <button
-                            type="button"
-                            onClick={addEducation}
-                            className="rounded-lg bg-purple-600 px-6 py-3 text-white transition-colors hover:bg-purple-700"
-                          >
-                            Add Education
-                          </button>
-                        </div>
-                      ) : (
-                        <EducationProfile educations={educations} setEducations={setEducations} />
-                      )}
-                    </div>
-                  )}
-
                   {/* Skills Section */}
                   {activeSection === 'skills' && (
                     <SkillsProfile
@@ -568,9 +385,8 @@ const JobseekerProfile = () => {
                       onDeleteSkills={deleteSkills}
                     />
                   )}
-
-                  {/* Social Links Section */}
-                  {activeSection === 'socialLinks' && (
+                  Social Links Section
+                  {/* {activeSection === 'socialLinks' && (
                     <div className="space-y-6">
                       <div>
                         <h3 className="mb-2 text-lg font-semibold text-gray-900">
@@ -657,7 +473,7 @@ const JobseekerProfile = () => {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>

@@ -20,6 +20,7 @@ export default class ApplicationService {
       throw error;
     }
   }
+
   async getApplicationsForEmployer() {
     try {
       const response = await axios.get(`${API_BASE_URL}/employer`, {
@@ -33,6 +34,7 @@ export default class ApplicationService {
       throw error;
     }
   }
+  
   async getApplicationsForJob(jobId) {
     try {
       const response = await axios.get(`${API_BASE_URL}/job/${jobId}`, {

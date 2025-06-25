@@ -1,17 +1,15 @@
-'use client';
-
 import { useContext, useEffect, useState } from 'react';
-import { Upload, Trash2, X, Download, Edit, FileText, Star, EyeIcon } from 'lucide-react';
+import { Upload, Trash2, X, Download, FileText, Star, EyeIcon } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';
 import ResumeService from '../../service/ResumeService';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ResumeTips from '../../components/additional/ResumeTips';
 import JobseekerProfileService from '../../service/JobseekerProfileService';
 
 const ResumeManager = () => {
-  const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
+
   const resumeService = new ResumeService(auth?.accessToken);
   const jobseekerProfileService = new JobseekerProfileService(auth?.accessToken);
 
@@ -63,7 +61,7 @@ const ResumeManager = () => {
     }
   };
 
-  // Helper function to process tags - made more robust
+  // function to process tags
   const processResumeTags = tags => {
     if (!tags) return [];
     if (Array.isArray(tags)) return tags.filter(tag => tag && tag.toString().trim());
@@ -73,11 +71,10 @@ const ResumeManager = () => {
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
     }
-    // If it's neither array nor string, return empty array
     return [];
   };
 
-  // Helper function to format date
+  //function to format date
   const formatDate = dateString => {
     if (!dateString) return 'Unknown date';
     try {
@@ -87,6 +84,7 @@ const ResumeManager = () => {
     }
   };
 
+  // Function to handle resume deletion with confirmation
   const handleDeleteConfirmation = async resumeId => {
     const isConfirmed = window.confirm('Are you sure you want to delete this resume?');
     if (!isConfirmed) return;
@@ -140,17 +138,6 @@ const ResumeManager = () => {
     }
   };
 
-  const openUploadModal = () => {
-    setShowUploadModal(true);
-    setNewResume({
-      file: null,
-      name: '',
-      tags: [],
-    });
-    setErrors({});
-    setNewTag('');
-  };
-
   const closeUploadModal = () => {
     setShowUploadModal(false);
     setNewResume({
@@ -172,7 +159,6 @@ const ResumeManager = () => {
         name: fileName,
       }));
 
-      // Clear file error if it exists
       if (errors.file) {
         setErrors(prev => ({
           ...prev,
@@ -188,7 +174,6 @@ const ResumeManager = () => {
       name: e.target.value,
     }));
 
-    // Clear name error if it exists
     if (errors.name) {
       setErrors(prev => ({
         ...prev,
@@ -244,45 +229,13 @@ const ResumeManager = () => {
       let uploadedResumeData = null;
 
       // Check if data is nested in response.data
-      if (response.data) {
-        uploadedResumeData = response.data;
-      } else if (response) {
-        // Sometimes the data might be directly in response
+      if (response) {
         uploadedResumeData = response;
       }
-
       console.log('Processed upload data:', uploadedResumeData);
-
-      if (uploadedResumeData) {
-        // Create a new resume object with the data we have
-        const uploadedResume = {
-          // Use the data from response or create temporary data
-          resumeId: uploadedResumeData.resumeId || uploadedResumeData.id || Date.now().toString(),
-          fileName: uploadedResumeData.fileName || newResume.name,
-          fileUrl: uploadedResumeData.fileUrl || uploadedResumeData.url || '#',
-          tags: processResumeTags(uploadedResumeData.tags || newResume.tags),
-          size: uploadedResumeData.size || `${(newResume.file.size / 1024).toFixed(1)} KB`,
-          updatedAt: formatDate(
-            uploadedResumeData.updatedAt || uploadedResumeData.createdAt || new Date()
-          ),
-          createdAt: uploadedResumeData.createdAt || new Date().toISOString(),
-          isDefault: uploadedResumeData.isDefault || resumes.length === 0,
-          ...uploadedResumeData,
-        };
-
-        console.log('Final processed resume:', uploadedResume);
-
-        // Add the new resume to the list
-        setResumes(prev => [...prev, uploadedResume]);
-        toast.success('Resume uploaded successfully');
-        closeUploadModal();
-      } else {
-        // If we can't get the data from response, refetch all resumes
-        console.warn('Could not process upload response, refetching all resumes');
-        await fetchResumes();
-        toast.success('Resume uploaded successfully');
-        closeUploadModal();
-      }
+      await fetchResumes();
+      toast.success('Resume uploaded successfully');
+      closeUploadModal();
     } catch (error) {
       console.error('Upload error:', error);
       toast.error(
@@ -293,6 +246,18 @@ const ResumeManager = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-gray-50">
+        <div className="flex items-center justify-center">
+          <div className="h-16 w-16 animate-spin rounded-full border-t-4 border-b-4 border-blue-500"></div>
+        </div>
+        <p className="mt-4 animate-pulse text-lg font-medium text-gray-700">
+          Loading, please wait...
+        </p>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Hero Section */}
@@ -354,9 +319,7 @@ const ResumeManager = () => {
                           <div className="text-base font-medium text-gray-800">
                             {resume.fileName || 'Untitled Resume'}
                           </div>
-                          <p className="text-sm text-gray-500">
-                            {resume.size} • {resume.updatedAt}
-                          </p>
+                          <p className="text-sm text-gray-500">Uploaded : {resume.updatedAt}</p>
                         </div>
                       </div>
                       {resume.isDefault && (

@@ -1,5 +1,12 @@
-import React from 'react';
-import { MapPin, Briefcase, CheckCircle, Clock, DollarSign, Users } from 'lucide-react';
+import {
+  MapPin,
+  Briefcase,
+  CheckCircle,
+  Clock,
+  DollarSign,
+  Users,
+  IndianRupee,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const EnhancedJobCard = ({ job, applications }) => {
@@ -7,6 +14,7 @@ const EnhancedJobCard = ({ job, applications }) => {
 
   return (
     <div>
+      {/* Job Card Container */}
       <div
         className={
           'group relative overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-md transition-all duration-300 hover:shadow-xl'
@@ -46,26 +54,14 @@ const EnhancedJobCard = ({ job, applications }) => {
                   <span className="text-sm">{job.jobType}</span>
                 </div>
                 <div className="flex items-center text-green-600">
-                  <DollarSign className="mr-1 h-3.5 w-3.5" />
+                  <IndianRupee className="mr-1 h-3.5 w-3.5" />
                   <span className="text-sm font-medium">{job.salaryMin} - </span>
                   <span className="text-sm font-medium">
                     {'  '} {job.salaryMax}
                   </span>
                 </div>
               </div>
-
               <p className="mb-4 line-clamp-2 text-sm text-gray-600">{job.jobDescription}</p>
-
-              <div className="mb-4 flex flex-wrap gap-2">
-                {/* {job.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700"
-                >
-                  {tag}
-                </span>
-              ))} */}
-              </div>
             </div>
           </div>
 
@@ -76,11 +72,7 @@ const EnhancedJobCard = ({ job, applications }) => {
           <div className="flex items-center space-x-8">
             <div className="flex items-center text-gray-500">
               <Clock className="mr-1 h-3.5 w-3.5" />
-              <span className="text-xs">{job.postedDate}</span>
-            </div>
-            <div className="mt-1 flex items-center text-gray-500">
-              <Users className="mr-1 h-3.5 w-3.5" />
-              <span className="text-xs">690 applicants</span>
+              <span className="text-xs">Posted : {job.postedDate}</span>
             </div>
           </div>
 
@@ -91,7 +83,6 @@ const EnhancedJobCard = ({ job, applications }) => {
             >
               View Details
             </Link>
-
             {/* Conditional Apply Button */}
             {hasApplied ? (
               <button

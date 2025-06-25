@@ -169,10 +169,8 @@ const ViewApplications = () => {
         stage: interviewData.stage,
       };
 
-      // ✅ Call API to schedule interview
       const savedInterview = await interviewService.scheduleInterview(interviewPayload);
 
-      // ✅ Update the application with response interview data
       setApplications(prevApps =>
         prevApps.map(app =>
           app.applicationId === interviewData.applicationId
@@ -185,7 +183,6 @@ const ViewApplications = () => {
         )
       );
 
-      // ✅ Update selectedApplication if needed
       if (
         selectedApplication &&
         selectedApplication.applicationId === interviewData.applicationId
@@ -254,6 +251,12 @@ const ViewApplications = () => {
           </span>
         );
     }
+  };
+
+  const getCurrentDateTimeLocal = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // adjust for timezone
+    return now.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
   };
 
   const downloadResume = (fileUrl, fileName) => {
@@ -507,6 +510,7 @@ const ViewApplications = () => {
                   onChange={handleInterviewInputChange}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
                   required
+                  min={getCurrentDateTimeLocal()}
                 />
               </div>
 

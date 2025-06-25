@@ -1,33 +1,18 @@
-'use client';
-
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  Search,
-  Briefcase,
-  Users,
-  Building,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  ArrowLeft,
-  ArrowRight,
-} from 'lucide-react';
+import { Search, MapPin, ArrowRight } from 'lucide-react';
 
 import backgroundImage from '../../assets/images/background.png';
-
 import { Helmet } from 'react-helmet-async';
 
 import JobCard from '../../components/common/JobCard';
 import AboutPage from '../../components/landing/AboutPage';
-import AuthContext from '../../context/AuthProvider';
 import JobService from '../../service/JobService';
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const jobService = new JobService();
   const [featuredJobs, setFeaturedJobs] = useState([]);
-  // Sample featured jobs
 
   useEffect(() => {
     fetchFeaturedJobs();
@@ -45,11 +30,11 @@ const LandingPage = () => {
 
   return (
     <div className="">
-      {/* Hero Section */}
       <Helmet>
         <title>CareerCrafter - Where Talent Meets Opportunity </title>
       </Helmet>
 
+      {/* Hero Section */}
       <section
         id="home"
         className="flex flex-col items-center justify-between bg-[#f6f6f645] px-6 py-20 text-gray-900 md:flex-row md:px-24 md:py-20"
@@ -80,8 +65,6 @@ const LandingPage = () => {
           />
         </div>
       </section>
-
-      {/* <div className="w-full border-t-2 border-dashed border-gray-400 my-20" /> */}
 
       {/* Search Bar */}
       <section className="md:24 relative z-10 container mx-auto -mt-12 bg-[#f6f6f645] px-8 sm:px-48">

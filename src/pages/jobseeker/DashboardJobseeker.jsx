@@ -49,28 +49,27 @@ const DashboardJobSeeker = () => {
     {
       title: 'Applications',
       value: recentApplications.length > 0 ? recentApplications.length.toString() : '0',
-      change: '+3 this week',
       icon: <Briefcase className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-purple-500 to-purple-600',
     },
     {
       title: 'Skills Added',
       value: skills.length > 0 ? skills.length.toString() : '0',
-      change: '+12 this week',
       icon: <Eye className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-blue-500 to-blue-600',
     },
     {
       title: 'Interviews',
-      value: '3',
-      change: '+1 this week',
+      value:
+        recentApplications.length > 0
+          ? recentApplications.filter(app => app.status === 'SHORTLISTED').length.toString()
+          : '0',
       icon: <Calendar className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-green-500 to-green-600',
     },
     {
       title: 'Resume Uploaded',
       value: resume.length > 0 ? resume.length.toString() : '0',
-      change: '+5 this week',
       icon: <Heart className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-orange-500 to-orange-600',
     },
@@ -150,15 +149,16 @@ const DashboardJobSeeker = () => {
       console.error('Error fetching jobs:', error);
     }
   };
+
   const profileCompleteness = profileCompletion.profileCompletion;
 
   const getStatusColor = status => {
     switch (status) {
-      case 'Applied':
+      case 'SHORTLISTED':
         return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'Interview':
+      case 'OFFERED':
         return 'bg-green-50 text-green-700 border-green-200';
-      case 'Rejected':
+      case 'REJECTED':
         return 'bg-red-50 text-red-700 border-red-200';
       default:
         return 'bg-gray-50 text-gray-700 border-gray-200';
@@ -251,8 +251,6 @@ const DashboardJobSeeker = () => {
                   <h3 className="text-xl font-semibold text-gray-800">{stat.value}</h3>
                 </div>
               </div>
-              {/* Optional: Change indicator */}
-              {/* <p className="text-xs text-green-500">{stat.change}</p> */}
             </div>
           ))}
         </div>
@@ -395,6 +393,8 @@ const DashboardJobSeeker = () => {
             )}
           </div>
         </div>
+
+        {/* Quick Advice Box */}
         <div className="mb-8">
           <QuickAdviceBox />
         </div>

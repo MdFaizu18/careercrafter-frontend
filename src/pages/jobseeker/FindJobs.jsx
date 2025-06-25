@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Star,
   Sliders,
+  Filter,
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
@@ -28,10 +29,13 @@ const FindJobs = () => {
   const applicationService = new ApplicationService(auth?.accessToken);
 
   const [jobs, setJobs] = useState([]);
+  const [allJobs, setAllJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
+
+  const [loading, setIsLoading] = useState(true);
   const [applications, setApplications] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [filters, setFilters] = useState({
     jobType: [],
     salary: [],
@@ -41,69 +45,33 @@ const FindJobs = () => {
     featured: false,
   });
 
-  // Filter options
-  const jobTypes = ['Full-time', 'Part-time', 'Contract', 'Internship'];
-  const salaryRanges = ['$0 - $50K', '$50K - $100K', '$100K - $150K', '$150K+'];
-  const datePostedOptions = [
-    { value: 'any', label: 'Any time' },
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'Past week' },
-    { value: 'month', label: 'Past month' },
-  ];
-  const experienceLevels = ['Entry Level', 'Mid Level', 'Senior Level', 'Executive'];
-
   useEffect(() => {
     fetchApplications();
-    fetchJobs();
+    fetchAllJobs();
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
   }, []);
-  const fetchJobs = async () => {
+
+  const fetchAllJobs = async () => {
     try {
       const response = await jobService.getAllJobs();
-      console.log('Fetched jobs:', response);
-      setJobs(response);
+      console.log('Fetched all jobs:', response);
+      setAllJobs(response);
+      setJobs(response); // Show all jobs initially
     } catch (error) {
       console.error('Error fetching jobs:', error);
     }
   };
+
   const fetchApplications = async () => {
     try {
       const response = await applicationService.getApplicationsForUser();
-      console.log('Fetched jobs:', response);
+      console.log('Fetched applications:', response);
       setApplications(response);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error('Error fetching applications:', error);
     }
-  };
-
-  const toggleFilter = (category, value) => {
-    setFilters(prevFilters => {
-      if (category === 'remote' || category === 'featured') {
-        return {
-          ...prevFilters,
-          [category]: !prevFilters[category],
-        };
-      }
-
-      const currentFilters = [...prevFilters[category]];
-      if (currentFilters.includes(value)) {
-        return {
-          ...prevFilters,
-          [category]: currentFilters.filter(item => item !== value),
-        };
-      } else {
-        return {
-          ...prevFilters,
-          [category]: [...currentFilters, value],
-        };
-      }
-    });
-  };
-
-  const setDatePosted = value => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      datePosted: value,
-    }));
   };
 
   const clearFilters = () => {
@@ -117,51 +85,49 @@ const FindJobs = () => {
     });
     setSearchTerm('');
     setLocation('');
+    setJobs(allJobs);
   };
 
   const handleSearch = () => {
-    let filteredJobs = [...jobs];
+    try {
+      const filteredJobs = allJobs.filter(job => {
+        const titleMatch = searchTerm.trim()
+          ? job.jobTitle?.toLowerCase().includes(searchTerm.trim().toLowerCase())
+          : true;
 
-    // Filter by search term
-    if (searchTerm) {
-      filteredJobs = filteredJobs.filter(
-        job =>
-          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          job.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+        const locationMatch = location.trim()
+          ? job.location?.toLowerCase().includes(location.trim().toLowerCase())
+          : true;
+
+        return titleMatch && locationMatch;
+      });
+
+      setJobs(filteredJobs);
+    } catch (error) {
+      console.error('Error filtering jobs:', error);
+      setJobs(allJobs); // fallback
     }
-
-    // Filter by location
-    if (location) {
-      filteredJobs = filteredJobs.filter(job =>
-        job.location.toLowerCase().includes(location.toLowerCase())
-      );
-    }
-
-    // Filter by remote
-    if (filters.remote) {
-      filteredJobs = filteredJobs.filter(job => job.remote);
-    }
-
-    // Filter by featured
-    if (filters.featured) {
-      filteredJobs = filteredJobs.filter(job => job.featured);
-    }
-
-    // Other filters...
-    if (filters.jobType.length > 0) {
-      filteredJobs = filteredJobs.filter(job => filters.jobType.includes(job.type));
-    }
-
-    setJobs(filteredJobs);
   };
 
-  // Run search when filters change
-  useEffect(() => {
-    handleSearch();
-  }, [filters]);
+  // Handle Enter key press in search inputs
+  const handleKeyPress = e => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-gray-50">
+        <div className="flex items-center justify-center">
+          <div className="h-16 w-16 animate-spin rounded-full border-t-4 border-b-4 border-blue-500"></div>
+        </div>
+        <p className="mt-4 animate-pulse text-lg font-medium text-gray-700">
+          Loading, please wait...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -173,7 +139,6 @@ const FindJobs = () => {
       <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white">
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
-            {/* <h1 className="text-3xl md:text-4xl font-bold mb-4">Find Your Dream Job</h1> */}
             <p className="mb-8 text-xl text-purple-100">
               Discover opportunities that match your skills and aspirations
             </p>
@@ -188,6 +153,7 @@ const FindJobs = () => {
                     placeholder="Job title, keywords"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     className="w-full rounded-lg border border-gray-200 py-3 pr-4 pl-12 text-gray-900 placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
                   />
                 </div>
@@ -198,22 +164,25 @@ const FindJobs = () => {
                     placeholder="Location"
                     value={location}
                     onChange={e => setLocation(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     className="w-full rounded-lg border border-gray-200 py-3 pr-4 pl-12 text-gray-900 placeholder-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none"
                   />
                 </div>
                 <button
-                  className="flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg"
+                  className="flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleSearch}
+                  disabled={isSearching}
                 >
                   <Search className="mr-2 h-5 w-5" />
-                  Search Jobs
+                  {isSearching ? 'Searching...' : 'Search Jobs'}
                 </button>
                 <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center rounded-full bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-purple-100"
+                  className="flex items-center justify-center rounded-lg bg-gradient-to-r from-gray-600 to-blue-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={clearFilters}
+                  disabled={isSearching}
                 >
-                  <Sliders className="mr-2 h-4 w-4" />
-                  Advanced Filters
+                  <Filter className="mr-2 h-5 w-5" />
+                  Clear Filters
                 </button>
               </div>
             </div>
@@ -222,194 +191,19 @@ const FindJobs = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8 sm:px-24">
-        {/* Advanced Filters */}
-        {showFilters && (
-          <div className="mb-8 rounded-xl border border-gray-100 bg-white p-6 shadow-md">
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
-              <button
-                onClick={clearFilters}
-                className="font-medium text-purple-600 hover:text-purple-700"
-              >
-                Clear All
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-              {/* Job Type */}
-              <div>
-                <h4 className="mb-3 flex items-center font-medium text-gray-900">
-                  <Briefcase className="mr-2 h-4 w-4 text-purple-600" />
-                  Job Type
-                </h4>
-                <div className="space-y-3">
-                  {jobTypes.map(type => (
-                    <label key={type} className="flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.jobType.includes(type)}
-                        onChange={() => toggleFilter('jobType', type)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">{type}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Salary Range */}
-              <div>
-                <h4 className="mb-3 flex items-center font-medium text-gray-900">
-                  <DollarSign className="mr-2 h-4 w-4 text-green-600" />
-                  Salary Range
-                </h4>
-                <div className="space-y-3">
-                  {salaryRanges.map(range => (
-                    <label key={range} className="flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.salary.includes(range)}
-                        onChange={() => toggleFilter('salary', range)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">{range}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Date Posted */}
-              <div>
-                <h4 className="mb-3 flex items-center font-medium text-gray-900">
-                  <Clock className="mr-2 h-4 w-4 text-blue-600" />
-                  Date Posted
-                </h4>
-                <div className="space-y-3">
-                  {datePostedOptions.map(option => (
-                    <label key={option.value} className="flex cursor-pointer items-center">
-                      <input
-                        type="radio"
-                        checked={filters.datePosted === option.value}
-                        onChange={() => setDatePosted(option.value)}
-                        className="h-4 w-4 border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Experience Level */}
-              <div>
-                <h4 className="mb-3 flex items-center font-medium text-gray-900">
-                  <TrendingUp className="mr-2 h-4 w-4 text-orange-600" />
-                  Experience Level
-                </h4>
-                <div className="space-y-3">
-                  {experienceLevels.map(level => (
-                    <label key={level} className="flex cursor-pointer items-center">
-                      <input
-                        type="checkbox"
-                        checked={filters.experienceLevel.includes(level)}
-                        onChange={() => toggleFilter('experienceLevel', level)}
-                        className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="ml-3 text-sm text-gray-700">{level}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Results Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               {jobs.length} {jobs.length === 1 ? 'Job' : 'Jobs'} Found
             </h2>
-            <p className="mt-1 text-gray-600">Showing the best matches for your search</p>
-          </div>
-
-          <div className="mt-4 flex items-center space-x-4 md:mt-0">
-            <div className="flex items-center">
-              <span className="mr-3 text-sm text-gray-600">Sort by:</span>
-              <select className="rounded-lg border border-gray-300 px-4 py-2 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 focus:outline-none">
-                <option>Most Relevant</option>
-                <option>Newest</option>
-                <option>Salary: High to Low</option>
-                <option>Salary: Low to High</option>
-              </select>
-            </div>
+            <p className="mt-1 text-gray-600">
+              {searchTerm || location
+                ? `Showing results for "${searchTerm}"${location ? ` in ${location}` : ''}`
+                : 'Showing all available jobs'}
+            </p>
           </div>
         </div>
-
-        {/* Active Filters */}
-        {(filters.jobType.length > 0 ||
-          filters.salary.length > 0 ||
-          filters.datePosted !== 'any' ||
-          filters.experienceLevel.length > 0 ||
-          filters.remote ||
-          filters.featured ||
-          searchTerm ||
-          location) && (
-          <div className="mb-6 rounded-xl border border-gray-100 bg-white p-4 shadow-md">
-            <div className="flex flex-wrap gap-2">
-              {searchTerm && (
-                <div className="flex items-center rounded-full bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-700">
-                  <span>Keyword: {searchTerm}</span>
-                  <button
-                    onClick={() => setSearchTerm('')}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {location && (
-                <div className="flex items-center rounded-full bg-blue-100 px-3 py-1.5 text-sm font-medium text-blue-700">
-                  <span>Location: {location}</span>
-                  <button
-                    onClick={() => setLocation('')}
-                    className="ml-2 text-blue-700 hover:text-blue-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {filters.featured && (
-                <div className="flex items-center rounded-full bg-yellow-100 px-3 py-1.5 text-sm font-medium text-yellow-700">
-                  <span>Featured Jobs</span>
-                  <button
-                    onClick={() => toggleFilter('featured', null)}
-                    className="ml-2 text-yellow-700 hover:text-yellow-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* Other active filters... */}
-              {filters.jobType.map(type => (
-                <div
-                  key={type}
-                  className="flex items-center rounded-full bg-purple-100 px-3 py-1.5 text-sm font-medium text-purple-700"
-                >
-                  <span>{type}</span>
-                  <button
-                    onClick={() => toggleFilter('jobType', type)}
-                    className="ml-2 text-purple-700 hover:text-purple-900"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Job Listings */}
         <div className="grid grid-cols-1 gap-6 space-y-6 sm:grid-cols-2">
@@ -421,8 +215,9 @@ const FindJobs = () => {
                 <Briefcase className="mx-auto mb-4 h-16 w-16 text-gray-300" />
                 <h3 className="mb-2 text-xl font-semibold text-gray-900">No jobs found</h3>
                 <p className="mb-6 text-gray-600">
-                  Try adjusting your search criteria or explore different keywords to find more
-                  opportunities.
+                  {searchTerm || location
+                    ? 'No jobs match your search criteria. Try adjusting your search terms.'
+                    : 'No jobs available at the moment. Please check back later.'}
                 </p>
                 <button
                   onClick={clearFilters}

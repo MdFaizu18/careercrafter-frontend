@@ -1,19 +1,5 @@
 import { Link } from 'react-router-dom';
-import {
-  Briefcase,
-  Users,
-  Clock,
-  Eye,
-  Plus,
-  ChevronRight,
-  Search,
-  Bell,
-  Filter,
-  MapPin,
-  Star,
-  CheckCircle,
-} from 'lucide-react';
-import EmployerApplicationsChart from '../../components/charts/EmployerApplicationsChart';
+import { Briefcase, Users, Clock, Eye, Plus, ChevronRight, MapPin } from 'lucide-react';
 import ApplicationService from '../../service/ApplicationService';
 import { useContext, useEffect, useState } from 'react';
 import AuthContext from '../../context/AuthProvider';
@@ -49,7 +35,7 @@ const DashboardEmployer = () => {
       console.log(error);
     }
   };
-  // Sample data
+
   const stats = [
     {
       title: 'Active Jobs',
@@ -65,13 +51,19 @@ const DashboardEmployer = () => {
     },
     {
       title: 'Interviews',
-      value: '28',
+      value:
+        recentApplications.length > 0
+          ? recentApplications.filter(app => app.status === 'SHORTLISTED').length.toString()
+          : '0',
       icon: <Clock className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-green-500 to-green-700',
     },
     {
-      title: 'Profile Views',
-      value: '1,254',
+      title: 'Selected',
+      value:
+        recentApplications.length > 0
+          ? recentApplications.filter(app => app.status === 'SELECTED').length.toString()
+          : '0',
       icon: <Eye className="h-6 w-6 text-white" />,
       color: 'bg-gradient-to-br from-orange-500 to-orange-700',
     },
@@ -130,59 +122,6 @@ const DashboardEmployer = () => {
           {/* Left column - Active Jobs */}
           <div className="lg:col-span-1">
             {/* Tips Section */}
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg">
-              <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
-                <Star className="mr-2 h-5 w-5 text-yellow-500" />
-                Pro Tips for Better Results
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Write Clear Job Titles</h4>
-                    <p className="text-sm text-gray-600">
-                      Use specific, searchable titles that candidates understand
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Include Salary Range</h4>
-                    <p className="text-sm text-gray-600">
-                      Jobs with salary info get 3x more applications
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Highlight Benefits</h4>
-                    <p className="text-sm text-gray-600">Showcase what makes your company unique</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="mt-0.5 mr-3 flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900">Be Specific</h4>
-                    <p className="text-sm text-gray-600">
-                      Detailed requirements attract better matches
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
             <div className="mb-4 flex items-center justify-between pt-8">
               <h2 className="text-xl font-bold text-gray-900">Posted Jobs</h2>
               <Link
@@ -227,12 +166,6 @@ const DashboardEmployer = () => {
                     >
                       View Applications
                     </Link>
-                    <Link
-                      to={`/employer/manage-jobs/${job.jobId}`}
-                      className="rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-200"
-                    >
-                      Edit
-                    </Link>
                   </div>
                 </div>
               ))}
@@ -240,8 +173,6 @@ const DashboardEmployer = () => {
           </div>
           {/* Right column - Applications and Chart */}
           <div className="lg:col-span-2">
-            {/* Chart - Simplified and more stylish */}
-            <EmployerApplicationsChart />
             {/* Recent Applications - Redesigned */}
             <div className="mt-8 mb-8">
               <div className="mb-4 flex items-center justify-between">
@@ -256,7 +187,7 @@ const DashboardEmployer = () => {
               </div>
 
               <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-                {recentApplications.slice(0, 5).map((application, index) => (
+                {recentApplications.slice(0, 7).map((application, index) => (
                   <div
                     key={application.applicationId}
                     className={`flex items-center justify-between p-4 hover:bg-gray-50 ${

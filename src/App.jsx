@@ -5,6 +5,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomeOutlet from './pages/landing/HomeOutlet';
 import NotFoundPage from './pages/error/NotFoundPage';
 import LandingPage from './pages/landing/LandingPage';
+import RegisterPage from './pages/auth/RegisterPage';
 import LoginPage from './pages/auth/LoginPage';
 
 import DashboardJobseeker from './pages/jobseeker/DashboardJobseeker';
@@ -23,7 +24,6 @@ import ManageJobs from './pages/employer/ManageJobs';
 import EmployerProfile from './pages/employer/EmployerProfile';
 import RequireAuth from './auth/RequireAuth';
 import JobApplications from './pages/employer/JobApplications';
-import RegisterPage from './pages/auth/RegisterPage';
 const router = createBrowserRouter([
   {
     path: '/',

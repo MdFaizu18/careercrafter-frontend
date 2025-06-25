@@ -1,5 +1,3 @@
-'use client';
-
 import { useContext, useState } from 'react';
 import {
   Mail,
@@ -9,7 +7,6 @@ import {
   CheckCircle,
   AlertCircle,
   HelpCircle,
-  Search,
   Send,
 } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';

@@ -23,6 +23,8 @@ import { HashLink } from 'react-router-hash-link';
 import UserService from '../../service/UserService';
 import AuthContext from '../../context/AuthProvider';
 import { toast } from 'react-toastify';
+import EmployerProfileService from '../../service/EmployerProfileService';
+import CompanyService from '../../service/CompanyService';
 
 const EmployerNavbar = ({ isAuthenticated, userRole, onLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

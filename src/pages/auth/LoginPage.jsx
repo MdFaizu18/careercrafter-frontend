@@ -6,32 +6,26 @@ import AuthService from '../../service/AuthService';
 import { toast } from 'react-toastify';
 import AuthContext from '../../context/AuthProvider';
 
-const LoginPage = ({ onLogin }) => {
+const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const { setAuth } = useContext(AuthContext);
 
+  // Handle input changes
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: '',
-      });
-    }
   };
 
+  // Validate form data
   const handleSubmit = async e => {
     e.preventDefault();
     const authService = new AuthService();
@@ -52,12 +46,10 @@ const LoginPage = ({ onLogin }) => {
       let redirectTo;
 
       if (role === 'JOBSEEKER') {
-        // Allow if it's jobseeker route or default to dashboard
         redirectTo = fromPath?.startsWith('/jobseeker') ? fromPath : '/jobseeker/dashboard';
       } else if (role === 'EMPLOYER') {
         redirectTo = fromPath?.startsWith('/employer') ? fromPath : '/employer/dashboard';
       } else {
-        // Fallback for unexpected role
         redirectTo = '/';
       }
       navigate(redirectTo, { replace: true });
@@ -72,6 +64,8 @@ const LoginPage = ({ onLogin }) => {
       <Helmet>
         <title>Sign In for CareerCrafter</title>
       </Helmet>
+
+      {/* Login container  */}
       <div className="flex min-h-screen flex-col justify-center bg-gray-50 pt-0 pb-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -85,6 +79,7 @@ const LoginPage = ({ onLogin }) => {
           </p>
         </div>
 
+        {/* Login form  */}
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6">
@@ -104,10 +99,9 @@ const LoginPage = ({ onLogin }) => {
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+                    className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                 </div>
-                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
               </div>
 
               <div>
@@ -126,7 +120,7 @@ const LoginPage = ({ onLogin }) => {
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`w-full border px-4 py-2 ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
+                    className={`w-full rounded-md border border-gray-300 px-4 py-2 pl-10 focus:border-transparent focus:ring-2 focus:ring-purple-500 focus:outline-none`}
                   />
                   <button
                     type="button"
@@ -140,7 +134,6 @@ const LoginPage = ({ onLogin }) => {
                     )}
                   </button>
                 </div>
-                {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
               </div>
 
               <div>

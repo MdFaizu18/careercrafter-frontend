@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, DollarSign, Briefcase, BookmarkPlus, IndianRupee } from 'lucide-react';
+import { MapPin, Clock, Briefcase, BookmarkPlus, IndianRupee } from 'lucide-react';
 
 const JobCard = ({ job, showActions = true }) => {
   return (
@@ -7,15 +7,7 @@ const JobCard = ({ job, showActions = true }) => {
       <div className="flex items-start justify-between">
         <div className="flex items-start space-x-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-purple-100">
-            {job.companyLogo ? (
-              <img
-                src={job.companyLogo || '/placeholder.svg'}
-                alt={job.company}
-                className="h-10 w-10 object-contain"
-              />
-            ) : (
-              <Briefcase className="h-6 w-6 text-purple-600" />
-            )}
+            <Briefcase className="h-6 w-6 text-purple-600" />
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">{job.jobTitle}</h3>

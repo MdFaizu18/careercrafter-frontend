@@ -21,11 +21,12 @@ export default class EmployerProfileService {
     }
   }
 
-  async saveEmployerProfile() {
+  async saveEmployerProfile(profileData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/profile/save`, {
+      const response = await axios.post(`${API_BASE_URL}/profile/save`, profileData, {
         headers: {
           Authorization: `Bearer ${this.token}`,
+          'Content-Type': 'application/json',
         },
       });
       return response.data;

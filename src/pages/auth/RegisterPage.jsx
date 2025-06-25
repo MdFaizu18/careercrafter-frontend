@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Lock, CheckCircle, XCircle } from 'lucide-react';
@@ -20,13 +18,13 @@ const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Handle input changes
   const handleChange = e => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
       [name]: value,
     });
-    // Clear error when user types
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -35,6 +33,7 @@ const RegisterPage = () => {
     }
   };
 
+  // Validate form fields
   const validateForm = () => {
     const newErrors = {};
 
@@ -64,8 +63,14 @@ const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handle form submission
   const handleSubmit = async e => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      console.error('Form validation failed:', errors);
+      return;
+    }
 
     const authService = new AuthService();
     try {
@@ -137,6 +142,8 @@ const RegisterPage = () => {
       <Helmet>
         <title>Sign Up for CareerCrafter</title>
       </Helmet>
+
+      {/* Heading  */}
       <div className="flex min-h-screen flex-col justify-center bg-gray-50 py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -150,6 +157,7 @@ const RegisterPage = () => {
           </p>
         </div>
 
+        {/* Form Container */}
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white px-4 py-8 shadow sm:rounded-lg sm:px-10">
             <div className="mb-6">
@@ -179,6 +187,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
+            {/* Registration Form */}
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="name" className="mb-1 block text-sm font-medium text-gray-700">
@@ -292,6 +301,8 @@ const RegisterPage = () => {
                   </button>
                 </div>
               </div>
+
+              {/* submit button  */}
               <div>
                 <button
                   type="submit"

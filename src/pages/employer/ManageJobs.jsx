@@ -103,17 +103,6 @@ const ManageJobs = () => {
           >
             All Jobs ({filteredJobs.length})
           </button>
-
-          {/* <button
-            onClick={() => setStatusFilter('expired')}
-            className={`rounded-full px-6 py-2 text-sm font-medium transition-all duration-200 ${
-              statusFilter === 'expired'
-                ? 'bg-red-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 shadow-sm hover:shadow-md'
-            }`}
-          >
-            Expired ({jobs.filter(j => j.status === 'expired').length})
-          </button> */}
         </div>
 
         {/* Search and Filters */}
@@ -236,13 +225,6 @@ const ManageJobs = () => {
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center justify-end space-x-3">
-                          <Link
-                            to={`/employer/applications?job=${job.jobId}`}
-                            className="rounded-lg p-2 text-purple-600 transition-colors hover:bg-purple-100"
-                            title="View Applications"
-                          >
-                            <Eye className="h-5 w-5" />
-                          </Link>
                           <Link
                             to={`/employer/update-job/${job.jobId}`}
                             className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-100"

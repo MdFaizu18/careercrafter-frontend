@@ -8,8 +8,10 @@ const HomeOutlet = () => {
   return (
     <div>
       <ScrollToTop />
+      {/* Navbar for all pages  */}
       <LandingNavbar />
       <Outlet />
+      {/* Footer for all pages  */}
       <LandingFooter />
     </div>
   );

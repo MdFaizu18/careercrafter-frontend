@@ -20,9 +20,9 @@ export default class CompanyService {
       throw error;
     }
   }
-  async saveCompany() {
+  async saveCompany(companyData) {
     try {
-      const response = await axios.post(`${API_BASE_URL}/save`, {
+      const response = await axios.post(`${API_BASE_URL}/save`, companyData, {
         headers: {
           Authorization: `Bearer ${this.token}`,
         },

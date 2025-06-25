@@ -1,12 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Search,
-  Filter,
-  Eye,
-  MessageCircle,
-  X,
-  Calendar,
   Clock,
   CheckCircle,
   XCircle,
@@ -16,25 +10,68 @@ import {
   Briefcase,
   Target,
   Plus,
-  MapPin,
-  DollarSign,
+  Search,
+  Filter,
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import ApplicationService from '../../service/ApplicationService';
 import AuthContext from '../../context/AuthProvider';
+import { ApplicationCard } from '../../components/common/ApplicationCard';
+import { ApplicationDetailsModal } from '../../components/common/ApplicationDetailsModal';
+
+const STATUS_COLORS = {
+  pending: 'bg-blue-100 text-blue-700 border-blue-200',
+  shortlisted: 'bg-purple-100 text-purple-700 border-purple-200',
+  selected: 'bg-green-100 text-green-700 border-green-200',
+  rejected: 'bg-red-100 text-red-700 border-red-200',
+  default: 'bg-gray-100 text-gray-700 border-gray-200',
+};
+
+const STATUS_ICONS = {
+  pending: Clock,
+  shortlisted: Users,
+  selected: CheckCircle,
+  rejected: XCircle,
+  default: Clock,
+};
+
+const DATE_FORMAT_OPTIONS = {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+};
 
 const MyApplications = () => {
   const { auth } = useContext(AuthContext);
-  const applicationService = new ApplicationService(auth?.accessToken);
-
-  const [application, setApplication] = useState([]);
-
+  const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [viewMode, setViewMode] = useState('cards'); // cards or kanban
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [noteText, setNoteText] = useState('');
+  const [loading, setIsLoading] = useState(false);
+
+  const applicationService = new ApplicationService(auth?.accessToken);
+
+  const fetchRecentApplications = async () => {
+    setIsLoading(true);
+    try {
+      const response = await applicationService.getApplicationsForUser();
+      setApplications(response);
+      console.log('Recent Applications:', response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentApplications();
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
+  }, []);
 
   const handleSearch = e => {
     setSearchTerm(e.target.value);
@@ -44,25 +81,10 @@ const MyApplications = () => {
     setStatusFilter(e.target.value);
   };
 
-  useEffect(() => {
-    fetchRecentApplications();
-  }, []);
-
-  const fetchRecentApplications = async () => {
-    try {
-      const response = await applicationService.getApplicationsForUser();
-      console.log(response);
-      setApplication(response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const applications = [];
-
-  const filteredApplications = application.filter(app => {
+  const filteredApplications = applications.filter(app => {
     const matchesSearch =
-      app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.companyName.toLowerCase().includes(searchTerm.toLowerCase());
+      app.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.companyName?.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus =
       statusFilter === 'all' || app.status?.toLowerCase() === statusFilter.toLowerCase();
@@ -70,13 +92,67 @@ const MyApplications = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const totalApps = applications.length;
+  const shortlistedApps = applications.filter(app => app.status === 'SHORTLISTED').length;
+  const pendingApps = applications.filter(app => app.status === 'PENDING').length;
+  const responseRate =
+    totalApps > 0 ? Math.round(((totalApps - pendingApps) / totalApps) * 100) : 0;
+
+  const stats = [
+    {
+      title: 'Total Applications',
+      value: totalApps.toString(),
+      icon: <Briefcase className="h-6 w-6" />,
+      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
+      change: '+12%',
+    },
+    {
+      title: 'Active Interviews',
+      value: shortlistedApps,
+      icon: <Users className="h-6 w-6" />,
+      color: 'bg-gradient-to-r from-purple-500 to-purple-600',
+      change: '+25%',
+    },
+    {
+      title: 'Pending Offers',
+      value: pendingApps,
+      icon: <Target className="h-6 w-6" />,
+      color: 'bg-gradient-to-r from-green-500 to-green-600',
+      change: '+100%',
+    },
+    {
+      title: 'Response Rate',
+      value: `${responseRate}%`,
+      icon: <TrendingUp className="h-6 w-6" />,
+      color: 'bg-gradient-to-r from-orange-500 to-orange-600',
+      change: '+8%',
+    },
+  ];
+
+  const getStatusColor = status => {
+    return STATUS_COLORS[status?.toLowerCase()] || STATUS_COLORS.default;
+  };
+
+  const getStatusIcon = status => {
+    const IconComponent = STATUS_ICONS[status?.toLowerCase()] || STATUS_ICONS.default;
+    return <IconComponent className="h-4 w-4" />;
+  };
+
+  const formatDate = dateString => {
+    return new Date(dateString).toLocaleDateString(undefined, DATE_FORMAT_OPTIONS);
+  };
+
   const viewApplicationDetails = application => {
     setSelectedApplication(application);
-    setNoteText(application.notes);
+    setNoteText(application.notes || '');
   };
 
   const closeApplicationDetails = () => {
     setSelectedApplication(null);
+  };
+
+  const closeNoteModal = () => {
+    setShowNoteModal(false);
   };
 
   const saveNote = () => {
@@ -90,95 +166,18 @@ const MyApplications = () => {
       closeNoteModal();
     }
   };
-
-  const formatDate = dateString => {
-    const options = {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-
-  const getStatusColor = status => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'shortlisted':
-        return 'bg-purple-100 text-purple-700 border-purple-200';
-      case 'selected':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'rejected':
-        return 'bg-red-100 text-red-700 border-red-200';
-      case 'no response':
-        return 'bg-gray-100 text-gray-700 border-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
-  };
-
-  const getStatusIcon = status => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return <Clock className="h-4 w-4" />;
-      case 'shortlisted':
-        return <Users className="h-4 w-4" />;
-      case 'selected':
-        return <CheckCircle className="h-4 w-4" />;
-      case 'rejected':
-        return <XCircle className="h-4 w-4" />;
-      case 'no response':
-        return <AlertCircle className="h-4 w-4" />;
-      default:
-        return <Clock className="h-4 w-4" />;
-    }
-  };
-
-  const getUrgencyIndicator = urgency => {
-    switch (urgency) {
-      case 'high':
-        return 'bg-red-500';
-      case 'medium':
-        return 'bg-yellow-500';
-      case 'low':
-        return 'bg-green-500';
-      default:
-        return 'bg-gray-300';
-    }
-  };
-
-  const stats = [
-    {
-      title: 'Total Applications',
-      value: application.length.toString(),
-      icon: <Briefcase className="h-6 w-6" />,
-      color: 'bg-gradient-to-r from-blue-500 to-blue-600',
-      change: '+12%',
-    },
-    {
-      title: 'Active Interviews',
-      value: application.filter(app => app.status === 'SHORTLISTED').length,
-      icon: <Users className="h-6 w-6" />,
-      color: 'bg-gradient-to-r from-purple-500 to-purple-600',
-      change: '+25%',
-    },
-    {
-      title: 'Pending Offers',
-      value: application.filter(app => app.status === 'PENDING').length,
-      icon: <Target className="h-6 w-6" />,
-      color: 'bg-gradient-to-r from-green-500 to-green-600',
-      change: '+100%',
-    },
-    {
-      title: 'Response Rate',
-      value: `${Math.round(((application.length - application.filter(app => app.status === 'PENDING').length) / application.length) * 100)}%`,
-      icon: <TrendingUp className="h-6 w-6" />,
-      color: 'bg-gradient-to-r from-orange-500 to-orange-600',
-      change: '+8%',
-    },
-  ];
+  if (loading) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center bg-gray-50">
+        <div className="flex items-center justify-center">
+          <div className="h-16 w-16 animate-spin rounded-full border-t-4 border-b-4 border-blue-500"></div>
+        </div>
+        <p className="mt-4 animate-pulse text-lg font-medium text-gray-700">
+          Loading, please wait...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -254,339 +253,65 @@ const MyApplications = () => {
                   <option value="SHORTLISTED">Shortlisted</option>
                   <option value="SELECTED">Selected</option>
                   <option value="REJECTED">Rejected</option>
-                  <option value="no response">No Response</option>
                 </select>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setViewMode('cards')}
-                className={`rounded-lg px-4 py-2 transition-colors duration-200 ${
-                  viewMode === 'cards'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Cards
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Applications Display */}
-        {viewMode === 'cards' ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {filteredApplications.length > 0 ? (
-              filteredApplications.map(application => (
-                <div
-                  key={application.id}
-                  className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all duration-300 hover:border-purple-200 hover:shadow-lg"
-                >
-                  {/* Urgency Indicator */}
-                  <div
-                    className={`absolute top-0 left-0 h-full w-1 ${getUrgencyIndicator(application.urgency)}`}
-                  />
-
-                  {/* Header */}
-                  <div className="mb-4 flex items-start justify-between">
-                    <div className="flex items-start gap-4">
-                      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50">
-                        {application.companyLogo ? (
-                          <img
-                            src={application.companyLogo || '/placeholder.svg'}
-                            alt={application.company}
-                            className="h-8 w-8 rounded-lg object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm font-bold text-purple-600">
-                            {application?.companyName.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="mb-1 truncate text-lg font-semibold text-gray-900">
-                          {application?.jobTitle}
-                        </h3>
-                        <p className="mb-1 font-medium text-gray-600">{application.company}</p>
-                        <div className="flex items-center gap-3 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            {application.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <DollarSign className="h-3 w-3" />
-                            {application.salary}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium ${getStatusColor(application.status)}`}
-                      >
-                        {getStatusIcon(application.status)}
-                        {application.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Progress Section */}
-                  <div className="mb-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Progress</span>
-                      <span className="text-sm font-semibold text-gray-900">
-                        {application.progress}%
-                      </span>
-                    </div>
-                    <div className="h-2 w-full rounded-full bg-gray-100">
-                      <div
-                        className="h-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
-                        style={{ width: `${application.progress}%` }}
-                      />
-                    </div>
-                    <p className="mt-2 text-sm text-gray-600">{application.nextStep}</p>
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {application.appliedDate}
-                      </span>
-                      {application.interviews.length > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          {application.interviews.length} interview(s)
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => viewApplicationDetails(application)}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-purple-600 transition-colors hover:bg-purple-50"
-                      >
-                        <Eye className="h-4 w-4" />
-                        Details
-                      </button>
-                      {/* <button
-                        onClick={() => {
-                          setSelectedApplication(application);
-                          openNoteModal();
-                        }}
-                        className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                        Note
-                      </button> */}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full rounded-2xl bg-white p-12 text-center shadow-sm">
-                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-50 to-indigo-50">
-                  <Briefcase className="h-10 w-10 text-purple-600" />
-                </div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">No applications found</h3>
-                <p className="mx-auto mb-6 max-w-md text-gray-600">
-                  {searchTerm || statusFilter !== 'all'
-                    ? 'Try adjusting your search or filter criteria.'
-                    : 'Start your job search journey by applying to positions that match your skills.'}
-                </p>
-                <Link
-                  to="/jobseeker/find-jobs"
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg"
-                >
-                  <Plus className="h-5 w-5" />
-                  Find Jobs
-                </Link>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {filteredApplications.length > 0 ? (
+            filteredApplications.map(application => (
+              <ApplicationCard
+                key={application.id}
+                application={application}
+                getStatusColor={getStatusColor}
+                getStatusIcon={getStatusIcon}
+                viewApplicationDetails={viewApplicationDetails}
+              />
+            ))
+          ) : (
+            <div className="col-span-full rounded-2xl bg-white p-12 text-center shadow-sm">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-purple-50 to-indigo-50">
+                <Briefcase className="h-10 w-10 text-purple-600" />
               </div>
-            )}
-          </div>
-        ) : (
-          // Kanban Board View
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-5"></div>
-        )}
+              <h3 className="mb-2 text-xl font-semibold text-gray-900">No applications found</h3>
+              <p className="mx-auto mb-6 max-w-md text-gray-600">
+                {searchTerm || statusFilter !== 'all'
+                  ? 'Try adjusting your search or filter criteria.'
+                  : 'Start your job search journey by applying to positions that match your skills.'}
+              </p>
+              <Link
+                to="/jobseeker/find-jobs"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                Find Jobs
+              </Link>
+            </div>
+          )}
+        </div>
 
         {/* Application Details Modal */}
         {selectedApplication && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
-              <div className="p-8">
-                <div className="mb-8 flex items-start justify-between">
-                  <div>
-                    <h2 className="mb-2 text-3xl font-bold text-gray-900">
-                      {selectedApplication.position}
-                    </h2>
-                    <p className="text-xl text-gray-600">
-                      {selectedApplication.company} • {selectedApplication.location}
-                    </p>
-                    <p className="mt-1 text-lg font-semibold text-green-600">
-                      {selectedApplication.salary}
-                    </p>
-                  </div>
-                  <button
-                    onClick={closeApplicationDetails}
-                    className="rounded-lg p-2 text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-600"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
-                        Applied Date
-                      </h3>
-                      <p className="mt-1 text-lg text-gray-900">
-                        {selectedApplication.appliedDate}
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
-                        Status
-                      </h3>
-                      <span
-                        className={`mt-1 inline-flex items-center space-x-2 rounded-full border px-3 py-1 text-sm font-medium ${getStatusColor(selectedApplication.status)}`}
-                      >
-                        {getStatusIcon(selectedApplication.status)}
-                        <span>{selectedApplication.status}</span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {/* <div>
-                      <h3 className="text-sm font-medium tracking-wide text-gray-500 uppercase">
-                        Progress
-                      </h3>
-                      <div className="mt-2">
-                        <div className="mb-1 flex items-center justify-between">
-                          <span className="text-lg font-medium text-gray-900">
-                            {selectedApplication.progress}%
-                          </span>
-                        </div>
-                        <div className="h-3 w-full rounded-full bg-gray-200">
-                          <div
-                            className="h-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-300"
-                            style={{ width: `${selectedApplication.progress}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div> */}
-                    <div></div>
-                  </div>
-                </div>
-
-                <div className="mb-8"></div>
-
-                {selectedApplication.interviews.length > 0 && (
-                  <div className="mb-8">
-                    <h3 className="mb-6 text-xl font-bold text-gray-900">Interview Timeline</h3>
-                    <div className="space-y-6">
-                      {selectedApplication.interviews.map((interview, index) => (
-                        <div key={index} className="relative">
-                          {index !== selectedApplication.interviews.length - 1 && (
-                            <div className="absolute top-12 left-6 h-16 w-0.5 bg-gray-200"></div>
-                          )}
-                          <div className="flex items-start space-x-4">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 font-bold text-white">
-                              {index + 1}
-                            </div>
-                            <div className="flex-1 rounded-xl bg-gray-50 p-6">
-                              <div className="mb-3 flex items-start justify-between">
-                                <h4 className="text-lg font-bold text-gray-900">
-                                  {interview.mode}
-                                </h4>
-                                <span className="rounded-full bg-white px-3 py-1 text-sm text-gray-500">
-                                  {formatDate(interview.interviewDateTime)}
-                                </span>
-                              </div>
-                              <p className="mb-3 text-gray-600">
-                                <span className="font-medium">With:</span>{' '}
-                                {interview.interviewerNames}
-                              </p>
-                              {interview.notes && (
-                                <div>
-                                  <h5 className="mb-2 text-sm font-medium tracking-wide text-gray-500 uppercase">
-                                    Notes
-                                  </h5>
-                                  <p className="text-gray-700">{interview.notes}</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex justify-end space-x-4">
-                  <button
-                    onClick={closeApplicationDetails}
-                    className="rounded-lg border border-gray-300 px-6 py-3 text-gray-700 transition-colors duration-200 hover:bg-gray-50"
-                  >
-                    Close
-                  </button>
-                  <Link
-                    to={`/job-seeker/job/${selectedApplication.id}`}
-                    className="flex items-center space-x-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg"
-                  >
-                    <Eye className="h-5 w-5" />
-                    <span>View Job Posting</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ApplicationDetailsModal
+            selectedApplication={selectedApplication}
+            closeApplicationDetails={closeApplicationDetails}
+            getStatusColor={getStatusColor}
+            getStatusIcon={getStatusIcon}
+            formatDate={formatDate}
+          />
         )}
 
         {/* Note Modal */}
         {showNoteModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
-              <div className="p-8">
-                <div className="mb-6 flex items-start justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {selectedApplication?.notes ? 'Edit Note' : 'Add Note'}
-                  </h2>
-                  <button
-                    onClick={closeNoteModal}
-                    className="rounded-lg p-2 text-gray-400 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-600"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                <div className="mb-6">
-                  <textarea
-                    value={noteText}
-                    onChange={e => setNoteText(e.target.value)}
-                    rows="6"
-                    className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 transition-all duration-200 focus:border-transparent focus:ring-2 focus:ring-purple-500"
-                    placeholder="Add notes about this application, interviews, follow-ups, or any other relevant information..."
-                  ></textarea>
-                </div>
-
-                <div className="flex justify-end space-x-4">
-                  <button
-                    onClick={closeNoteModal}
-                    className="rounded-lg border border-gray-300 px-6 py-3 text-gray-700 transition-colors duration-200 hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={saveNote}
-                    className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-3 font-medium text-white transition-all duration-200 hover:shadow-lg"
-                  >
-                    Save Note
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <NoteModal
+            selectedApplication={selectedApplication}
+            noteText={noteText}
+            setNoteText={setNoteText}
+            closeNoteModal={closeNoteModal}
+            saveNote={saveNote}
+          />
         )}
       </div>
     </div>

@@ -1,7 +1,5 @@
-'use client';
-
 import { useContext, useEffect, useState } from 'react';
-import { useSearchParams, Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   MapPin,
@@ -11,14 +9,11 @@ import {
   Calendar,
   Mail,
   Phone,
-  Download,
-  Eye,
   CheckCircle,
   XCircle,
   AlertCircle,
   Filter,
   Search,
-  MoreHorizontal,
 } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';
 import JobService from '../../service/JobService';
@@ -28,7 +23,6 @@ const JobApplications = () => {
   const { auth } = useContext(AuthContext);
   const jobService = new JobService(auth?.accessToken);
   const applicationService = new ApplicationService(auth?.accessToken);
-  const [searchParams] = useSearchParams();
   const { id } = useParams();
 
   const [job, setJob] = useState(null);
@@ -105,7 +99,7 @@ const JobApplications = () => {
         return 'bg-green-100 text-green-800';
       case 'rejected':
         return 'bg-red-100 text-red-800';
-      case 'hired':
+      case 'selected':
         return 'bg-purple-100 text-purple-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -121,7 +115,7 @@ const JobApplications = () => {
         return <CheckCircle className="h-4 w-4" />;
       case 'rejected':
         return <XCircle className="h-4 w-4" />;
-      case 'hired':
+      case 'selected':
         return <CheckCircle className="h-4 w-4" />;
       default:
         return <AlertCircle className="h-4 w-4" />;
@@ -292,11 +286,10 @@ const JobApplications = () => {
                   className="w-full rounded-xl border border-gray-200 py-4 pr-4 pl-12 outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="reviewed">Reviewed</option>
-                  <option value="shortlisted">Shortlisted</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="hired">Hired</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="SHORTLISTED">Shortlisted</option>
+                  <option value="REJECTED">Rejected</option>
+                  <option value="SELECTED">Hired</option>
                 </select>
               </div>
             </div>
@@ -326,9 +319,6 @@ const JobApplications = () => {
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold tracking-wider text-gray-600 uppercase">
                     Applied
-                  </th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold tracking-wider text-gray-600 uppercase">
-                    Actions
                   </th>
                 </tr>
               </thead>
@@ -380,52 +370,6 @@ const JobApplications = () => {
                       </td>
                       <td className="px-6 py-6 text-sm text-gray-500">
                         {formatDate(application.appliedAt)}
-                      </td>
-                      <td className="px-6 py-6">
-                        <div className="flex items-center justify-end space-x-2">
-                          {application.resumeUrl && (
-                            <button
-                              onClick={() =>
-                                downloadResume(
-                                  application.applicationId,
-                                  `${application.fullName}_resume.pdf`
-                                )
-                              }
-                              className="rounded-lg p-2 text-blue-600 transition-colors hover:bg-blue-100"
-                              title="Download Resume"
-                            >
-                              <Download className="h-4 w-4" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              setSelectedApplication(application);
-                              setShowStatusModal(true);
-                            }}
-                            className="rounded-lg p-2 text-purple-600 transition-colors hover:bg-purple-100"
-                            title="Update Status"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <div className="group relative">
-                            <button className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </button>
-                            <div className="ring-opacity-5 absolute right-0 z-10 mt-2 hidden w-48 rounded-xl bg-white shadow-lg ring-1 ring-black group-hover:block">
-                              <div className="py-2">
-                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                  View Profile
-                                </button>
-                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                  Schedule Interview
-                                </button>
-                                <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                  Send Message
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
                       </td>
                     </tr>
                   ))
