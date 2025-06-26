@@ -58,8 +58,17 @@ const PostJob = () => {
     applicationEmail: '',
     requirements: [''],
     responsibility: [''],
-    companyId: company?.companyId || 0,
+    companyId:  0,
   });
+
+useEffect(() => {
+  if (company?.companyId) {
+    setFormData(prev => ({
+      ...prev,
+      companyId: company.companyId,
+    }));
+  }
+}, [company]);
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);

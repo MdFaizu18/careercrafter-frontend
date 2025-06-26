@@ -223,7 +223,7 @@ const DashboardEmployer = () => {
                         {application.status}
                       </span>
                       <Link
-                        to={`/employer/applications/${application.applicationId}`}
+                        to={`/employer/applications/${application.jobId}`}
                         className="rounded-lg bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-gray-200"
                       >
                         View

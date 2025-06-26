@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Edit, Trash2, Eye, Plus, Search, Filter, MoreHorizontal } from 'lucide-react';
 import AuthContext from '../../context/AuthProvider';
 import JobService from '../../service/JobService';
+import { toast } from 'react-toastify';
 
 const ManageJobs = () => {
   const { auth } = useContext(AuthContext);
@@ -56,9 +57,17 @@ const ManageJobs = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const confirmDelete = jobId => {
-    setJobToDelete(jobId);
-    setShowDeleteModal(true);
+  const confirmDelete = async(jobId) => {
+  try {
+    await jobService.deleteJob(jobId);
+    setJobs(jobs.filter(job => job.jobId !== jobId));
+    setShowDeleteModal(false);
+    toast.success('Job details fetched successfully. Ready to delete.');
+  } catch (error) {
+    
+    console.error('Failed to fetch job details:', error);
+    toast.error('Failed to fetch job details. Please try again later.');
+  }
   };
 
   const deleteJob = () => {
